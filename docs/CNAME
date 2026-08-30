@@ -1,0 +1,19 @@
+# discomplemented.com
+
+## Domain Configuration
+- **Production URL:** https://discomplemented.com
+- **Staging URL:** https://bicameral-staging.workers.dev
+- **DNS Provider:** Cloudflare (nameservers)
+- **Hosting:** Cloudflare Workers
+
+## Setup Instructions
+See `docs/dns-setup.md` for complete DNS configuration guide.
+
+## Quick Start
+```bash
+# After purchasing/transfering domain to Cloudflare:
+wrangler deploy --env production
+
+# Custom domain will be automatically configured on first deploy.
+# Verify with: curl -I https://discomplemented.com/api/health
+```

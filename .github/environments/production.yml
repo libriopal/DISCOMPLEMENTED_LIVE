@@ -1,0 +1,24 @@
+# Environment: Production
+# Used for production deployments from main branch
+
+name: Production
+
+# Branches that can deploy to this environment
+branches:
+  - main
+
+# Required reviewers for production deployments (add team members later)
+required_reviewers:
+  - libriopal
+
+# Environment variables (non-secret)
+variables:
+  APP_URL: https://bicameral.workers.dev
+
+# Secrets are configured via GitHub UI:
+# CLOUDFLARE_API_TOKEN — Cloudflare API token for deploying Workers
+# CLOUDFLARE_ACCOUNT_ID — Cloudflare account ID
+# COHERE_API_KEY — Cohere API key (platform-provided)
+# STRIPE_SECRET_KEY — Stripe API secret key
+# STRIPE_WEBHOOK_SECRET — Stripe webhook signing secret
+# BETTER_AUTH_SECRET — Better Auth session signing secret

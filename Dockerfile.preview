@@ -1,0 +1,12 @@
+# Placeholder image for the Tier 3 preview Sandbox container binding
+# (see wrangler.toml [[containers]], durable-objects/Sandbox).
+#
+# This is a stand-in so `wrangler dev`/`deploy` can resolve the
+# [[containers]] binding before Phase 6 builds the real sandbox image
+# (Node.js + Vite dev server, used by the Coder agent's error feedback
+# loop). See @agent_docs/preview-tiers.md.
+FROM node:22-slim
+
+WORKDIR /sandbox
+
+CMD ["sleep", "infinity"]

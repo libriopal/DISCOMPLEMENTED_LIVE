@@ -1,0 +1,10 @@
+# Environment: Staging
+# Used for pre-production testing from develop branch
+
+name: Staging
+
+# Branches that can deploy to this environment
+branches:
+  - develop
+
+# Secrets are configured via GitHub UI (not listed here for security)

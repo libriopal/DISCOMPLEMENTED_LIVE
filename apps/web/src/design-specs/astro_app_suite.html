@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AstroApp - AI Prompt to Application Suite</title>
+    <style>
+        :root {
+            /* Scorpio Dark Theme Spectrum */
+            --scorpio-bg: #0A070A;
+            --scorpio-surface: #140E14;
+            --scorpio-surface-muted: #1D151E;
+            --scorpio-border: #2C182D;
+            --scorpio-text: #E5DCE5;
+            --scorpio-text-muted: #8E7A90;
+            --scorpio-scarlet: #E61934;
+            --scorpio-crimson: #9B111E;
+            --scorpio-amethyst: #6F35A2;
+            --scorpio-glow: rgba(230, 25, 52, 0.15);
+
+            /* Libra Light Theme Spectrum */
+            --libra-bg: #FAFAF9;
+            --libra-surface: #FFFFFF;
+            --libra-surface-muted: #F3F1EF;
+            --libra-border: #E6DFE4;
+            --libra-text: #2C262B;
+            --libra-text-muted: #736774;
+            --libra-serenity: #5B84C4;
+            --libra-rose: #EAA8B6;
+            --libra-lavender: #9A75D8;
+            --libra-glow: rgba(91, 132, 196, 0.12);
+
+            --radius: 12px;
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font);
+            background: #110E12;
+            color: #E5DCE5;
+            overflow-x: hidden;
+            padding: 24px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto 32px auto;
+            background: #181319;
+            padding: 20px 32px;
+            border-radius: var(--radius);
+            border: 1px solid #261E28;
+        }
+
+        .brand h1 {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--scorpio-scarlet), var(--libra-serenity));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand p {
+            font-size: 12px;
+            color: #8E7A90;
+            margin-top: 2px;
+        }
+
+        .badge {
+            background: #251B27;
+            border: 1px solid #3A2A3D;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            color: #D3C3D5;
+            font-weight: 500;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* App Window Styling */
+        .app-window {
+            border-radius: var(--radius);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 820px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            transition: transform 0.3s ease;
+        }
+
+        .app-window:hover {
+            transform: translateY(-4px);
+        }
+
+        /* Scorpio Container Mechanics */
+        .scorpio-window {
+            background: var(--scorpio-bg);
+            color: var(--scorpio-text);
+            border: 1px solid var(--scorpio-border);
+            box-shadow: 0 0 40px var(--scorpio-glow);
+        }
+
+        /* Libra Container Mechanics */
+        .libra-window {
+            background: var(--libra-bg);
+            color: var(--libra-text);
+            border: 1px solid var(--libra-border);
+            box-shadow: 0 0 40px var(--libra-glow);
+        }
+
+        /* Global App Bar */
+        .app-bar {
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .scorpio-window .app-bar {
+            background: var(--scorpio-surface);
+            border-bottom: 1px solid var(--scorpio-border);
+        }
+        .libra-window .app-bar {
+            background: var(--libra-surface);
+            border-bottom: 1px solid var(--libra-border);
+        }
+
+        .dots {
+            display: flex;
+            gap: 6px;
+        }
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        .scorpio-window .dot { background: #3C1F3E; }
+        .libra-window .dot { background: #D5CBD2; }
+        .scorpio-window .dot.active { background: var(--scorpio-scarlet); }
+        .libra-window .dot.active { background: var(--libra-serenity); }
+
+        /* Workspace Grid */
+        .workspace {
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Generation Prompt Header */
+        .prompt-header {
+            padding: 24px;
+        }
+        .scorpio-window .prompt-header { background: var(--scorpio-surface-muted); border-bottom: 1px solid var(--scorpio-border); }
+        .libra-window .prompt-header { background: var(--libra-surface-muted); border-bottom: 1px solid var(--libra-border); }
+
+        .label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .scorpio-window .label { color: var(--scorpio-scarlet); }
+        .libra-window .label { color: var(--libra-serenity); }
+
+        .prompt-box {
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: monospace;
+        }
+        .scorpio-window .prompt-box { background: var(--scorpio-bg); border: 1px solid var(--scorpio-border); color: #D5BCD7; }
+        .libra-window .prompt-box { background: var(--libra-surface); border: 1px solid var(--libra-border); color: #4E4250; }
+
+        /* Split Code Preview & App UI Output */
+        .stage-split {
+            display: grid;
+            grid-template-columns: 1fr;
+            grid-template-rows: 1fr 1fr;
+            overflow: hidden;
+        }
+
+        /* IDE Syntax Panel */
+        .ide-panel {
+            padding: 20px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            overflow-y: auto;
+            border-bottom: 1px solid transparent;
+        }
+        .scorpio-window .ide-panel { background: var(--scorpio-surface); border-color: var(--scorpio-border); }
+        .libra-window .ide-panel { background: var(--libra-surface); border-color: var(--libra-border); }
+
+        /* Scorpio Syntax Mapping */
+        .sc-kw { color: var(--scorpio-scarlet); font-weight: bold; }
+        .sc-fn { color: #FFA3B1; }
+        .sc-str { color: #B386DF; }
+        .sc-var { color: var(--scorpio-text); }
+        .sc-cm { color: #5C485D; font-style: italic; }
+
+        /* Libra Syntax Mapping */
+        .lb-kw { color: var(--libra-serenity); font-weight: bold; }
+        .lb-fn { color: var(--libra-lavender); }
+        .lb-str { color: var(--libra-rose); }
+        .lb-var { color: var(--libra-text); }
+        .lb-cm { color: #A397A5; font-style: italic; }
+
+        /* Live Application Preview Screen */
+        .app-preview {
+            padding: 24px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .scorpio-window .app-preview { background: var(--scorpio-bg); }
+        .libra-window .app-preview { background: var(--libra-bg); }
+
+        /* Live Generated Components */
+        .card {
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid transparent;
+        }
+        .scorpio-window .card { background: var(--scorpio-surface); border-color: var(--scorpio-border); }
+        .libra-window .card { background: var(--libra-surface); border-color: var(--libra-border); box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
+
+        .btn {
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            display: inline-block;
+            text-align: center;
+        }
+        .scorpio-window .btn-primary { background: var(--scorpio-scarlet); color: white; }
+        .scorpio-window .btn-secondary { background: var(--scorpio-surface-muted); color: var(--scorpio-text); border: 1px solid var(--scorpio-border); }
+        .libra-window .btn-primary { background: var(--libra-serenity); color: white; }
+        .libra-window .btn-secondary { background: var(--libra-surface-muted); color: var(--libra-text); border: 1px solid var(--libra-border); }
+
+        .input-field {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            border: 1px solid transparent;
+            outline: none;
+            margin-top: 6px;
+        }
+        .scorpio-window .input-field { background: var(--scorpio-surface-muted); border-color: var(--scorpio-border); color: white; }
+        .libra-window .input-field { background: var(--libra-surface-muted); border-color: var(--libra-border); color: var(--libra-text); }
+
+        /* Meta Palette Drawer */
+        .meta-drawer {
+            padding: 16px 24px;
+            font-size: 12px;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+            border-top: 1px solid transparent;
+        }
+        .scorpio-window .meta-drawer { background: var(--scorpio-surface); border-color: var(--scorpio-border); }
+        .libra-window .meta-drawer { background: var(--libra-surface); border-color: var(--libra-border); }
+
+        .swatch-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .swatch {
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand">
+            <h1>AstroApp UI</h1>
+            <p>Astrological Spectrum Prompt-to-Application Engine</p>
+        </div>
+        <div class="badge">V3.0 Generation Coherent Pipeline</div>
+    </header>
+
+    <div class="dashboard">
+        
+        <!-- SCORPIO DARK APP NODE -->
+        <div class="app-window scorpio-window">
+            <div class="app-bar">
+                <div class="dots">
+                    <div class="dot active"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+                <div>scorpio_dark_core.app</div>
+                <div style="opacity: 0.6;">Dark Mode Engine</div>
+            </div>
+            
+            <div class="workspace">
+                <div class="prompt-header">
+                    <span class="label">System Input Prompt</span>
+                    <div class="prompt-box">/generate secure financial analytics dashboard utilizing intense, high-contrast night aesthetics and high-risk action indicators.</div>
+                </div>
+                
+                <div class="stage-split">
+                    <!-- IDE Syntax Screen -->
+                    <div class="ide-panel">
+                        <span class="sc-cm">// Scorpio Core Syntax Mapping</span><br>
+                        <span class="sc-kw">const</span> <span class="sc-var">initializeMetrics</span> = (<span class="sc-var">node</span>) =&gt; {<br>
+                        &nbsp;&nbsp;<span class="sc-kw">let</span> <span class="sc-var">threatLevel</span> = <span class="sc-str">"critical"</span>;<br>
+                        &nbsp;&nbsp;<span class="sc-kw">return</span> <span class="sc-var">node</span>.<span class="sc-fn">dispatchAlert</span>({ <span class="sc-var">status</span>: <span class="sc-var">threatLevel</span>, <span class="sc-var">code</span>: <span class="sc-str">'#E61934'</span> });<br>
+                        };
+                    </div>
+                    
+                    <!-- Live Output Screen -->
+                    <div class="app-preview">
+                        <div class="card">
+                            <h3 style="font-size:16px; margin-bottom:4px; color:#FFF;">Threat Assessment Portal</h3>
+                            <p style="font-size:12px; color:var(--scorpio-text-muted); margin-bottom:12px;">Realtime backend anomaly listener</p>
+                            
+                            <label style="font-size:11px; display:block; color:var(--scorpio-text);">System Override Key</label>
+                            <input type="text" class="input-field" value="0x7F99A2_SCORPIO_CORE" readonly>
+                            
+                            <div style="margin-top:16px; display:flex; gap:10px;">
+                                <button class="btn btn-primary">Purge Node</button>
+                                <button class="btn btn-secondary">Ignore</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="meta-drawer">
+                    <span style="color: var(--scorpio-text-muted)">Spectrum Keys:</span>
+                    <div class="swatch-group"><div class="swatch" style="background:#0A070A;"></div> <span>#0A070A</span></div>
+                    <div class="swatch-group"><div class="swatch" style="background:#140E14;"></div> <span>#140E14</span></div>
+                    <div class="swatch-group"><div class="swatch" style="background:#E61934;"></div> <span style="color:var(--scorpio-scarlet)">#E61934</span></div>
+                    <div class="swatch-group"><div class="swatch" style="background:#6F35A2;"></div> <span>#6F35A2</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- LIBRA LIGHT APP NODE -->
+        <div class="app-window libra-window">
+            <div class="app-bar">
+                <div class="dots">
+                    <div class="dot active"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+                <div>libra_light_harmony.app</div>
+                <div style="opacity: 0.6;">Light Mode Engine</div>
+            </div>
+            
+            <div class="workspace">
+                <div class="prompt-header">
+                    <span class="label">System Input Prompt</span>
+                    <div class="prompt-box">/generate collaborative calendar planner using symmetrical design layouts, air elements, and calming pastel typography nodes.</div>
+                </div>
+                
+                <div class="stage-split">
+                    <!-- IDE Syntax Screen -->
+                    <div class="ide-panel">
+                        <span class="lb-cm">// Libra Core Syntax Mapping</span><br>
+                        <span class="lb-kw">import</span> { <span class="lb-var">balance</span> } <span class="lb-kw">from</span> <span class="lb-str">'astral-geometry'</span>;<br>
+                        <span class="lb-kw">function</span> <span class="lb-fn">renderWorkspace</span>(<span class="lb-var">view</span>) {<br>
+                        &nbsp;&nbsp;<span class="lb-kw">return</span> <span class="lb-var">view</span>.<span class="lb-fn">symmetricalSplit</span>({ <span class="lb-var">primary</span>: <span class="lb-str">'#5B84C4'</span>, <span class="lb-var">secondary</span>: <span class="lb-str">'#EAA8B6'</span> });<br>
+                        }
+                    </div>
+                    
+                    <!-- Live Output Screen -->
+                    <div class="app-preview">
+                        <div class="card">
+                            <h3 style="font-size:16px; margin-bottom:4px; color:var(--libra-text);">Team Alignment Calendar</h3>
+                            <p style="font-size:12px; color:var(--libra-text-muted); margin-bottom:12px;">Equilibrium scheduler node</p>
+                            
+                            <label style="font-size:11px; display:block; color:var(--libra-text);">Next Synced Milestone</label>
+                            <input type="text" class="input-field" value="Design Symmetry Review - 14:00 UTC" readonly>
+                            
+                            <div style="margin-top:16px; display:flex; gap:10px;">
+                                <button class="btn btn-primary">Accept Plan</button>
+                                <button class="btn btn-secondary">Reschedule</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="meta-drawer">
+                    <span style="color: var(--libra-text-muted)">Spectrum Keys:</span>
+                    <div class="swatch-group"><div class="swatch" style="background:#FAFAF9;"></div> <span>#FAFAF9</span></div>
+                    <div class="swatch-group"><div class="swatch" style="background:#FFFFFF;"></div> <span>#FFFFFF</span></div>
+                    <div class="swatch-group"><div class="swatch" style="background:#5B84C4;"></div> <span style="color:var(--libra-serenity)">#5B84C4</span></div>
+                    <div class="swatch-group"><div class="swatch" style="background:#EAA8B6;"></div> <span>#EAA8B6</span></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

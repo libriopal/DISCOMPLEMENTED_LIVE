@@ -1,0 +1,49 @@
+name-template: 'v$RESOLVED_VERSION'
+tag-template: 'v$RESOLVED_VERSION'
+template: |
+  # Bicameral Release $RESOLVED_VERSION
+
+  ## Changes
+
+  $CHANGES
+
+  ## Contributors
+
+  $CONTRIBUTORS
+
+categories:
+  - title: '🚀 Features'
+    labels:
+      - 'feature'
+      - 'enhancement'
+  - title: '🐛 Bug Fixes'
+    labels:
+      - 'bug'
+      - 'fix'
+  - title: '🔒 Security'
+    labels:
+      - 'security'
+  - title: '📚 Documentation'
+    labels:
+      - 'documentation'
+  - title: '🤖 Cohere'
+    labels:
+      - 'cohere'
+  - title: '☁️ Cloudflare'
+    labels:
+      - 'cloudflare'
+  - title: '🧠 Memory Lattice'
+    labels:
+      - 'lattice'
+  - title: '⚖️ Governance'
+    labels:
+      - 'governance'
+  - title: '🔄 CI/CD'
+    labels:
+      - 'dependencies'
+      - 'automated'
+
+exclude-labels:
+  - 'skip-changelog'
+
+change-template: '- $TITLE @$AUTHOR (#$NUMBER)'

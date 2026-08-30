@@ -1,0 +1,458 @@
+<div data-name="component-library-spec" style="min-width: 1440px; min-height: 4200px; background-color: #ffffff; padding: 56px 64px; box-sizing: border-box; font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; color: #000000;">
+<style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Space+Grotesk:wght@400;500&family=Fira+Code:wght@400;500&display=swap');</style>
+
+<!-- HEADER -->
+<div data-name="header" style="display: flex; flex-direction: column; gap: 16px; padding-bottom: 40px; border-bottom: 1px solid #d9d9dd;">
+<div style="display: flex; align-items: center; gap: 12px;">
+<div style="display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; background-color: #17171c; border-radius: 8px;">
+<img src="https://api.iconify.design/mdi/view-grid-outline.svg?color=%23ffffff" style="width: 16px; height: 16px;" />
+</div>
+<span style="font-family: 'Fira Code', monospace; font-size: 11px; letter-spacing: 0.28px; text-transform: uppercase; color: #93939f;">Bicameral · View 04 / 06 · Component Library</span>
+</div>
+<div style="font-family: 'Space Grotesk', sans-serif; font-size: 60px; font-weight: 400; letter-spacing: -1.2px; line-height: 1.0; color: #000000;">Component Library Spec<br/>Core Components</div>
+<div style="font-size: 18px; line-height: 1.4; color: #93939f; max-width: 900px;">Every production-ready component with live variant swatches, exhaustive state matrices, keyboard & ARIA behavior, responsive rules, and React + Tailwind + Framer Motion implementation notes. Each maps to Tier-3 component tokens from View 03.</div>
+</div>
+
+<!-- ============ 01 BUTTONS ============ -->
+<div data-name="c-buttons" style="padding-top: 40px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; letter-spacing: 0.28px; text-transform: uppercase; color: #93939f; padding-bottom: 12px;">01 — Buttons</div>
+<div style="font-family: 'Space Grotesk', sans-serif; font-size: 32px; letter-spacing: -0.32px; color: #000000; padding-bottom: 24px;">Actions & Triggers</div>
+
+<div style="display: flex; gap: 28px;">
+<!-- live variants -->
+<div style="flex: 1.6; border: 1px solid #f2f2f2; border-radius: 22px; padding: 32px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; color: #93939f; text-transform: uppercase; padding-bottom: 20px;">Variants</div>
+<div style="display: flex; flex-direction: column; gap: 24px;">
+
+<div style="display: flex; align-items: center; gap: 16px;">
+<div style="display: inline-flex; align-items: center; justify-content: center; padding: 10px 20px; background-color: #17171c; color: #ffffff; border-radius: 9999px; font-size: 14px; font-weight: 500;">Primary</div>
+<div style="display: inline-flex; align-items: center; justify-content: center; padding: 10px 20px; background-color: #1863dc; color: #ffffff; border-radius: 9999px; font-size: 14px; font-weight: 500;">Primary · Hover</div>
+<div style="display: inline-flex; align-items: center; justify-content: center; padding: 10px 20px; background-color: #17171c; color: #ffffff; border-radius: 9999px; font-size: 14px; font-weight: 500; box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #4c6ee6;">Focus ring</div>
+<div style="display: inline-flex; align-items: center; justify-content: center; padding: 10px 20px; background-color: #d9d9dd; color: #93939f; border-radius: 9999px; font-size: 14px; font-weight: 500;">Disabled</div>
+</div>
+
+<div style="display: flex; align-items: center; gap: 16px;">
+<div style="display: inline-flex; align-items: center; justify-content: center; padding: 10px 20px; background-color: transparent; color: #000000; border: 1px solid #d9d9dd; border-radius: 9999px; font-size: 14px; font-weight: 500;">Secondary</div>
+<div style="display: inline-flex; align-items: center; justify-content: center; padding: 10px 20px; background-color: transparent; color: #1863dc; border: 1px solid #1863dc; border-radius: 9999px; font-size: 14px; font-weight: 500;">Secondary · Hover</div>
+<div style="display: inline-flex; align-items: center; justify-content: center; padding: 10px 16px; background-color: transparent; color: #000000; border-radius: 9999px; font-size: 14px; font-weight: 500;">Ghost</div>
+<div style="display: inline-flex; align-items: center; justify-content: center; padding: 10px 16px; background-color: transparent; color: #c0362c; border: 1px solid #f2c9c5; border-radius: 9999px; font-size: 14px; font-weight: 500;">Destructive</div>
+</div>
+
+<div style="display: flex; align-items: center; gap: 16px;">
+<div style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background-color: #17171c; color: #ffffff; border-radius: 9999px; font-size: 13px; font-weight: 500;"><img src="https://api.iconify.design/mdi/plus.svg?color=%23ffffff" style="width: 14px; height: 14px;" />With icon</div>
+<div style="display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; background-color: #f2f2f2; border-radius: 9999px;"><img src="https://api.iconify.design/mdi/dots-horizontal.svg?color=%2317171c" style="width: 18px; height: 18px;" /></div>
+<div style="display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; background-color: transparent; border: 1px solid #d9d9dd; border-radius: 9999px;"><img src="https://api.iconify.design/mdi/heart-outline.svg?color=%2317171c" style="width: 18px; height: 18px;" /></div>
+<div style="display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; background-color: #17171c; color: #ffffff; border-radius: 9999px; font-size: 12px; font-weight: 500;"><img src="https://api.iconify.design/mdi/loading.svg?color=%23ffffff" style="width: 13px; height: 13px;" />Loading</div>
+</div>
+
+<div style="display: flex; align-items: center; gap: 16px;">
+<div style="display: inline-flex; align-items: center; justify-content: center; padding: 6px 14px; background-color: #17171c; color: #ffffff; border-radius: 9999px; font-size: 12px;">Small</div>
+<div style="display: inline-flex; align-items: center; justify-content: center; padding: 10px 20px; background-color: #17171c; color: #ffffff; border-radius: 9999px; font-size: 14px;">Medium</div>
+<div style="display: inline-flex; align-items: center; justify-content: center; padding: 14px 28px; background-color: #17171c; color: #ffffff; border-radius: 9999px; font-size: 16px;">Large</div>
+</div>
+</div>
+</div>
+
+<!-- spec card -->
+<div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 22px; padding: 28px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; color: #93939f; text-transform: uppercase; padding-bottom: 12px;">States</div>
+<div style="font-size: 13px; color: #17171c; line-height: 1.8; padding-bottom: 20px;">default · hover · active · focus-visible · disabled · loading · pressed</div>
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; color: #93939f; text-transform: uppercase; padding-bottom: 12px;">Keyboard & A11y</div>
+<div style="font-size: 13px; color: #93939f; line-height: 1.6; padding-bottom: 20px;">Enter/Space activate · focus ring #4c6ee6 2px · icon-only buttons require aria-label · loading sets aria-busy · min 44px touch target.</div>
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; color: #93939f; text-transform: uppercase; padding-bottom: 12px;">Props</div>
+<div style="font-family: 'Fira Code', monospace; font-size: 12px; color: #17171c; line-height: 1.7;">variant · size · icon · iconPos · loading · disabled · fullWidth · onClick</div>
+</div>
+</div>
+
+<!-- impl note -->
+<div style="background-color: #0d0a14; border-radius: 22px; padding: 24px 28px; margin-top: 20px; font-family: 'Fira Code', monospace; font-size: 12px; line-height: 1.8;">
+<span style="color: #6ee7b7;">// React + Framer Motion</span><br/>
+<span style="color: #93939f;">&lt;motion.button whileTap={{ scale: 0.97 }} transition={{ duration: 0.08 }}</span><br/>
+<span style="color: #93939f; padding-left: 16px; display: inline-block;">className="rounded-full px-5 py-2.5 bg-neutral-900 text-white hover:text-accent focus-visible:ring-2 ring-[#4c6ee6]" /&gt;</span>
+</div>
+</div>
+
+<!-- ============ 02 INPUTS ============ -->
+<div data-name="c-inputs" style="padding-top: 56px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; letter-spacing: 0.28px; text-transform: uppercase; color: #93939f; padding-bottom: 12px;">02 — Inputs & Forms</div>
+<div style="font-family: 'Space Grotesk', sans-serif; font-size: 32px; letter-spacing: -0.32px; color: #000000; padding-bottom: 24px;">Text · Search · Code · Autosuggest</div>
+
+<div style="display: flex; gap: 28px;">
+<div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 22px; padding: 28px; display: flex; flex-direction: column; gap: 18px;">
+<div>
+<div style="font-size: 13px; color: #17171c; padding-bottom: 8px;">Text · default</div>
+<div style="display: flex; align-items: center; padding: 12px 16px; border: 1px solid #d9d9dd; border-radius: 16px; font-size: 14px; color: #93939f;">Placeholder text</div>
+</div>
+<div>
+<div style="font-size: 13px; color: #17171c; padding-bottom: 8px;">Text · focus</div>
+<div style="display: flex; align-items: center; padding: 12px 16px; border: 1px solid #9b60aa; border-radius: 16px; font-size: 14px; color: #17171c; box-shadow: 0 0 0 2px rgba(155,96,170,0.18);">Typing here<span style="width:1px;height:16px;background:#9b60aa;display:inline-block;margin-left:2px;"></span></div>
+</div>
+<div>
+<div style="font-size: 13px; color: #17171c; padding-bottom: 8px;">Text · error</div>
+<div style="display: flex; align-items: center; padding: 12px 16px; border: 1px solid #c0362c; border-radius: 16px; font-size: 14px; color: #17171c;">Invalid value</div>
+<div style="font-size: 12px; color: #c0362c; padding-top: 6px;">This field is required</div>
+</div>
+</div>
+
+<div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 22px; padding: 28px; display: flex; flex-direction: column; gap: 18px;">
+<div>
+<div style="font-size: 13px; color: #17171c; padding-bottom: 8px;">Search</div>
+<div style="display: flex; align-items: center; gap: 10px; padding: 10px 16px; border: 1px solid #d9d9dd; border-radius: 9999px; font-size: 14px; color: #93939f;"><img src="https://api.iconify.design/mdi/magnify.svg?color=%2393939f" style="width: 16px; height: 16px;" />Search or ⌘K</div>
+</div>
+<div>
+<div style="font-size: 13px; color: #17171c; padding-bottom: 8px;">Textarea</div>
+<div style="padding: 12px 16px; border: 1px solid #d9d9dd; border-radius: 16px; font-size: 14px; color: #93939f; min-height: 64px;">Multi-line prompt input…</div>
+</div>
+<div>
+<div style="font-size: 13px; color: #17171c; padding-bottom: 8px;">Autosuggest</div>
+<div style="border: 1px solid #d9d9dd; border-radius: 16px; overflow: hidden;">
+<div style="padding: 10px 16px; font-size: 14px; color: #17171c; border-bottom: 1px solid #f2f2f2;">sema</div>
+<div style="padding: 8px 16px; font-size: 13px; color: #17171c; background-color: #eef1fd;">semantic-cluster</div>
+<div style="padding: 8px 16px; font-size: 13px; color: #93939f;">semantic-node</div>
+</div>
+</div>
+</div>
+
+<div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 22px; padding: 28px; display: flex; flex-direction: column; gap: 18px;">
+<div>
+<div style="font-size: 13px; color: #17171c; padding-bottom: 8px;">Code input</div>
+<div style="background-color: #0d0a14; border-radius: 16px; padding: 16px; font-family: 'Fira Code', monospace; font-size: 12px; line-height: 1.7;"><span style="color:#c79bf5;">const</span> <span style="color:#8ea0ff;">node</span> = <span style="color:#6ee7b7;">lattice</span>.<span style="color:#f0b968;">align</span>();</div>
+</div>
+<div style="border-top: 1px solid #f2f2f2; padding-top: 16px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; color: #93939f; text-transform: uppercase; padding-bottom: 10px;">A11y & Keyboard</div>
+<div style="font-size: 13px; color: #93939f; line-height: 1.6;">Labels bound via htmlFor · aria-invalid on error · aria-describedby → hint/error · autosuggest = combobox role, ↑↓ navigate, Enter selects, Esc closes · code input Tab traps softly.</div>
+</div>
+<div style="border-top: 1px solid #f2f2f2; padding-top: 16px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; color: #93939f; text-transform: uppercase; padding-bottom: 10px;">Props</div>
+<div style="font-family: 'Fira Code', monospace; font-size: 12px; color: #17171c; line-height: 1.7;">type · value · state · hint · error · leadingIcon · suggestions · onChange</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ============ 03 CARDS ============ -->
+<div data-name="c-cards" style="padding-top: 56px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; letter-spacing: 0.28px; text-transform: uppercase; color: #93939f; padding-bottom: 12px;">03 — Cards</div>
+<div style="font-family: 'Space Grotesk', sans-serif; font-size: 32px; letter-spacing: -0.32px; color: #000000; padding-bottom: 24px;">Hero · Status · Project · Compact</div>
+
+<div style="display: flex; gap: 28px;">
+<!-- hero -->
+<div style="flex: 1.4; background-color: #0d0a14; border-radius: 22px; padding: 28px; min-height: 200px; display: flex; flex-direction: column; justify-content: space-between;">
+<div style="display: flex; gap: 10px;"><span style="font-family: 'Fira Code', monospace; font-size: 10px; color: #ffffff; background-color: rgba(255,255,255,0.12); padding: 6px 12px; border-radius: 9999px; text-transform: uppercase;">Hero Card</span></div>
+<div>
+<div style="font-family: 'Space Grotesk', sans-serif; font-size: 28px; color: #ffffff; padding-bottom: 6px;">Live Lattice</div>
+<div style="font-size: 13px; color: rgba(255,255,255,0.6);">Dark surface · gradient-ready · houses feature centerpieces.</div>
+</div>
+</div>
+<!-- status -->
+<div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 22px; padding: 24px;">
+<span style="font-family: 'Fira Code', monospace; font-size: 10px; color: #1863dc; background-color: #eef1fd; padding: 4px 10px; border-radius: 9999px; text-transform: uppercase;">In Progress</span>
+<div style="font-family: 'Space Grotesk', sans-serif; font-size: 32px; color: #000000; padding: 16px 0 4px 0;">92%</div>
+<div style="font-size: 13px; color: #93939f;">Status metric card</div>
+</div>
+<!-- project -->
+<div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 22px; padding: 24px;">
+<div style="display: flex; justify-content: space-between; align-items: center;"><span style="font-family: 'Fira Code', monospace; font-size: 10px; color: #0a8a5c; background-color: #e8f7f0; padding: 4px 10px; border-radius: 9999px; text-transform: uppercase;">Verified</span><img src="https://api.iconify.design/mdi/dots-horizontal.svg?color=%2393939f" style="width: 18px; height: 18px;" /></div>
+<div style="font-size: 17px; color: #000000; padding: 14px 0 4px 0;">Project Card</div>
+<div style="font-size: 13px; color: #93939f;">Title · meta · progress</div>
+</div>
+<!-- compact -->
+<div style="flex: 0.7; border: 1px solid #f2f2f2; border-radius: 22px; padding: 20px; display: flex; flex-direction: column; gap: 10px;">
+<div style="display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; background-color: #f6eefc; border-radius: 9999px;"><img src="https://api.iconify.design/mdi/lightning-bolt-outline.svg?color=%238b3fd6" style="width: 18px; height: 18px;" /></div>
+<div style="font-size: 14px; color: #000000;">Compact</div>
+<div style="font-size: 12px; color: #93939f; line-height: 1.4;">Icon + label list item.</div>
+</div>
+</div>
+<div style="border: 1px solid #f2f2f2; border-radius: 22px; padding: 20px 28px; margin-top: 20px; font-size: 13px; color: #93939f; line-height: 1.6;"><span style="color:#17171c;">A11y:</span> interactive cards = role button/link, full keyboard focus, aria-label summarizing content. <span style="color:#17171c;">Responsive:</span> 4→2→1 column collapse. <span style="color:#17171c;">Props:</span> variant · elevation · interactive · badge · onClick.</div>
+</div>
+
+<!-- ============ 04 NAVIGATION ============ -->
+<div data-name="c-nav" style="padding-top: 56px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; letter-spacing: 0.28px; text-transform: uppercase; color: #93939f; padding-bottom: 12px;">04 — Navigation</div>
+<div style="font-family: 'Space Grotesk', sans-serif; font-size: 32px; letter-spacing: -0.32px; color: #000000; padding-bottom: 24px;">Top Nav · Sidebar · Drawer</div>
+
+<!-- top nav -->
+<div style="border: 1px solid #f2f2f2; border-radius: 22px; overflow: hidden; margin-bottom: 24px;">
+<div style="display: flex; align-items: center; gap: 24px; padding: 14px 24px; border-bottom: 1px solid #f2f2f2;">
+<div style="display: flex; align-items: center; gap: 8px;"><div style="display: flex; align-items: center; justify-content: center; width: 26px; height: 26px; background-color: #17171c; border-radius: 8px;"><img src="https://api.iconify.design/mdi/hexagon-multiple-outline.svg?color=%23ffffff" style="width: 14px; height: 14px;" /></div><span style="font-family: 'Space Grotesk', sans-serif; font-size: 16px; color: #000000;">Bicameral</span></div>
+<span style="font-size: 14px; color: #000000; border-bottom: 2px solid #1863dc; padding-bottom: 4px;">Dashboard</span>
+<span style="font-size: 14px; color: #93939f;">Projects</span>
+<span style="font-size: 14px; color: #93939f;">Research</span>
+<span style="font-size: 14px; color: #93939f;">Lattice</span>
+<div style="flex: 1;"></div>
+<div style="display: flex; align-items: center; gap: 10px; padding: 8px 14px; border: 1px solid #d9d9dd; border-radius: 9999px; font-size: 13px; color: #93939f;"><img src="https://api.iconify.design/mdi/magnify.svg?color=%2393939f" style="width: 14px; height: 14px;" />⌘K</div>
+</div>
+</div>
+
+<div style="display: flex; gap: 28px;">
+<!-- sidebar -->
+<div style="flex: 0.6; border: 1px solid #f2f2f2; border-radius: 22px; padding: 20px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 10px; color: #93939f; text-transform: uppercase; padding-bottom: 14px;">Sidebar</div>
+<div style="display: flex; flex-direction: column; gap: 4px;">
+<div style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; background-color: #eef1fd; border-radius: 12px; font-size: 14px; color: #1863dc;"><img src="https://api.iconify.design/mdi/view-dashboard-outline.svg?color=%231863dc" style="width: 16px; height: 16px;" />Dashboard</div>
+<div style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; font-size: 14px; color: #17171c;"><img src="https://api.iconify.design/mdi/brain.svg?color=%2317171c" style="width: 16px; height: 16px;" />Research</div>
+<div style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; font-size: 14px; color: #17171c;"><img src="https://api.iconify.design/mdi/graph-outline.svg?color=%2317171c" style="width: 16px; height: 16px;" />Lattice</div>
+<div style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; font-size: 14px; color: #17171c;"><img src="https://api.iconify.design/mdi/code-braces.svg?color=%2317171c" style="width: 16px; height: 16px;" />Architecture</div>
+</div>
+</div>
+<!-- drawer -->
+<div style="flex: 0.5; border: 1px solid #f2f2f2; border-radius: 22px; padding: 20px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 10px; color: #93939f; text-transform: uppercase; padding-bottom: 14px;">Mobile Drawer</div>
+<div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 16px;"><img src="https://api.iconify.design/mdi/menu.svg?color=%2317171c" style="width: 20px; height: 20px;" /><img src="https://api.iconify.design/mdi/close.svg?color=%2393939f" style="width: 18px; height: 18px;" /></div>
+<div style="display: flex; flex-direction: column; gap: 12px;">
+<span style="font-size: 15px; color: #1863dc;">Dashboard</span>
+<span style="font-size: 15px; color: #17171c;">Research</span>
+<span style="font-size: 15px; color: #17171c;">Lattice</span>
+</div>
+</div>
+<!-- notes -->
+<div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 22px; padding: 24px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; color: #93939f; text-transform: uppercase; padding-bottom: 12px;">A11y · Keyboard · Responsive</div>
+<div style="font-size: 13px; color: #93939f; line-height: 1.7;">nav landmark + aria-current on active · Tab through links, arrow-key roving in sidebar · drawer traps focus, Esc closes, returns focus to trigger · &lt;lg collapses top-nav → hamburger drawer · sidebar collapses to icon-rail at md. Framer Motion slide-in with prefers-reduced-motion fallback to fade.</div>
+</div>
+</div>
+</div>
+
+<!-- ============ 05 TABS + ACCORDION + DROPDOWN ============ -->
+<div data-name="c-tabs" style="padding-top: 56px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; letter-spacing: 0.28px; text-transform: uppercase; color: #93939f; padding-bottom: 12px;">05 — Tabs · Accordion · Dropdown</div>
+<div style="font-family: 'Space Grotesk', sans-serif; font-size: 32px; letter-spacing: -0.32px; color: #000000; padding-bottom: 24px;">Disclosure & Selection</div>
+
+<div style="display: flex; gap: 28px;">
+<!-- tabs -->
+<div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 22px; padding: 28px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; color: #93939f; text-transform: uppercase; padding-bottom: 16px;">Tabs</div>
+<div style="display: flex; gap: 24px; border-bottom: 1px solid #f2f2f2; padding-bottom: 12px;">
+<span style="font-size: 14px; color: #000000; border-bottom: 2px solid #1863dc; padding-bottom: 12px;">Overview</span>
+<span style="font-size: 14px; color: #93939f;">Sources</span>
+<span style="font-size: 14px; color: #93939f;">Confidence</span>
+</div>
+<div style="font-size: 13px; color: #93939f; padding-top: 16px; line-height: 1.6;">tablist/tab/tabpanel roles · ←→ move, Home/End jump, activation follows focus · underline slides via layoutId (Framer Motion).</div>
+</div>
+<!-- accordion -->
+<div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 22px; padding: 28px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; color: #93939f; text-transform: uppercase; padding-bottom: 16px;">Accordion</div>
+<div style="border-bottom: 1px solid #f2f2f2; padding-bottom: 12px; display: flex; justify-content: space-between; align-items: center;"><span style="font-size: 14px; color: #000000;">Requirements</span><img src="https://api.iconify.design/mdi/chevron-up.svg?color=%2317171c" style="width: 18px; height: 18px;" /></div>
+<div style="font-size: 13px; color: #93939f; padding: 12px 0; line-height: 1.6;">Expanded panel content revealed with height auto-animate.</div>
+<div style="border-top: 1px solid #f2f2f2; padding-top: 12px; display: flex; justify-content: space-between; align-items: center;"><span style="font-size: 14px; color: #17171c;">Architecture</span><img src="https://api.iconify.design/mdi/chevron-down.svg?color=%2393939f" style="width: 18px; height: 18px;" /></div>
+<div style="font-size: 12px; color: #93939f; padding-top: 16px; line-height: 1.6;">aria-expanded · button header · Enter/Space toggles · region role on panel.</div>
+</div>
+<!-- dropdown -->
+<div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 22px; padding: 28px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; color: #93939f; text-transform: uppercase; padding-bottom: 16px;">Dropdown / Menu</div>
+<div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border: 1px solid #d9d9dd; border-radius: 12px; font-size: 14px; color: #17171c;">Select stage<img src="https://api.iconify.design/mdi/chevron-down.svg?color=%2393939f" style="width: 16px; height: 16px;" /></div>
+<div style="border: 1px solid #f2f2f2; border-radius: 12px; margin-top: 8px; box-shadow: 0 6px 20px rgba(13,10,20,0.10); overflow: hidden;">
+<div style="padding: 10px 14px; font-size: 13px; color: #1863dc; background-color: #eef1fd;">Research</div>
+<div style="padding: 10px 14px; font-size: 13px; color: #17171c;">Requirements</div>
+<div style="padding: 10px 14px; font-size: 13px; color: #17171c;">Architecture</div>
+</div>
+<div style="font-size: 12px; color: #93939f; padding-top: 16px; line-height: 1.6;">menu/menuitem roles · ↑↓ navigate, Enter select, Esc close, typeahead · focus returns to trigger.</div>
+</div>
+</div>
+</div>
+
+<!-- ============ 06 MODALS + DRAWERS + COMMAND PALETTE ============ -->
+<div data-name="c-modal" style="padding-top: 56px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; letter-spacing: 0.28px; text-transform: uppercase; color: #93939f; padding-bottom: 12px;">06 — Overlays</div>
+<div style="font-family: 'Space Grotesk', sans-serif; font-size: 32px; letter-spacing: -0.32px; color: #000000; padding-bottom: 24px;">Modal · Drawer · Command Palette</div>
+
+<div style="display: flex; gap: 28px;">
+<!-- modal -->
+<div style="flex: 1; background-color: #fafafa; border: 1px solid #f2f2f2; border-radius: 22px; padding: 28px; display: flex; align-items: center; justify-content: center;">
+<div style="background-color: #ffffff; border-radius: 22px; box-shadow: 0 16px 40px rgba(13,10,20,0.18); padding: 28px; width: 100%;">
+<div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px;"><span style="font-family: 'Space Grotesk', sans-serif; font-size: 20px; color: #000000;">Approve stage?</span><img src="https://api.iconify.design/mdi/close.svg?color=%2393939f" style="width: 18px; height: 18px;" /></div>
+<div style="font-size: 13px; color: #93939f; line-height: 1.6; padding-bottom: 20px;">Human-in-the-loop gate. Approving advances to Architecture.</div>
+<div style="display: flex; gap: 12px; justify-content: flex-end;"><span style="padding: 8px 16px; border: 1px solid #d9d9dd; border-radius: 9999px; font-size: 13px; color: #17171c;">Cancel</span><span style="padding: 8px 16px; background-color: #17171c; color: #ffffff; border-radius: 9999px; font-size: 13px;">Approve</span></div>
+</div>
+</div>
+<!-- command palette -->
+<div style="flex: 1; background-color: #0d0a14; border-radius: 22px; padding: 24px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 10px; color: rgba(255,255,255,0.5); text-transform: uppercase; padding-bottom: 14px;">Command Palette ⌘K</div>
+<div style="display: flex; align-items: center; gap: 10px; background-color: rgba(255,255,255,0.08); border-radius: 12px; padding: 12px 16px;"><img src="https://api.iconify.design/mdi/magnify.svg?color=%23ffffff" style="width: 16px; height: 16px;" /><span style="font-size: 14px; color: rgba(255,255,255,0.6);">Type a command…</span></div>
+<div style="padding-top: 14px; display: flex; flex-direction: column; gap: 4px;">
+<div style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; background-color: rgba(59,79,214,0.25); border-radius: 10px;"><img src="https://api.iconify.design/mdi/plus.svg?color=%23ffffff" style="width: 14px; height: 14px;" /><span style="font-size: 13px; color: #ffffff;">New Project</span></div>
+<div style="display: flex; align-items: center; gap: 10px; padding: 10px 12px;"><img src="https://api.iconify.design/mdi/graph-outline.svg?color=%23ffffff" style="width: 14px; height: 14px;" /><span style="font-size: 13px; color: rgba(255,255,255,0.7);">Open Lattice</span></div>
+<div style="display: flex; align-items: center; gap: 10px; padding: 10px 12px;"><img src="https://api.iconify.design/mdi/cog-outline.svg?color=%23ffffff" style="width: 14px; height: 14px;" /><span style="font-size: 13px; color: rgba(255,255,255,0.7);">Settings</span></div>
+</div>
+</div>
+<!-- notes -->
+<div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 22px; padding: 24px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; color: #93939f; text-transform: uppercase; padding-bottom: 12px;">Behavior</div>
+<div style="font-size: 13px; color: #93939f; line-height: 1.7;">role dialog + aria-modal · focus trap, Esc closes, restore focus · scrim click dismisses (not on destructive) · palette: fuzzy search, ↑↓ + Enter, grouped results, recent actions · drawer slides from edge (z-drawer 300) · modal z-500. Framer Motion: scale/opacity enter at 240ms ease-standard.</div>
+</div>
+</div>
+</div>
+
+<!-- ============ 07 TABLE + TREE + TIMELINE ============ -->
+<div data-name="c-table" style="padding-top: 56px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; letter-spacing: 0.28px; text-transform: uppercase; color: #93939f; padding-bottom: 12px;">07 — Data Display</div>
+<div style="font-family: 'Space Grotesk', sans-serif; font-size: 32px; letter-spacing: -0.32px; color: #000000; padding-bottom: 24px;">Table · Tree View · Timeline</div>
+
+<div style="display: flex; gap: 28px;">
+<!-- table -->
+<div style="flex: 1.4; border: 1px solid #d9d9dd; border-radius: 22px; overflow: hidden;">
+<div style="display: flex; padding: 14px 20px; background-color: #fafafa; border-bottom: 1px solid #d9d9dd;"><span style="flex: 2; font-family: 'Fira Code', monospace; font-size: 11px; color: #93939f; text-transform: uppercase;">Node</span><span style="flex: 1; font-family: 'Fira Code', monospace; font-size: 11px; color: #93939f; text-transform: uppercase;">Type</span><span style="flex: 1; font-family: 'Fira Code', monospace; font-size: 11px; color: #93939f; text-transform: uppercase; text-align: right;">Confidence</span></div>
+<div style="display: flex; padding: 14px 20px; border-bottom: 1px solid #f2f2f2;"><span style="flex: 2; font-size: 14px; color: #17171c;">Auth flow spec</span><span style="flex: 1; font-size: 13px; color: #93939f;">Semantic</span><span style="flex: 1; font-size: 13px; color: #0a8a5c; text-align: right;">94%</span></div>
+<div style="display: flex; padding: 14px 20px; border-bottom: 1px solid #f2f2f2; background-color: #eef1fd;"><span style="flex: 2; font-size: 14px; color: #17171c;">Token service</span><span style="flex: 1; font-size: 13px; color: #93939f;">Code</span><span style="flex: 1; font-size: 13px; color: #b36a00; text-align: right;">71%</span></div>
+<div style="display: flex; padding: 14px 20px;"><span style="flex: 2; font-size: 14px; color: #17171c;">Rate limiter</span><span style="flex: 1; font-size: 13px; color: #93939f;">Code</span><span style="flex: 1; font-size: 13px; color: #0a8a5c; text-align: right;">88%</span></div>
+</div>
+<!-- tree -->
+<div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 22px; padding: 24px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; color: #93939f; text-transform: uppercase; padding-bottom: 14px;">Tree View</div>
+<div style="display: flex; flex-direction: column; gap: 8px; font-size: 14px;">
+<div style="display: flex; align-items: center; gap: 6px; color: #17171c;"><img src="https://api.iconify.design/mdi/chevron-down.svg?color=%2317171c" style="width: 16px; height: 16px;" /><img src="https://api.iconify.design/mdi/folder-outline.svg?color=%233b4fd6" style="width: 16px; height: 16px;" />Semantic</div>
+<div style="display: flex; align-items: center; gap: 6px; color: #17171c; padding-left: 22px;"><img src="https://api.iconify.design/mdi/file-outline.svg?color=%2393939f" style="width: 15px; height: 15px;" />requirements.md</div>
+<div style="display: flex; align-items: center; gap: 6px; color: #17171c; padding-left: 22px;"><img src="https://api.iconify.design/mdi/file-outline.svg?color=%2393939f" style="width: 15px; height: 15px;" />sources.json</div>
+<div style="display: flex; align-items: center; gap: 6px; color: #17171c;"><img src="https://api.iconify.design/mdi/chevron-right.svg?color=%2393939f" style="width: 16px; height: 16px;" /><img src="https://api.iconify.design/mdi/folder-outline.svg?color=%238b3fd6" style="width: 16px; height: 16px;" />Implementation</div>
+</div>
+<div style="font-size: 12px; color: #93939f; padding-top: 14px; line-height: 1.6;">tree/treeitem · ←→ collapse/expand, ↑↓ move.</div>
+</div>
+<!-- timeline -->
+<div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 22px; padding: 24px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; color: #93939f; text-transform: uppercase; padding-bottom: 16px;">Timeline</div>
+<div style="display: flex; flex-direction: column; gap: 16px;">
+<div style="display: flex; gap: 12px;"><div style="display: flex; flex-direction: column; align-items: center;"><div style="width: 12px; height: 12px; border-radius: 9999px; background-color: #0a8a5c;"></div><div style="width: 2px; flex: 1; background-color: #f2f2f2;"></div></div><div><div style="font-size: 13px; color: #000000;">Research complete</div><div style="font-size: 11px; color: #93939f;">2h ago</div></div></div>
+<div style="display: flex; gap: 12px;"><div style="display: flex; flex-direction: column; align-items: center;"><div style="width: 12px; height: 12px; border-radius: 9999px; background-color: #1863dc;"></div><div style="width: 2px; flex: 1; background-color: #f2f2f2;"></div></div><div><div style="font-size: 13px; color: #000000;">Awaiting approval</div><div style="font-size: 11px; color: #93939f;">now</div></div></div>
+<div style="display: flex; gap: 12px;"><div style="width: 12px; height: 12px; border-radius: 9999px; background-color: #d9d9dd;"></div><div><div style="font-size: 13px; color: #93939f;">Architecture</div><div style="font-size: 11px; color: #93939f;">pending</div></div></div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ============ 08 TAGS + TOAST + TOOLTIP + CONTEXT + PROGRESS + SKELETON ============ -->
+<div data-name="c-misc" style="padding-top: 56px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; letter-spacing: 0.28px; text-transform: uppercase; color: #93939f; padding-bottom: 12px;">08 — Feedback & Micro-components</div>
+<div style="font-family: 'Space Grotesk', sans-serif; font-size: 32px; letter-spacing: -0.32px; color: #000000; padding-bottom: 24px;">Tags · Toasts · Tooltips · Context · Progress · Skeleton</div>
+
+<div style="display: flex; gap: 28px; padding-bottom: 24px;">
+<!-- tags -->
+<div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 22px; padding: 24px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; color: #93939f; text-transform: uppercase; padding-bottom: 16px;">Tags & Badges</div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px;">
+<span style="font-family: 'Fira Code', monospace; font-size: 10px; color: #1863dc; background-color: #eef1fd; padding: 4px 10px; border-radius: 9999px; text-transform: uppercase;">In Progress</span>
+<span style="font-family: 'Fira Code', monospace; font-size: 10px; color: #0a8a5c; background-color: #e8f7f0; padding: 4px 10px; border-radius: 9999px; text-transform: uppercase;">Verified</span>
+<span style="font-family: 'Fira Code', monospace; font-size: 10px; color: #b36a00; background-color: #fdf3e3; padding: 4px 10px; border-radius: 9999px; text-transform: uppercase;">Review</span>
+<span style="font-family: 'Fira Code', monospace; font-size: 10px; color: #c0362c; background-color: #fceceb; padding: 4px 10px; border-radius: 9999px; text-transform: uppercase;">Error</span>
+<span style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: #17171c; border: 1px solid #d9d9dd; padding: 4px 10px; border-radius: 9999px;">Removable<img src="https://api.iconify.design/mdi/close.svg?color=%2393939f" style="width: 12px; height: 12px;" /></span>
+</div>
+</div>
+<!-- progress chip -->
+<div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 22px; padding: 24px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; color: #93939f; text-transform: uppercase; padding-bottom: 16px;">Progress Chips</div>
+<div style="display: flex; flex-direction: column; gap: 14px;">
+<div><div style="display: flex; justify-content: space-between; padding-bottom: 6px;"><span style="font-size: 12px; color: #17171c;">Left hemisphere</span><span style="font-size: 12px; color: #93939f;">92%</span></div><div style="height: 7px; background-color: #f2f2f2; border-radius: 9999px;"><div style="width: 92%; height: 7px; background-color: #3b4fd6; border-radius: 9999px;"></div></div></div>
+<div><div style="display: flex; justify-content: space-between; padding-bottom: 6px;"><span style="font-size: 12px; color: #17171c;">Right hemisphere</span><span style="font-size: 12px; color: #93939f;">68%</span></div><div style="height: 7px; background-color: #f2f2f2; border-radius: 9999px;"><div style="width: 68%; height: 7px; background-color: #8b3fd6; border-radius: 9999px;"></div></div></div>
+</div>
+</div>
+<!-- skeleton -->
+<div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 22px; padding: 24px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; color: #93939f; text-transform: uppercase; padding-bottom: 16px;">Skeleton</div>
+<div style="display: flex; flex-direction: column; gap: 10px;">
+<div style="height: 12px; width: 60%; background: linear-gradient(90deg,#f2f2f2,#e8e8ec,#f2f2f2); border-radius: 6px;"></div>
+<div style="height: 12px; width: 90%; background: linear-gradient(90deg,#f2f2f2,#e8e8ec,#f2f2f2); border-radius: 6px;"></div>
+<div style="height: 12px; width: 75%; background: linear-gradient(90deg,#f2f2f2,#e8e8ec,#f2f2f2); border-radius: 6px;"></div>
+<div style="height: 60px; width: 100%; background: linear-gradient(90deg,#f2f2f2,#e8e8ec,#f2f2f2); border-radius: 12px; margin-top: 6px;"></div>
+</div>
+</div>
+</div>
+
+<div style="display: flex; gap: 28px;">
+<!-- toast -->
+<div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 22px; padding: 24px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; color: #93939f; text-transform: uppercase; padding-bottom: 16px;">Toasts</div>
+<div style="display: flex; flex-direction: column; gap: 10px;">
+<div style="display: flex; align-items: center; gap: 10px; background-color: #17171c; border-radius: 12px; padding: 12px 16px;"><img src="https://api.iconify.design/mdi/check-circle.svg?color=%236ee7b7" style="width: 16px; height: 16px;" /><span style="font-size: 13px; color: #ffffff;">Stage approved</span><span style="flex:1;"></span><span style="font-size: 12px; color: rgba(255,255,255,0.5);">Undo</span></div>
+<div style="display: flex; align-items: center; gap: 10px; background-color: #fceceb; border: 1px solid #f2c9c5; border-radius: 12px; padding: 12px 16px;"><img src="https://api.iconify.design/mdi/alert-circle.svg?color=%23c0362c" style="width: 16px; height: 16px;" /><span style="font-size: 13px; color: #c0362c;">Generation failed</span></div>
+</div>
+<div style="font-size: 12px; color: #93939f; padding-top: 14px; line-height: 1.6;">role status/alert · aria-live polite/assertive · auto-dismiss 6s with pause-on-hover · undo affordance 10s.</div>
+</div>
+<!-- tooltip + context -->
+<div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 22px; padding: 24px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; color: #93939f; text-transform: uppercase; padding-bottom: 16px;">Tooltip & Context Menu</div>
+<div style="display: flex; gap: 24px; align-items: flex-start;">
+<div style="display: inline-block; background-color: #17171c; color: #ffffff; font-size: 12px; padding: 6px 10px; border-radius: 8px;">Alignment strength</div>
+<div style="border: 1px solid #f2f2f2; border-radius: 12px; box-shadow: 0 6px 20px rgba(13,10,20,0.10); overflow: hidden; min-width: 160px;">
+<div style="padding: 8px 14px; font-size: 13px; color: #17171c;">Open node</div>
+<div style="padding: 8px 14px; font-size: 13px; color: #17171c;">Pin to lattice</div>
+<div style="padding: 8px 14px; font-size: 13px; color: #c0362c; border-top: 1px solid #f2f2f2;">Delete</div>
+</div>
+</div>
+<div style="font-size: 12px; color: #93939f; padding-top: 14px; line-height: 1.6;">tooltip role, 400ms delay, dismiss on Esc/blur · context menu on right-click + Shift+F10, menu role, arrow nav.</div>
+</div>
+<!-- notes -->
+<div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 22px; padding: 24px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; color: #93939f; text-transform: uppercase; padding-bottom: 12px;">Impl. Notes</div>
+<div style="font-size: 13px; color: #93939f; line-height: 1.7;">Skeleton shimmer = Framer Motion background-position loop, disabled under reduced-motion. Progress bars animate width with ease-standard. Tags map to <span style="font-family:'Fira Code',monospace;color:#17171c;">status</span> semantic token. Toasts stack in a portal at z-toast 700.</div>
+</div>
+</div>
+</div>
+
+<!-- ============ 09 MEMORY LATTICE NODES ============ -->
+<div data-name="c-nodes" style="padding-top: 56px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; letter-spacing: 0.28px; text-transform: uppercase; color: #93939f; padding-bottom: 12px;">09 — Memory Lattice Node Components</div>
+<div style="font-family: 'Space Grotesk', sans-serif; font-size: 32px; letter-spacing: -0.32px; color: #000000; padding-bottom: 8px;">First-Class Graph Primitives</div>
+<div style="font-size: 16px; color: #93939f; padding-bottom: 24px; max-width: 800px;">The atomic units of the lattice — semantic nodes, code nodes, bridge nodes, edges, and clusters — each carrying confidence, density, and alignment state.</div>
+
+<div style="background-color: #0d0a14; border-radius: 22px; padding: 40px; margin-bottom: 24px;">
+<div style="display: flex; gap: 48px; align-items: center; justify-content: center; flex-wrap: wrap;">
+<!-- semantic node -->
+<div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+<div style="width: 64px; height: 64px; border-radius: 9999px; background: radial-gradient(circle, #5a6fe6, #3b4fd6); box-shadow: 0 0 24px rgba(59,79,214,0.6); display: flex; align-items: center; justify-content: center;"><img src="https://api.iconify.design/mdi/brain.svg?color=%23ffffff" style="width: 26px; height: 26px;" /></div>
+<span style="font-family: 'Fira Code', monospace; font-size: 11px; color: rgba(255,255,255,0.7);">Semantic</span>
+</div>
+<!-- edge -->
+<div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+<div style="width: 90px; height: 2px; background: linear-gradient(90deg, #3b4fd6, #db3f88, #8b3fd6);"></div>
+<span style="font-family: 'Fira Code', monospace; font-size: 10px; color: rgba(255,255,255,0.5);">edge · align 87%</span>
+</div>
+<!-- bridge node -->
+<div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+<div style="width: 52px; height: 52px; border-radius: 9999px; background: radial-gradient(circle, #ef82ba, #db3f88); box-shadow: 0 0 20px rgba(219,63,136,0.6); display: flex; align-items: center; justify-content: center;"><img src="https://api.iconify.design/mdi/link-variant.svg?color=%23ffffff" style="width: 20px; height: 20px;" /></div>
+<span style="font-family: 'Fira Code', monospace; font-size: 11px; color: rgba(255,255,255,0.7);">Bridge</span>
+</div>
+<!-- edge -->
+<div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+<div style="width: 90px; height: 2px; background: linear-gradient(90deg, #db3f88, #8b3fd6);"></div>
+<span style="font-family: 'Fira Code', monospace; font-size: 10px; color: rgba(255,255,255,0.5);">dependency</span>
+</div>
+<!-- code node -->
+<div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+<div style="width: 64px; height: 64px; border-radius: 9999px; background: radial-gradient(circle, #a55ee0, #8b3fd6); box-shadow: 0 0 24px rgba(139,63,214,0.6); display: flex; align-items: center; justify-content: center;"><img src="https://api.iconify.design/mdi/code-braces.svg?color=%23ffffff" style="width: 26px; height: 26px;" /></div>
+<span style="font-family: 'Fira Code', monospace; font-size: 11px; color: rgba(255,255,255,0.7);">Code</span>
+</div>
+<!-- cluster -->
+<div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+<div style="width: 72px; height: 72px; border-radius: 9999px; border: 1px dashed rgba(255,255,255,0.3); display: flex; align-items: center; justify-content: center; position: relative;">
+<div style="width: 22px; height: 22px; border-radius: 9999px; background-color: #3b4fd6; position: absolute; top: 12px; left: 14px;"></div>
+<div style="width: 18px; height: 18px; border-radius: 9999px; background-color: #8b3fd6; position: absolute; bottom: 12px; right: 12px;"></div>
+<div style="width: 14px; height: 14px; border-radius: 9999px; background-color: #db3f88; position: absolute; bottom: 14px; left: 16px;"></div>
+</div>
+<span style="font-family: 'Fira Code', monospace; font-size: 11px; color: rgba(255,255,255,0.7);">Cluster</span>
+</div>
+</div>
+</div>
+
+<div style="display: flex; gap: 28px;">
+<div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 22px; padding: 24px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; color: #93939f; text-transform: uppercase; padding-bottom: 12px;">Node States</div>
+<div style="font-size: 13px; color: #93939f; line-height: 1.7;">idle · hover (glow intensifies) · selected (ring) · forming (pulse animation) · verified (solid) · stale (dimmed) · conflict (red halo). Confidence maps to glow radius; density maps to size.</div>
+</div>
+<div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 22px; padding: 24px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; color: #93939f; text-transform: uppercase; padding-bottom: 12px;">A11y & Keyboard</div>
+<div style="font-size: 13px; color: #93939f; line-height: 1.7;">Canvas exposes a semantic list fallback (View 02) · Tab enters graph, arrow keys traverse edges, Enter opens node detail · aria-label states node type + confidence · reduced-motion disables physics/pulse.</div>
+</div>
+<div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 22px; padding: 24px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; color: #93939f; text-transform: uppercase; padding-bottom: 12px;">Props & Impl</div>
+<div style="font-family: 'Fira Code', monospace; font-size: 12px; color: #17171c; line-height: 1.7;">type · confidence · density · state · edges[] · position · onSelect</div>
+<div style="font-size: 12px; color: #93939f; line-height: 1.6; padding-top: 10px;">Rendered in Three.js/R3F with Framer Motion for 2D overlays. Edges = animated dependency paths.</div>
+</div>
+</div>
+</div>
+
+<!-- FOOTER -->
+<div style="display: flex; align-items: center; gap: 12px; padding-top: 40px; border-top: 1px solid #d9d9dd; margin-top: 40px;">
+<img src="https://api.iconify.design/mdi/check-decagram-outline.svg?color=%230a8a5c" style="width: 20px; height: 20px;" />
+<span style="font-size: 14px; color: #93939f;">Every component: WCAG AA verified · keyboard-complete · reduced-motion fallbacks · mapped to Tier-3 tokens · exported as typed React props for zero-interpretation handoff.</span>
+</div>
+
+</div>

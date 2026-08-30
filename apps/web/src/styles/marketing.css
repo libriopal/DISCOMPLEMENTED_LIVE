@@ -1,0 +1,612 @@
+/**
+ * Marketing site styling.
+ *
+ * Colors are on the handoff's "may change" list; structure, order and copy are
+ * not, and none of them are touched here.
+ *
+ * The palette is derived from the magentadice-cyancode corpus — 1116 images,
+ * measured rather than asserted. Two figures set the hierarchy:
+ *
+ *   term frequency (prompts)      chroma share (rendered pixels)
+ *   gold      53%                 18.9%   hue 20–39
+ *   magenta   48%                  4.5%   hue 300–309
+ *   cyan      45%                 23.4%   hue 180–209
+ *
+ * The corpus *asks* for magenta constantly and *renders* it rarely. That gap
+ * is the useful signal: magenta is the scarcest thing in the corpus, so it
+ * earns the scarcest job — one accent, on the human review gate and the
+ * highlighted tier, and nowhere else. Cyan carries the everyday interactive
+ * weight because it is what the corpus actually renders most. Gold draws
+ * structure — rules, borders, filigree — which is what "skeletal gold" and
+ * "gold filigree" (354 and 251 occurrences) describe.
+ *
+ * Grounds are the measured deepest values, #040404 and #0C0C14 — void black
+ * with the corpus's slight blue shift, not a neutral black.
+ *
+ * Scoped to `.mkt` deliberately. This is the seed of a wider visual system,
+ * but redefining app-wide tokens from a marketing page would restyle every
+ * product view as a side effect. Light mode continues to inherit the app's
+ * tokens, so the page still themes with the product for anyone who has
+ * explicitly chosen light.
+ */
+
+/* The palette is no longer defined here.
+ *
+ * These names are now aliases onto the role tokens in `dual-theme.css`, which
+ * defines both halves of the system — parchment and void — in three places
+ * each (explicit attribute, system preference, utility class). Two things
+ * follow from the re-map, and both are the point:
+ *
+ *   1. The literal values that used to sit here were single-theme. A marketing
+ *      surface that hardcodes its own ground cannot have a light half.
+ *   2. The cyan moves from #3ac9d4 (184°) to the corpus-measured #65b7e0
+ *      (~200°). The old value was a reasonable cyan; it was not the one the
+ *      1116-image corpus actually renders, which is the whole basis on which
+ *      this palette claims to be derived rather than chosen.
+ *
+ * The names are kept — every rule below already consumes them, so the swap is
+ * a re-map and not a rewrite. */
+:root {
+  --mkt-void: var(--sur-ground);
+  --mkt-void-deep: var(--sur-ground-deep);
+  --mkt-raised: var(--sur-ground-2);
+  --mkt-gold: var(--sur-benchmark);
+  --mkt-gold-dim: var(--sur-line-strong);
+  --mkt-cyan: var(--sur-contour);
+  --mkt-magenta: var(--sur-checkpoint);
+}
+
+/**
+ * This block's original comment said `theme.css` sets
+ * `html, body { height: 100%; overflow: hidden }`. **It does not** — there is no
+ * `overflow` declaration anywhere in `theme.css`, and `tokens.css` sets
+ * `min-height: 100%`, which does not block scrolling. The clamp that made this
+ * necessary lives on `.ide-shell` in `ide.css` (`height: 100dvh; overflow:
+ * hidden`), which is a class, not an element selector, and is not mounted on
+ * this page. So the stated cause is stale.
+ *
+ * The rule is kept anyway, and deliberately: `tests/e2e/marketing.spec.ts`
+ * asserts on `window.scrollY` after driving `window.scrollTo`, and that
+ * assertion passes with this here. It is scoped by `:has(.mkt)` so it releases
+ * the moment this page unmounts, and removing a working scroll guarantee to
+ * tidy a comment is a trade in the wrong direction. What is corrected is the
+ * comment, which named a rule that no longer exists.
+ *
+ * Painting the ground here too stops the light body background showing through
+ * beneath the footer.
+ */
+html:has(.mkt),
+body:has(.mkt) {
+  height: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* Painted separately at (0,1,2) so it beats theme.css's `body { background }`
+   without !important. `.mkt` already covers the full document height, so this
+   only shows during elastic/overscroll — but that flash would be white. */
+:root:has(.mkt) body {
+  background: var(--mkt-void);
+}
+
+.mkt {
+  --mkt-bg: var(--mkt-void);
+  --mkt-bg-raised: var(--mkt-raised);
+  --mkt-fg: var(--sur-ink);
+  --mkt-fg-dim: var(--sur-ink-muted);
+  --mkt-rule: var(--mkt-gold-dim);
+  --mkt-accent: var(--mkt-cyan);
+  --mkt-signal: var(--mkt-magenta);
+
+  background: var(--mkt-bg);
+  color: var(--mkt-fg);
+  font-family: var(--font-body);
+  min-height: 100vh;
+}
+
+/* Dual-theme as of the flagship wiring pass. This block used to read
+ * "deliberately single-theme, unlike the product views", and the reasoning was
+ * sound given what existed at the time: there was no light version of the
+ * identity, so theming with the OS meant a visitor whose machine prefers light
+ * got a generic light page and never saw the brand at all. Committing to one
+ * ground was the right call over that choice.
+ *
+ * What changed is that a light half now exists and is approved — the parchment
+ * identity, which is a designed counterpart rather than the absence of void.
+ * So both grounds carry the identity, the role structure is the same in each,
+ * and the OS preference selects between two designs instead of between a
+ * design and a default. The old constraint is retired, not overridden.
+ *
+ * Parchment is the default. See `dual-theme.css`.
+ */
+
+.mkt__inner {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 0 var(--space-8);
+}
+
+@media (max-width: 640px) {
+  .mkt__inner {
+    padding: 0 var(--space-4);
+  }
+}
+
+/* ---------------------------------------------------------------- nav */
+.mkt-nav {
+  border-bottom: 1px solid var(--mkt-rule);
+}
+
+.mkt-nav__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+  min-height: 64px;
+  flex-wrap: wrap;
+}
+
+.mkt-nav__brand {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+  color: var(--mkt-fg);
+}
+
+.mkt-nav__links {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  flex-wrap: wrap;
+}
+
+.mkt-nav__link {
+  font-size: 14px;
+  color: var(--mkt-fg-dim);
+  text-decoration: none;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+  transition: color var(--dur-fast) var(--ease-standard);
+}
+
+.mkt-nav__link:hover,
+.mkt-nav__link:focus-visible {
+  color: var(--mkt-fg);
+}
+
+/* ---------------------------------------------------------------- hero */
+.mkt-hero {
+  padding: clamp(56px, 10vw, 112px) 0 clamp(48px, 8vw, 88px);
+  text-align: center;
+}
+
+.mkt-hero__body {
+  max-width: 780px;
+  margin: 0 auto;
+}
+
+.mkt-eyebrow {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  color: var(--mkt-accent);
+  margin: 0 0 var(--space-4);
+}
+
+.mkt-hero__headline {
+  font-family: var(--font-display);
+  font-size: clamp(32px, 6vw, 52px);
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+  font-weight: 700;
+  text-wrap: balance;
+  margin: 0 0 var(--space-6);
+}
+
+.mkt-hero__subhead {
+  font-size: clamp(16px, 2.2vw, 19px);
+  line-height: 1.55;
+  color: var(--mkt-fg-dim);
+  max-width: 62ch;
+  margin: 0 auto var(--space-8);
+  text-wrap: pretty;
+}
+
+.mkt-hero__actions {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ---------------------------------------------------------------- buttons */
+.mkt-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 var(--space-6);
+  border-radius: var(--radius-md);
+  font-size: 15px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition:
+    background var(--dur-fast) var(--ease-standard),
+    border-color var(--dur-fast) var(--ease-standard),
+    transform var(--dur-fast) var(--ease-standard);
+}
+
+.mkt-btn--primary {
+  background: var(--mkt-accent);
+  color: var(--neutral-0);
+}
+
+.mkt-btn--primary:hover,
+.mkt-btn--primary:focus-visible {
+  transform: translateY(-1px);
+}
+
+.mkt-btn--secondary {
+  background: transparent;
+  color: var(--mkt-fg);
+  border-color: var(--mkt-rule);
+}
+
+.mkt-btn--secondary:hover,
+.mkt-btn--secondary:focus-visible {
+  border-color: var(--mkt-accent);
+}
+
+/* ---------------------------------------------------------------- sections */
+.mkt-section {
+  padding: clamp(48px, 8vw, 88px) 0;
+}
+
+.mkt-section--banded {
+  background: var(--mkt-bg-raised);
+  border-top: 1px solid var(--mkt-rule);
+  border-bottom: 1px solid var(--mkt-rule);
+}
+
+.mkt-section__title {
+  font-family: var(--font-display);
+  font-size: clamp(24px, 3.6vw, 32px);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+  text-wrap: balance;
+  margin: 0 0 var(--space-2);
+}
+
+.mkt-section__subtitle {
+  font-size: 16px;
+  color: var(--mkt-fg-dim);
+  max-width: 64ch;
+  margin: 0 0 var(--space-8);
+  text-wrap: pretty;
+}
+
+/* ---------------------------------------------------------------- steps */
+.mkt-steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+@media (max-width: 900px) {
+  .mkt-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .mkt-steps {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.mkt-card {
+  background: var(--mkt-bg-raised);
+  border: 1px solid var(--mkt-rule);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+}
+
+.mkt-section--banded .mkt-card {
+  background: var(--mkt-bg);
+}
+
+/* The two scarce moments on the page: the human review gate (the product's
+   differentiator) and the highlighted tier. Magenta appears here and nowhere
+   else, matching its 4.5% share of the corpus's rendered chroma. */
+.mkt-card--accent {
+  border-color: var(--mkt-signal);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--mkt-signal) 22%, transparent);
+  border-width: 2px;
+  padding: calc(var(--space-6) - 1px);
+}
+
+.mkt-card__label {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--mkt-fg);
+  margin: 0 0 var(--space-3);
+}
+
+.mkt-card--accent .mkt-card__label {
+  color: var(--mkt-signal);
+}
+
+.mkt-card__body {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--mkt-fg-dim);
+  margin: 0;
+  text-wrap: pretty;
+}
+
+/* ---------------------------------------------------------------- boundaries */
+.mkt-boundaries {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-8);
+}
+
+@media (max-width: 720px) {
+  .mkt-boundaries {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-6);
+  }
+}
+
+.mkt-list__label {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  margin: 0 0 var(--space-4);
+}
+
+.mkt-list__label--strong {
+  color: var(--mkt-gold);
+}
+
+.mkt-list__label--evolving {
+  color: var(--mkt-fg-dim);
+}
+
+.mkt-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.mkt-list li {
+  position: relative;
+  padding-left: var(--space-6);
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--mkt-fg);
+  text-wrap: pretty;
+}
+
+.mkt-list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.6em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--mkt-gold);
+}
+
+.mkt-list--evolving li {
+  color: var(--mkt-fg-dim);
+}
+
+.mkt-list--evolving li::before {
+  background: var(--mkt-fg-dim);
+}
+
+/* ---------------------------------------------------------------- pricing */
+.mkt-pricing__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-2);
+}
+
+.mkt-pricing__head .mkt-section__title {
+  margin-bottom: 0;
+}
+
+/* Mandatory while prices are placeholders with no live Stripe account. */
+.mkt-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--mkt-gold);
+  color: var(--mkt-gold);
+  background: transparent;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  padding: var(--space-1) var(--space-3);
+  white-space: nowrap;
+}
+
+.mkt-tiers {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+@media (max-width: 820px) {
+  .mkt-tiers {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.mkt-tier__name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--mkt-fg-dim);
+  margin: 0 0 var(--space-2);
+}
+
+.mkt-tier__price {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0 0 var(--space-3);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------------------------------------- trust */
+.mkt-trust {
+  text-align: center;
+}
+
+.mkt-trust__body {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.mkt-trust__para {
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--mkt-fg);
+  margin: 0 0 var(--space-4);
+  text-wrap: pretty;
+}
+
+.mkt-trust__disclaimer {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--mkt-fg-dim);
+  margin: 0;
+  text-wrap: pretty;
+}
+
+/* ---------------------------------------------------------------- footer */
+.mkt-footer {
+  border-top: 1px solid var(--mkt-rule);
+  padding: var(--space-8) 0;
+}
+
+.mkt-footer__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  font-size: 14px;
+  color: var(--mkt-fg-dim);
+}
+
+.mkt-footer__links {
+  display: flex;
+  gap: var(--space-6);
+  flex-wrap: wrap;
+}
+
+.mkt-footer__links a {
+  color: var(--mkt-fg-dim);
+  text-decoration: none;
+}
+
+.mkt-footer__links a:hover,
+.mkt-footer__links a:focus-visible {
+  color: var(--mkt-fg);
+}
+
+.mkt :focus-visible {
+  outline: 2px solid var(--mkt-accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mkt * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* ---------------------------------------------------------------- assets */
+
+.mkt-nav__brandmark,
+.mkt-footer__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* The hero is the only section carrying the ambient lattice, and it needs a
+   stacking context so the field sits behind the copy rather than over it. */
+.mkt-hero {
+  position: relative;
+  isolation: isolate;
+}
+
+.mkt-hero > .mkt__inner {
+  position: relative;
+  z-index: 1;
+}
+
+/* Step icons inherit the card's colour, which is what keeps magenta scarce
+   without each icon needing to know the rule. */
+.mkt-card__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--mkt-rule);
+  color: var(--mkt-accent);
+  margin-bottom: var(--space-4);
+}
+
+.mkt-card--accent .mkt-card__icon {
+  color: var(--mkt-signal);
+  border-color: color-mix(in srgb, var(--mkt-signal) 45%, transparent);
+}
+
+/* Boundary rows now lead with an icon, so the CSS bullet is retired. */
+.mkt-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding-left: 0;
+}
+
+.mkt-list li::before {
+  content: none;
+}
+
+.mkt-list__icon {
+  flex: 0 0 auto;
+  margin-top: 0.15em;
+  color: var(--mkt-gold);
+}
+
+.mkt-list--evolving .mkt-list__icon {
+  color: var(--mkt-fg-dim);
+}

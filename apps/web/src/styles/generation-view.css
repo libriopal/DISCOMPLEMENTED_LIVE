@@ -1,0 +1,678 @@
+/* GenerationView — token-based styles (replaces all inline hex/px) */
+
+.gen-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* === Empty state (no pipeline running) === */
+.gen-empty {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: 48px var(--space-4);
+  max-width: 760px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.gen-empty__title {
+  font-size: 28px;
+  color: var(--text-primary);
+  margin-bottom: var(--space-2);
+  font-family: var(--font-display);
+}
+
+.gen-empty__subtitle {
+  color: var(--text-muted);
+  font-size: 15px;
+  margin-bottom: var(--space-4);
+}
+
+.gen-empty__textarea {
+  padding: var(--space-4);
+  border-radius: 12px;
+  border: 1px solid var(--border-default);
+  background: var(--surface-base);
+  color: var(--text-primary);
+  font-size: 15px;
+  font-family: var(--font-body);
+  resize: vertical;
+  outline: none;
+  transition: border-color var(--duration-fast) var(--ease-standard);
+}
+
+.gen-empty__textarea:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px var(--color-accent);
+}
+
+.gen-empty__actions {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.gen-empty__btn {
+  padding: 10px var(--space-6);
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--button-bg);
+  color: var(--button-text);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-standard);
+}
+
+.gen-empty__btn:hover:not(:disabled) {
+  background: var(--button-bg-hover);
+}
+
+.gen-empty__btn:disabled {
+  background: var(--surface-muted);
+  cursor: default;
+}
+
+.gen-empty__error {
+  color: var(--danger);
+  font-size: 13px;
+}
+
+/* === Pipeline progress indicator === */
+.gen-progress {
+  margin-top: var(--space-8);
+}
+
+.gen-progress__bar {
+  display: flex;
+  gap: var(--space-6);
+  padding: var(--space-4) 0;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.gen-progress__step {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 13px;
+  color: var(--text-muted);
+  transition: color var(--duration-normal) var(--ease-standard);
+}
+
+.gen-progress__step--active,
+.gen-progress__step--done {
+  color: var(--semantic-400);
+}
+
+.gen-progress__step-circle {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  background: var(--surface-muted);
+  color: var(--text-muted);
+  transition: all var(--duration-normal) var(--ease-standard);
+}
+
+.gen-progress__step--active .gen-progress__step-circle,
+.gen-progress__step--done .gen-progress__step-circle {
+  background: var(--semantic-400);
+  color: var(--neutral-950);
+}
+
+/* === Blueprint approval gate === */
+.gen-approval {
+  padding: var(--space-8);
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.gen-approval__card {
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+  background: color-mix(in srgb, var(--color-accent) 5%, transparent);
+}
+
+.gen-approval__title {
+  color: var(--text-primary);
+  margin-bottom: var(--space-4);
+  font-family: var(--font-display);
+}
+
+.gen-approval__blueprint {
+  font-size: 12px;
+  max-height: 300px;
+  overflow: auto;
+  background: var(--surface-base);
+  padding: var(--space-4);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+}
+
+.gen-approval__actions {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.gen-approval__btn--approve {
+  padding: 10px var(--space-5);
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--success);
+  color: var(--neutral-0);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.gen-approval__btn--reject {
+  padding: 10px var(--space-5);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-default);
+  background: transparent;
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* === IDE view (pipeline running) === */
+.gen-ide {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.gen-ide__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: var(--ide-header-bg);
+  border-bottom: 1px solid var(--ide-header-border);
+}
+
+.gen-ide__status {
+  font-size: 13px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.gen-ide__status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--text-muted);
+}
+
+.gen-ide__status-dot--running {
+  background: var(--semantic-400);
+  animation: pulse 1.5s infinite;
+}
+
+.gen-ide__status-dot--done {
+  background: var(--success);
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+/* === IDE view (pipeline running) — additional classes === */
+.gen-ide__coder-badge {
+  font-size: 12px;
+  color: var(--color-accent);
+  padding: var(--space-1) var(--space-2);
+  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+  border-radius: var(--radius-sm);
+}
+
+.gen-ide__error-toast {
+  position: fixed;
+  bottom: var(--space-4);
+  right: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-sm);
+  background: var(--danger);
+  color: var(--neutral-0);
+  font-size: 14px;
+  max-width: 400px;
+  z-index: var(--z-sticky);
+}
+
+/* Deploy button */
+.gen-ide__deploy-btn {
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 15%, transparent);
+  color: var(--color-accent);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-standard);
+}
+
+.gen-ide__deploy-btn:hover:not(:disabled) {
+  background: var(--color-accent);
+  color: var(--neutral-0);
+}
+
+.gen-ide__deploy-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Figma connection UI */
+.figma-connect-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-default);
+  background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+  color: var(--color-accent);
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-standard);
+}
+
+.figma-connect-btn:hover {
+  background: color-mix(in srgb, var(--color-accent) 15%, transparent);
+  border-color: var(--color-accent);
+}
+
+.figma-connected-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--success);
+  background: color-mix(in srgb, var(--success) 8%, transparent);
+  color: var(--success);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* ===================================================================== *
+ * §3.4 — pipeline legibility
+ *
+ * Roles, per Appendix B.2 and the carry-over rules in B.7:
+ *   ground     --sur-ground / --sur-ground-2   the surface itself
+ *   structure  --sur-benchmark (gold)          the rail and its rules
+ *   accent     --sur-contour  (cyan)           the stage that is working
+ *   signal     --sur-checkpoint (magenta/terracotta)  the review gate, ONLY
+ *
+ * The signal token appears in exactly two rules below, both of them the
+ * review gate: the gate's stage in the rail, and the gate panel itself.
+ * `styles/gate-scarcity.test.ts` reads this file and fails if a third
+ * claimant appears.
+ * ===================================================================== */
+
+.pipe-status {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background: var(--sur-ground-2);
+  border-bottom: 1px solid var(--sur-line);
+}
+
+/* --- the rail: structure ------------------------------------------- */
+
+.pipe-rail {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pipe-rail__stage {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 13px;
+  color: var(--sur-ink-faint);
+  transition: color var(--duration-normal) var(--ease-standard);
+}
+
+.pipe-rail__mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--sur-line-strong);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.pipe-rail__stage--done {
+  color: var(--sur-ink-muted);
+}
+
+.pipe-rail__stage--done .pipe-rail__mark {
+  border-color: var(--sur-benchmark);
+  color: var(--sur-benchmark);
+}
+
+.pipe-rail__stage--active {
+  color: var(--sur-ink);
+}
+
+.pipe-rail__stage--active .pipe-rail__mark {
+  border-color: var(--sur-contour);
+  color: var(--sur-contour);
+  animation: pipe-rail-pulse 1.6s ease-in-out infinite;
+}
+
+/* SIGNAL 1 of 2 — the stage that stopped to ask a human. */
+.pipe-rail__stage--gate {
+  color: var(--sur-checkpoint);
+  font-weight: 600;
+}
+
+.pipe-rail__stage--gate .pipe-rail__mark {
+  border-color: currentColor;
+  color: currentColor;
+}
+
+.pipe-rail__stage--failed {
+  color: var(--danger);
+}
+
+.pipe-rail__stage--failed .pipe-rail__mark {
+  border-color: currentColor;
+  color: currentColor;
+}
+
+@keyframes pipe-rail-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pipe-rail__stage--active .pipe-rail__mark {
+    animation: none;
+  }
+}
+
+/* --- the status line ------------------------------------------------ */
+
+.pipe-status__line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-3);
+  font-size: 13px;
+}
+
+.pipe-status__count {
+  color: var(--sur-ink-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.pipe-status__now {
+  color: var(--sur-ink);
+}
+
+/* A run waiting on a person and a run waiting on a model look identical in a
+   spinner, and they are the two states a founder most needs to tell apart. */
+.pipe-status__now--you {
+  font-weight: 600;
+}
+
+.pipe-status__elapsed,
+.pipe-status__model {
+  margin-left: auto;
+  color: var(--sur-ink-faint);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.pipe-status__model {
+  margin-left: 0;
+}
+
+.pipe-status__next {
+  margin: 0;
+  font-size: 12px;
+  color: var(--sur-ink-faint);
+}
+
+/* --- the three preview tiers, as three states ----------------------- */
+
+.pipe-status__preview {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--sur-line);
+  font-size: 12px;
+  color: var(--sur-ink-faint);
+}
+
+.pipe-tier {
+  flex-shrink: 0;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--sur-line-strong);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--sur-ink-muted);
+}
+
+/* Deliberately three different treatments, not three different words: an
+   outline, a filled outline, and a solid. §3.4 asks for visibly different
+   states, and "Instant" / "Bundled" / "Full-stack" in identical chrome is one
+   state with three captions. */
+.pipe-tier--esbuild {
+  border-color: var(--sur-benchmark);
+  color: var(--sur-benchmark);
+}
+
+.pipe-tier--sandbox {
+  border-color: var(--sur-contour);
+  background: var(--sur-contour);
+  color: var(--sur-on-signal);
+}
+
+/* --- the review gate ------------------------------------------------ */
+
+/* SIGNAL 2 of 2 — the panel. Appendix A.3: no crawled competitor exposes a
+   human approval gate as a headline feature, so it gets the scarcest colour
+   in the system and nothing else on this surface may claim it. */
+.review-gate {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  margin-bottom: var(--space-3);
+  border: 1px solid var(--sur-checkpoint);
+  border-left-width: 3px;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--sur-checkpoint) 8%, var(--sur-ground-2));
+}
+
+.review-gate__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 15px;
+  color: var(--sur-checkpoint);
+}
+
+.review-gate__body {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--sur-ink);
+}
+
+.review-gate__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.review-gate__label {
+  font-size: 12px;
+  color: var(--sur-ink-muted);
+}
+
+.review-gate__textarea {
+  padding: var(--space-2);
+  border: 1px solid var(--sur-line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--sur-ground);
+  color: var(--sur-ink);
+  /* 16px floor: anything smaller makes iOS Safari zoom on focus, which is the
+     same defect the flagship brief's §2c found on /signin. */
+  font-size: 16px;
+  font-family: var(--font-body);
+  resize: vertical;
+}
+
+.review-gate__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.review-gate__btn {
+  /* 44px tall including padding — the tap-target floor the mobile suite
+     asserts at 390px. */
+  min-height: 44px;
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--sur-line-strong);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--sur-ink);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-standard);
+}
+
+.review-gate__btn:hover:not(:disabled) {
+  background: var(--sur-ground-3);
+}
+
+.review-gate__btn--signal {
+  border-color: transparent;
+  background: var(--sur-checkpoint);
+  color: var(--sur-on-signal);
+}
+
+.review-gate__btn--signal:hover:not(:disabled) {
+  background: var(--sur-checkpoint-bright);
+}
+
+.review-gate__btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.review-gate__note {
+  margin: 0;
+  font-size: 11px;
+  color: var(--sur-ink-faint);
+}
+
+/* --- the error report ----------------------------------------------- */
+
+/* Replaces `.gen-ide__error-toast`, which rendered one raw string in a red
+   box with nothing to act on. §3.4: errors must say what failed, at which
+   stage, and what the user can do. */
+.pipe-error {
+  position: fixed;
+  right: var(--space-4);
+  bottom: var(--space-4);
+  z-index: var(--z-sticky);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-width: 420px;
+  padding: var(--space-4);
+  border: 1px solid var(--danger);
+  border-left-width: 3px;
+  border-radius: var(--radius-md);
+  background: var(--sur-ground-2);
+  color: var(--sur-ink);
+}
+
+.pipe-error__headline {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.pipe-error__detail {
+  margin: 0;
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--sur-ground);
+  color: var(--sur-ink-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.5;
+  overflow-x: auto;
+}
+
+.pipe-error__remedy {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--sur-ink);
+}
+
+.pipe-error__actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.pipe-error__btn {
+  min-height: 44px;
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--sur-line-strong);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--sur-ink);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.pipe-error__btn:hover {
+  background: var(--sur-ground-3);
+}

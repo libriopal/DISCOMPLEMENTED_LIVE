@@ -1,0 +1,115 @@
+/**
+ * Cohere proxy — free-first model routing for the 4-agent pipeline.
+ * `selectModel(step, complexity)` maps a pipeline step to its model
+ * (@bicameral/cohere/model-router); `callModel()` dispatches the chat
+ * request to the right provider and normalizes any per-model quirks so
+ * callers never branch on provider or model. See @agent_docs/cohere-integration.md.
+ *
+ * OpenRouter (`callOpenRouter`) is still available for genuinely
+ * OpenRouter-only models, but nothing in the pipeline routes there today —
+ * North Mini Code (the one model that used to) is called directly through
+ * Cohere's own API instead (see model-router.ts for why).
+ */
+import {
+  chat,
+  type ChatRequest,
+  type ChatResponse,
+} from '@bicameral/cohere/chat';
+import { callOpenRouter } from '@bicameral/cohere/openrouter';
+import {
+  selectModel,
+  getThinkingConfig,
+  type PipelineComplexity,
+} from '@bicameral/cohere/model-router';
+import type { CohereResponse } from '@bicameral/cohere';
+import type { AgentRole } from '@bicameral/shared/types';
+import type { Env } from '../env.js';
+
+export { selectModel, getThinkingConfig };
+export type { PipelineComplexity };
+
+function isOpenRouterModel(model: string): boolean {
+  return model.includes('/') || model.endsWith(':free');
+}
+
+// North models 400 on `response_format: json_object` — unlike R7B/Command A,
+// which need it for reliable JSON output. Confirmed directly against the
+// live API during Phase 9 testing.
+function isNorthModel(model: string): boolean {
+  return model.startsWith('north-');
+}
+
+/** Routes a chat request to the provider that serves `model`, normalizing
+ * both into the same CohereResponse<ChatResponse> shape. */
+export async function callModel(
+  model: string,
+  request: Omit<ChatRequest, 'model'>,
+  env: Env
+): Promise<CohereResponse<ChatResponse>> {
+  const fullRequest: ChatRequest = { ...request, model };
+  if (isNorthModel(model)) {
+    delete fullRequest.responseFormat;
+    // Cohere Labs' own model card (huggingface.co/CohereLabs/North-Mini-Code-1.0,
+    // verified 2026-08-12) states this model's generation quality was
+    // calibrated at temperature=1.0, top_p=0.95 — overriding whatever the
+    // caller passed (coder.ts previously hardcoded 0.2, a low-temperature
+    // trick meant for models relying on response_format for JSON compliance,
+    // which North can't use — see the delete above). Running this model
+    // outside its documented sampling point is a real, verified contributor
+    // to malformed/degenerate output, not just theory.
+    fullRequest.temperature = 1.0;
+    fullRequest.topP = 0.95;
+  }
+
+  if (isOpenRouterModel(model)) {
+    return callOpenRouter(fullRequest, {
+      OPENROUTER_API_KEY: env.OPENROUTER_API_KEY,
+      OPENROUTER_BASE_URL: env.OPENROUTER_BASE_URL,
+    });
+  }
+
+  return chat(fullRequest, {
+    COHERE_API_KEY: env.COHERE_API_KEY,
+    COHERE_API_BASE: env.COHERE_BASE_URL,
+  });
+}
+
+/** Convenience wrapper: picks the model for `step`/`complexity` and calls it. */
+/**
+ * `tier` was missing from this signature, so `selectModel`'s third argument was
+ * never supplied and its `if (tier === 'enterprise')` branch — the only path to
+ * command-a-plus-05-2026 — was unreachable through the agent pipeline.
+ * Enterprise accounts were silently served the same model as pro.
+ *
+ * The tier was already in scope at every call site (runAuditor, runVerifier and
+ * runDesigner take a `tier` parameter; researcher and coder read it off their
+ * context object and already use it for `getThinkingConfig`). Only this
+ * function had nowhere to put it.
+ *
+ * Passing nothing keeps the previous behaviour, so tier-less callers are
+ * unaffected: `selectModel` falls through to `selectModelInner` for every tier
+ * except enterprise.
+ */
+export async function callAgentModel(
+  step: AgentRole,
+  complexity: PipelineComplexity,
+  request: Omit<ChatRequest, 'model'>,
+  env: Env,
+  tier?: 'free' | 'pro' | 'team' | 'enterprise'
+): Promise<CohereResponse<ChatResponse>> {
+  // `env` is passed so the auditor's AUDITOR_MODEL override is honoured at the
+  // point of dispatch. Every site that *records* which model ran must pass it
+  // too, or the label drifts from reality the moment an override is set.
+  const model = selectModel(step, complexity, tier, env);
+  // `thinking` is decided here rather than at the call sites, because it is a
+  // function of the model far more than of the role: command-a-03-2025 (every
+  // non-enterprise dispatch since 2026-08-27) rejects the parameter outright,
+  // while Command A+ on enterprise accepts it. The agents used to pass
+  // getThinkingConfig(role, tier) without a model and could not know which
+  // they were talking to.
+  return callModel(
+    model,
+    { ...request, thinking: getThinkingConfig(step, tier, model) },
+    env
+  );
+}

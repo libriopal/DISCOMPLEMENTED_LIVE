@@ -1,0 +1,545 @@
+{
+  "timestamp": "2026-08-19T15:18:23.580999+00:00",
+  "run_type": "butterfly_evolution",
+  "data_source": "allenai/WildChat + DeepMostInnovations/saas-sales-conversations (4000 sampled each)",
+  "population_size": 30,
+  "num_generations": 50,
+  "interactions_per_genome": 1200,
+  "total_simulated_interactions": 1800000,
+  "target_vdr": 91.3,
+  "target_house_edge": 8.7,
+  "baseline_vdr": 15.55,
+  "baseline_house_edge": 84.45,
+  "baseline_result": {
+    "vdr": 15.55,
+    "house_edge": 84.45,
+    "total_credits": 7484,
+    "value_credits": 1164,
+    "loss_credits": 6320,
+    "win_runs": 186,
+    "loss_runs": 737,
+    "partial_runs": 277,
+    "total_tripwire_hits": 1024,
+    "bots_killed": 360,
+    "tripwire_breakdown": {
+      "TW-06-token-overflow": 140,
+      "TW-09-unauthorized-access": 103,
+      "moderation-gate": 139,
+      "TW-03-credit-burn-no-value": 132,
+      "TW-04-approval-bypass": 173,
+      "TW-07-duplicate-generation": 93
+    }
+  },
+  "evolved_vdr": 45.06,
+  "evolved_house_edge": 54.94,
+  "evolved_genome": {
+    "tw_01_empty_generation": 4,
+    "tw_02_infinite_loop": 3,
+    "tw_03_credit_burn": 39,
+    "tw_04_approval_bypass": 2,
+    "tw_05_silent_failure": 5,
+    "tw_06_token_overflow": 56054,
+    "tw_07_duplicate_gen": 6,
+    "tw_08_timeout": 33,
+    "tw_09_unauthorized": 1,
+    "early_exit_threshold": 23,
+    "tripwire_sensitivity": 4,
+    "deployment_gate_score": 0.3,
+    "approval_timeout_hours": 24,
+    "research_depth": 4,
+    "retry_limit": 5,
+    "per_user_budget": 267,
+    "per_bot_budget": 50,
+    "conversation_turn_limit": 25,
+    "burn_rate_per_min": 27,
+    "agent_timeout_seconds": 247,
+    "agent_parallel": 1,
+    "agent_research_sources": 4,
+    "responsive_breakpoint_px": 934,
+    "content_density": 0.857
+  },
+  "evolved_result": {
+    "vdr": 39.42,
+    "house_edge": 60.58,
+    "total_credits": 7873,
+    "value_credits": 3104,
+    "loss_credits": 4770,
+    "win_runs": 533,
+    "loss_runs": 431,
+    "partial_runs": 236,
+    "total_tripwire_hits": 1351,
+    "bots_killed": 135,
+    "tripwire_breakdown": {
+      "TW-06-token-overflow": 221,
+      "TW-04-approval-bypass": 251,
+      "TW-09-unauthorized-access": 118,
+      "moderation-gate": 192,
+      "TW-07-duplicate-generation": 111,
+      "TW-03-credit-burn-no-value": 221
+    }
+  },
+  "target_reached": false,
+  "improvement": 29.51,
+  "improvement_percent": 189.77,
+  "evolution_history": [
+    {
+      "generation": 1,
+      "best_vdr": 23.16,
+      "avg_vdr": 17.58,
+      "worst_vdr": 14.5,
+      "overall_best_vdr": 23.16
+    },
+    {
+      "generation": 2,
+      "best_vdr": 23.32,
+      "avg_vdr": 19.52,
+      "worst_vdr": 10.01,
+      "overall_best_vdr": 23.32
+    },
+    {
+      "generation": 3,
+      "best_vdr": 25.08,
+      "avg_vdr": 20.62,
+      "worst_vdr": 8.81,
+      "overall_best_vdr": 25.08
+    },
+    {
+      "generation": 4,
+      "best_vdr": 27.14,
+      "avg_vdr": 21.58,
+      "worst_vdr": 12.95,
+      "overall_best_vdr": 27.14
+    },
+    {
+      "generation": 5,
+      "best_vdr": 26.61,
+      "avg_vdr": 22.57,
+      "worst_vdr": 11.28,
+      "overall_best_vdr": 27.14
+    },
+    {
+      "generation": 6,
+      "best_vdr": 27.39,
+      "avg_vdr": 23.1,
+      "worst_vdr": 11.72,
+      "overall_best_vdr": 27.39
+    },
+    {
+      "generation": 7,
+      "best_vdr": 27.03,
+      "avg_vdr": 23.79,
+      "worst_vdr": 6.39,
+      "overall_best_vdr": 27.39
+    },
+    {
+      "generation": 8,
+      "best_vdr": 28.69,
+      "avg_vdr": 24.07,
+      "worst_vdr": 7.82,
+      "overall_best_vdr": 28.69
+    },
+    {
+      "generation": 9,
+      "best_vdr": 35.95,
+      "avg_vdr": 25.39,
+      "worst_vdr": 10.61,
+      "overall_best_vdr": 35.95
+    },
+    {
+      "generation": 10,
+      "best_vdr": 37.73,
+      "avg_vdr": 27.87,
+      "worst_vdr": 16.04,
+      "overall_best_vdr": 37.73
+    },
+    {
+      "generation": 11,
+      "best_vdr": 40.5,
+      "avg_vdr": 29.53,
+      "worst_vdr": 10.22,
+      "overall_best_vdr": 40.5
+    },
+    {
+      "generation": 12,
+      "best_vdr": 40.73,
+      "avg_vdr": 31.76,
+      "worst_vdr": 8.23,
+      "overall_best_vdr": 40.73
+    },
+    {
+      "generation": 13,
+      "best_vdr": 40.33,
+      "avg_vdr": 33.68,
+      "worst_vdr": 12.62,
+      "overall_best_vdr": 40.73
+    },
+    {
+      "generation": 14,
+      "best_vdr": 43.98,
+      "avg_vdr": 36.2,
+      "worst_vdr": 15.73,
+      "overall_best_vdr": 43.98
+    },
+    {
+      "generation": 15,
+      "best_vdr": 43.17,
+      "avg_vdr": 35.71,
+      "worst_vdr": 8.61,
+      "overall_best_vdr": 43.98
+    },
+    {
+      "generation": 16,
+      "best_vdr": 41.83,
+      "avg_vdr": 36.13,
+      "worst_vdr": 16.6,
+      "overall_best_vdr": 43.98
+    },
+    {
+      "generation": 17,
+      "best_vdr": 43.27,
+      "avg_vdr": 36.2,
+      "worst_vdr": 10.04,
+      "overall_best_vdr": 43.98
+    },
+    {
+      "generation": 18,
+      "best_vdr": 42.22,
+      "avg_vdr": 35.9,
+      "worst_vdr": 9.82,
+      "overall_best_vdr": 43.98
+    },
+    {
+      "generation": 19,
+      "best_vdr": 42.1,
+      "avg_vdr": 35.19,
+      "worst_vdr": 12.41,
+      "overall_best_vdr": 43.98
+    },
+    {
+      "generation": 20,
+      "best_vdr": 41.23,
+      "avg_vdr": 35.47,
+      "worst_vdr": 10.44,
+      "overall_best_vdr": 43.98
+    },
+    {
+      "generation": 21,
+      "best_vdr": 41.95,
+      "avg_vdr": 35.22,
+      "worst_vdr": 9.99,
+      "overall_best_vdr": 43.98
+    },
+    {
+      "generation": 22,
+      "best_vdr": 42.43,
+      "avg_vdr": 34.94,
+      "worst_vdr": 8.63,
+      "overall_best_vdr": 43.98
+    },
+    {
+      "generation": 23,
+      "best_vdr": 43.18,
+      "avg_vdr": 35.62,
+      "worst_vdr": 9.84,
+      "overall_best_vdr": 43.98
+    },
+    {
+      "generation": 24,
+      "best_vdr": 42.15,
+      "avg_vdr": 36.23,
+      "worst_vdr": 18.36,
+      "overall_best_vdr": 43.98
+    },
+    {
+      "generation": 25,
+      "best_vdr": 42.9,
+      "avg_vdr": 36.56,
+      "worst_vdr": 14.76,
+      "overall_best_vdr": 43.98
+    },
+    {
+      "generation": 26,
+      "best_vdr": 42.07,
+      "avg_vdr": 34.95,
+      "worst_vdr": 9.58,
+      "overall_best_vdr": 43.98
+    },
+    {
+      "generation": 27,
+      "best_vdr": 41.87,
+      "avg_vdr": 35.05,
+      "worst_vdr": 7.01,
+      "overall_best_vdr": 43.98
+    },
+    {
+      "generation": 28,
+      "best_vdr": 43.22,
+      "avg_vdr": 37.24,
+      "worst_vdr": 17.29,
+      "overall_best_vdr": 43.98
+    },
+    {
+      "generation": 29,
+      "best_vdr": 44.37,
+      "avg_vdr": 35.89,
+      "worst_vdr": 10.28,
+      "overall_best_vdr": 44.37
+    },
+    {
+      "generation": 30,
+      "best_vdr": 42.85,
+      "avg_vdr": 35.49,
+      "worst_vdr": 10.16,
+      "overall_best_vdr": 44.37
+    },
+    {
+      "generation": 31,
+      "best_vdr": 43.45,
+      "avg_vdr": 35.34,
+      "worst_vdr": 7.19,
+      "overall_best_vdr": 44.37
+    },
+    {
+      "generation": 32,
+      "best_vdr": 42.71,
+      "avg_vdr": 36.19,
+      "worst_vdr": 13.32,
+      "overall_best_vdr": 44.37
+    },
+    {
+      "generation": 33,
+      "best_vdr": 42.98,
+      "avg_vdr": 35.75,
+      "worst_vdr": 12.58,
+      "overall_best_vdr": 44.37
+    },
+    {
+      "generation": 34,
+      "best_vdr": 42.65,
+      "avg_vdr": 35.95,
+      "worst_vdr": 7.17,
+      "overall_best_vdr": 44.37
+    },
+    {
+      "generation": 35,
+      "best_vdr": 43.53,
+      "avg_vdr": 35.97,
+      "worst_vdr": 10.45,
+      "overall_best_vdr": 44.37
+    },
+    {
+      "generation": 36,
+      "best_vdr": 42.09,
+      "avg_vdr": 35.62,
+      "worst_vdr": 7.96,
+      "overall_best_vdr": 44.37
+    },
+    {
+      "generation": 37,
+      "best_vdr": 41.32,
+      "avg_vdr": 35.65,
+      "worst_vdr": 13.88,
+      "overall_best_vdr": 44.37
+    },
+    {
+      "generation": 38,
+      "best_vdr": 42.35,
+      "avg_vdr": 34.73,
+      "worst_vdr": 7.84,
+      "overall_best_vdr": 44.37
+    },
+    {
+      "generation": 39,
+      "best_vdr": 43.01,
+      "avg_vdr": 34.9,
+      "worst_vdr": 10.68,
+      "overall_best_vdr": 44.37
+    },
+    {
+      "generation": 40,
+      "best_vdr": 42.71,
+      "avg_vdr": 36.48,
+      "worst_vdr": 12.24,
+      "overall_best_vdr": 44.37
+    },
+    {
+      "generation": 41,
+      "best_vdr": 45.06,
+      "avg_vdr": 36.38,
+      "worst_vdr": 11.05,
+      "overall_best_vdr": 45.06
+    },
+    {
+      "generation": 42,
+      "best_vdr": 43.48,
+      "avg_vdr": 36.66,
+      "worst_vdr": 18.66,
+      "overall_best_vdr": 45.06
+    },
+    {
+      "generation": 43,
+      "best_vdr": 43.05,
+      "avg_vdr": 34.94,
+      "worst_vdr": 9.81,
+      "overall_best_vdr": 45.06
+    },
+    {
+      "generation": 44,
+      "best_vdr": 43.84,
+      "avg_vdr": 36.57,
+      "worst_vdr": 14.92,
+      "overall_best_vdr": 45.06
+    },
+    {
+      "generation": 45,
+      "best_vdr": 42.18,
+      "avg_vdr": 35.31,
+      "worst_vdr": 12.52,
+      "overall_best_vdr": 45.06
+    },
+    {
+      "generation": 46,
+      "best_vdr": 42.2,
+      "avg_vdr": 35.36,
+      "worst_vdr": 8.49,
+      "overall_best_vdr": 45.06
+    },
+    {
+      "generation": 47,
+      "best_vdr": 41.9,
+      "avg_vdr": 35.88,
+      "worst_vdr": 12.55,
+      "overall_best_vdr": 45.06
+    },
+    {
+      "generation": 48,
+      "best_vdr": 42.55,
+      "avg_vdr": 36.76,
+      "worst_vdr": 18.14,
+      "overall_best_vdr": 45.06
+    },
+    {
+      "generation": 49,
+      "best_vdr": 43.14,
+      "avg_vdr": 36.01,
+      "worst_vdr": 13.99,
+      "overall_best_vdr": 45.06
+    },
+    {
+      "generation": 50,
+      "best_vdr": 44.45,
+      "avg_vdr": 36.2,
+      "worst_vdr": 8.79,
+      "overall_best_vdr": 45.06
+    }
+  ],
+  "genome_changes": {
+    "tw_01_empty_generation": {
+      "baseline": 2,
+      "evolved": 4,
+      "changed": true
+    },
+    "tw_03_credit_burn": {
+      "baseline": 20,
+      "evolved": 39,
+      "changed": true
+    },
+    "tw_04_approval_bypass": {
+      "baseline": 1,
+      "evolved": 2,
+      "changed": true
+    },
+    "tw_05_silent_failure": {
+      "baseline": 2,
+      "evolved": 5,
+      "changed": true
+    },
+    "tw_06_token_overflow": {
+      "baseline": 100000,
+      "evolved": 56054,
+      "changed": true
+    },
+    "tw_07_duplicate_gen": {
+      "baseline": 3,
+      "evolved": 6,
+      "changed": true
+    },
+    "tw_08_timeout": {
+      "baseline": 60,
+      "evolved": 33,
+      "changed": true
+    },
+    "early_exit_threshold": {
+      "baseline": 20,
+      "evolved": 23,
+      "changed": true
+    },
+    "tripwire_sensitivity": {
+      "baseline": 2,
+      "evolved": 4,
+      "changed": true
+    },
+    "deployment_gate_score": {
+      "baseline": 0.6,
+      "evolved": 0.3,
+      "changed": true
+    },
+    "approval_timeout_hours": {
+      "baseline": 72,
+      "evolved": 24,
+      "changed": true
+    },
+    "research_depth": {
+      "baseline": 3,
+      "evolved": 4,
+      "changed": true
+    },
+    "retry_limit": {
+      "baseline": 3,
+      "evolved": 5,
+      "changed": true
+    },
+    "per_user_budget": {
+      "baseline": 100,
+      "evolved": 267,
+      "changed": true
+    },
+    "conversation_turn_limit": {
+      "baseline": 30,
+      "evolved": 25,
+      "changed": true
+    },
+    "burn_rate_per_min": {
+      "baseline": 10,
+      "evolved": 27,
+      "changed": true
+    },
+    "agent_timeout_seconds": {
+      "baseline": 60,
+      "evolved": 247,
+      "changed": true
+    },
+    "agent_parallel": {
+      "baseline": 0,
+      "evolved": 1,
+      "changed": true
+    },
+    "agent_research_sources": {
+      "baseline": 3,
+      "evolved": 4,
+      "changed": true
+    },
+    "responsive_breakpoint_px": {
+      "baseline": 768,
+      "evolved": 934,
+      "changed": true
+    },
+    "content_density": {
+      "baseline": 0.7,
+      "evolved": 0.857,
+      "changed": true
+    }
+  },
+  "safety_note": "This evolution ran 100% in simulation. Zero calls to production pipeline. The evolved genome is NOT applied to the architecture \u2014 it requires explicit human approval before any change is implemented.",
+  "recommendation": "The evolved architecture achieved VDR=45.06% (target: 91.3%). Target not reached. Current improvement: +29.51%. Recommend running more generations or adjusting the genome space."
+}

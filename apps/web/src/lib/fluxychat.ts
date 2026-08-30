@@ -1,0 +1,369 @@
+/**
+ * FluxyChat bridge — Phase 8. FluxyChat is a self-hosted chat Worker (its
+ * own Cloudflare deployment, see @agent_docs/live-chat.md); this file talks
+ * to it as a REST client via `@fluxy-chat/sdk` and answers the
+ * pipeline-status tool its Cohere-backed support agent calls mid-run.
+ */
+import { FluxyChatClient, type FluxyChatToolDefinition } from '@fluxy-chat/sdk';
+import { COHERE_MODELS } from '@bicameral/shared/constants';
+import type { Env } from '../env.js';
+import { timingSafeEqual } from './virtual-key.js';
+import { sendEmail } from './email.js';
+
+export const SUPPORT_AGENT_HANDLE = 'support-ai';
+
+const SUPPORT_ROOM_PREFIX = 'support-';
+
+export function supportRoomId(userId: string): string {
+  return `${SUPPORT_ROOM_PREFIX}${userId}`;
+}
+
+function serverClient(env: Env, userId: string): FluxyChatClient {
+  return new FluxyChatClient({
+    baseUrl: env.FLUXYCHAT_WORKER_URL,
+    userId,
+    apiKey: env.FLUXYCHAT_API_KEY,
+  });
+}
+
+export interface ChatSession {
+  token: string;
+  userId: string;
+  workerUrl: string;
+  roomId: string;
+  agentHandle: string;
+}
+
+/**
+ * Mints a short-lived member JWT for the founder and makes sure their 1:1
+ * support room exists (idempotent — createRoom 409s after the first call,
+ * which we swallow). @fluxy-chat/sdk@0.2.2 (pinned — see package.json) has
+ * no `client.signIn()` helper yet, so this mints the JWT with the same
+ * `POST /auth/token` REST call the SDK's own README documents as the
+ * "minimal backend" flow.
+ */
+export async function mintChatSession(
+  env: Env,
+  userId: string
+): Promise<ChatSession> {
+  // FLUXYCHAT_API_KEY is unset in production today. Unlike the research path,
+  // this one cannot degrade — without the key the request below would send
+  // `X-Fluxy-Api-Key: undefined` and fail at FluxyChat with an opaque auth
+  // error. Say which secret is missing instead.
+  const apiKey = env.FLUXYCHAT_API_KEY;
+  if (!apiKey) {
+    throw new Error(
+      'FLUXYCHAT_API_KEY is not set — live chat is unavailable. ' +
+        'Set it with `wrangler secret put FLUXYCHAT_API_KEY`.'
+    );
+  }
+
+  const client = serverClient(env, userId);
+  const roomId = supportRoomId(userId);
+
+  const tokenRes = await fetch(`${env.FLUXYCHAT_WORKER_URL}/auth/token`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Fluxy-Api-Key': apiKey,
+    },
+    body: JSON.stringify({ userId, roles: ['member'], ttlSeconds: 3600 }),
+  });
+  if (!tokenRes.ok) {
+    throw new Error(`FluxyChat token mint failed: ${tokenRes.status}`);
+  }
+  const { token } = await tokenRes.json<{ token: string }>();
+
+  try {
+    await client.createRoom({
+      id: roomId,
+      name: `Support — ${userId}`,
+      type: 'direct',
+      members: [{ userId, role: 'member' }],
+    });
+  } catch {
+    // Already exists — expected on every session after the first.
+  }
+
+  return {
+    token,
+    userId,
+    workerUrl: env.FLUXYCHAT_WORKER_URL,
+    roomId,
+    agentHandle: SUPPORT_AGENT_HANDLE,
+  };
+}
+
+interface PipelineRunRow {
+  id: string;
+  project_id: string | null;
+  status: string;
+  current_step: number;
+  current_agent: string | null;
+  gate_status: string | null;
+  error_message: string | null;
+  updated_date: string;
+}
+
+interface PipelineStepRow {
+  iteration: number;
+  error_message: string | null;
+}
+
+export interface PipelineStatusSummary {
+  active: boolean;
+  pipelineRunId?: string;
+  projectId?: string | null;
+  step?: number;
+  stepLabel?: string | null;
+  agentRole?: string | null;
+  status?: string;
+  gateStatus?: string | null;
+  iteration?: number | null;
+  errorMessage?: string | null;
+  updatedAt?: string;
+}
+
+// Mirrors routes/pipeline.ts TERMINAL_STATUSES — 'error' also covers
+// founder/admin cancellation (see pipeline.ts POST /:id/cancel).
+const ACTIVE_STATUS_EXCLUSION = "('deployed', 'error', 'paused')";
+
+const STEP_LABELS: Record<number, string> = {
+  1: 'Architect (Prompt Companion) — turning your vision into a project brief',
+  2: 'Researcher (Research Discovered) — validating the tech stack',
+  3: 'Designer (Design Coherent) — building the system blueprint',
+  4: 'Coder (Architecture Implemented) — writing and deploying code',
+};
+
+/** Queried by the support agent's `get_pipeline_status` tool — see chatWebhookRoutes. */
+export async function getPipelineStatusForUser(
+  db: D1Database,
+  userId: string
+): Promise<PipelineStatusSummary> {
+  const run = await db
+    .prepare(
+      `SELECT id, project_id, status, current_step, current_agent, gate_status, error_message, updated_date
+       FROM pipeline_runs
+       WHERE user_id = ? AND status NOT IN ${ACTIVE_STATUS_EXCLUSION}
+       ORDER BY created_date DESC LIMIT 1`
+    )
+    .bind(userId)
+    .first<PipelineRunRow>();
+
+  if (!run) return { active: false };
+
+  const step = await db
+    .prepare(
+      `SELECT iteration, error_message FROM pipeline_steps
+       WHERE pipeline_run_id = ? ORDER BY step_number DESC, iteration DESC LIMIT 1`
+    )
+    .bind(run.id)
+    .first<PipelineStepRow>();
+
+  return {
+    active: true,
+    pipelineRunId: run.id,
+    projectId: run.project_id,
+    step: run.current_step,
+    stepLabel: STEP_LABELS[run.current_step] ?? null,
+    agentRole: run.current_agent,
+    status: run.status,
+    gateStatus: run.gate_status,
+    iteration: step?.iteration ?? null,
+    errorMessage: run.error_message ?? step?.error_message ?? null,
+    updatedAt: run.updated_date,
+  };
+}
+
+const SUPPORT_SYSTEM_PROMPT = `You are Bicameral's customer support assistant.
+Be helpful, concise, and friendly.
+
+You have access to the Bicameral pipeline system. When a founder asks about
+their build status, call get_pipeline_status with their user_id. The
+pipeline has 4 steps:
+1. Architect (Prompt Companion) — turns vision into project brief
+2. Researcher (Research Discovered) — validates tech stack
+3. Designer (Design Coherent) — creates system blueprint
+4. Coder (Architecture Implemented) — writes and deploys code
+
+If a pipeline is awaiting_approval, tell the founder to review their
+blueprint on the Design tab. If a pipeline failed, summarize the error and
+offer to connect them with a human agent.
+
+ESCALATION — do not try to resolve these yourself, even if you think you
+know the answer. As soon as a message is about any of the following, call
+escalate_to_human immediately with a short reason and summary, then tell
+the founder a human will follow up by email:
+- a security vulnerability, data breach, or account compromise report
+- a billing dispute, unauthorized charge, refund request, or chargeback
+- a legal notice, subpoena, DMCA claim, or ToS/privacy-policy dispute
+- anything the founder explicitly asks to escalate to a human
+
+If you cannot help with something else, say "Let me connect you with a
+human agent" and call escalate_to_human with reason "general" — do not
+just apologize and stop. Never make up information about pricing,
+features, or account details.`;
+
+const PIPELINE_STATUS_TOOL: FluxyChatToolDefinition = {
+  type: 'function',
+  function: {
+    name: 'get_pipeline_status',
+    description:
+      "Get the status of the founder's active 4-agent pipeline run: which step it's on, iteration count, blueprint gate status, and any error.",
+    parameters: {
+      type: 'object',
+      properties: {
+        user_id: {
+          type: 'string',
+          description: "The founder's Bicameral user id",
+        },
+      },
+      required: ['user_id'],
+    },
+  },
+};
+
+const ESCALATION_REASONS = ['security', 'billing', 'legal', 'general'] as const;
+export type EscalationReason = (typeof ESCALATION_REASONS)[number];
+
+const ESCALATE_TOOL: FluxyChatToolDefinition = {
+  type: 'function',
+  function: {
+    name: 'escalate_to_human',
+    description:
+      'Flags this conversation for a human support agent to follow up by ' +
+      'email instead of the AI trying to resolve it. Call this immediately ' +
+      'for security, billing, or legal issues — do not attempt to resolve ' +
+      'those yourself first.',
+    parameters: {
+      type: 'object',
+      properties: {
+        user_id: {
+          type: 'string',
+          description: "The founder's Bicameral user id",
+        },
+        reason: {
+          type: 'string',
+          enum: [...ESCALATION_REASONS],
+          description: 'Category of the issue',
+        },
+        summary: {
+          type: 'string',
+          description:
+            "One or two sentences summarizing the founder's issue for the human agent.",
+        },
+      },
+      required: ['user_id', 'reason', 'summary'],
+    },
+  },
+};
+
+/**
+ * Handles the escalate_to_human tool call — emails a human agent (if
+ * SUPPORT_ESCALATION_EMAIL is configured) with the founder's id and issue
+ * summary. Never throws back into the chat flow: a founder reporting a
+ * security issue should still get a "you're being connected" reply even if
+ * the notification email itself fails, so failures are logged, not raised.
+ */
+export async function escalateToHuman(
+  env: Env,
+  userId: string,
+  reason: string,
+  summary: string
+): Promise<{ escalated: boolean }> {
+  const category = ESCALATION_REASONS.includes(reason as EscalationReason)
+    ? reason
+    : 'general';
+
+  if (!env.SUPPORT_ESCALATION_EMAIL) {
+    console.error(
+      `[chat escalation] ${category} — user ${userId}: ${summary} ` +
+        `(SUPPORT_ESCALATION_EMAIL not configured, not emailed)`
+    );
+    return { escalated: true };
+  }
+
+  try {
+    // summary/userId originate from an AI tool call driven by the
+    // founder's own chat messages — escape before interpolating into HTML,
+    // same as any other untrusted input reaching an email template.
+    const esc = (s: string) =>
+      s.replace(
+        /[&<>"']/g,
+        (c) =>
+          ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;',
+          })[c]!
+      );
+    await sendEmail(
+      {
+        to: env.SUPPORT_ESCALATION_EMAIL,
+        subject: `[Bicameral support] ${category} escalation — ${userId}`,
+        html: `
+          <p><strong>Category:</strong> ${esc(category)}</p>
+          <p><strong>Founder user id:</strong> ${esc(userId)}</p>
+          <p><strong>Summary:</strong> ${esc(summary)}</p>
+          <p>Room: ${esc(supportRoomId(userId))}</p>
+        `.trim(),
+      },
+      env
+    );
+  } catch (err) {
+    console.error(
+      `[chat escalation] failed to send escalation email for user ${userId}:`,
+      err
+    );
+  }
+
+  return { escalated: true };
+}
+
+/**
+ * (Re)creates the Cohere-backed support agent on the FluxyChat Worker.
+ * Idempotent by handle — safe to call from an admin route whenever the
+ * system prompt or tool wiring changes. The Worker itself owns the Cohere
+ * API key and llmBaseUrl for `provider: "custom"` (set via `wrangler secret
+ * put` on the FluxyChat deployment, not passed through this call).
+ */
+export async function provisionSupportAgent(env: Env) {
+  // Same reason as mintChatSession: without the key the SDK would send an
+  // undefined X-Fluxy-Api-Key and the admin would read FluxyChat's opaque
+  // auth error instead of "the secret is not set".
+  if (!env.FLUXYCHAT_API_KEY) {
+    throw new Error(
+      'FLUXYCHAT_API_KEY is not set — cannot provision the support agent. ' +
+        'Set it with `wrangler secret put FLUXYCHAT_API_KEY`.'
+    );
+  }
+
+  const client = serverClient(env, 'system');
+  return client.createAgent({
+    name: 'Bicameral Support Assistant',
+    handle: SUPPORT_AGENT_HANDLE,
+    provider: 'custom',
+    model: COHERE_MODELS.free,
+    systemPrompt: SUPPORT_SYSTEM_PROMPT,
+    toolExecuteUrl: `${env.APP_URL}/api/chat/webhook/tools/execute`,
+    toolsSchema: [PIPELINE_STATUS_TOOL, ESCALATE_TOOL],
+  });
+}
+
+/**
+ * The FluxyChat Worker signs outbound tool-execute callbacks with the same
+ * project API key used to mint JWTs (X-Fluxy-Api-Key), mirroring the
+ * inbound POST /auth/token convention documented in the SDK README.
+ */
+export function verifyToolWebhookSecret(
+  env: Env,
+  header: string | undefined
+): boolean {
+  return (
+    !!header &&
+    !!env.FLUXYCHAT_API_KEY &&
+    timingSafeEqual(header, env.FLUXYCHAT_API_KEY)
+  );
+}

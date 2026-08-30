@@ -1,0 +1,1719 @@
+{
+  "timestamp": "2026-08-20T00:39:41.837562+00:00",
+  "run_type": "butterfly_v6_honest_production_hardening",
+  "version": "6.0",
+  "fixes": [
+    "NO compound multipliers (additive only)",
+    "VDR capped at 91.3% (realistic ceiling)",
+    "Held-out validation (20% unseen personas)",
+    "Complexity penalty (simpler = better)",
+    "Exploit detection (gate, budget, retry, VDR inflation)",
+    "Data sovereignty measured as fitness dimension",
+    "Stress test at 10x volume",
+    "Deterministic seeds (reproducible)"
+  ],
+  "total_interactions": 10240000,
+  "islands": {
+    "solo_dev": {
+      "train_fitness": 56.48,
+      "held_out_fitness": 56.97,
+      "overfit_gap": -0.49,
+      "vdr": 66.35,
+      "sovereignty": 1.0,
+      "stress_test": {
+        "fitness": 56.15,
+        "vdr": 65.27
+      },
+      "total_rejected": 760,
+      "history": [
+        {
+          "gen": 1,
+          "best": 35.35,
+          "best_vdr": 48.92,
+          "best_sov": 0.3,
+          "rejected": 3,
+          "mutation": 0.02
+        },
+        {
+          "gen": 2,
+          "best": 36.86,
+          "best_vdr": 48.77,
+          "best_sov": 0.4,
+          "rejected": 21,
+          "mutation": 0.02
+        },
+        {
+          "gen": 3,
+          "best": 40.87,
+          "best_vdr": 66.57,
+          "best_sov": 0.6,
+          "rejected": 19,
+          "mutation": 0.02
+        },
+        {
+          "gen": 4,
+          "best": 44.78,
+          "best_vdr": 59.07,
+          "best_sov": 0.95,
+          "rejected": 21,
+          "mutation": 0.02
+        },
+        {
+          "gen": 5,
+          "best": 46.98,
+          "best_vdr": 60.8,
+          "best_sov": 0.8,
+          "rejected": 23,
+          "mutation": 0.02
+        },
+        {
+          "gen": 6,
+          "best": 49.64,
+          "best_vdr": 62.07,
+          "best_sov": 0.9,
+          "rejected": 21,
+          "mutation": 0.02
+        },
+        {
+          "gen": 7,
+          "best": 51.04,
+          "best_vdr": 66.35,
+          "best_sov": 0.95,
+          "rejected": 17,
+          "mutation": 0.02
+        },
+        {
+          "gen": 8,
+          "best": 52.69,
+          "best_vdr": 64.18,
+          "best_sov": 1.0,
+          "rejected": 24,
+          "mutation": 0.02
+        },
+        {
+          "gen": 9,
+          "best": 53.34,
+          "best_vdr": 66.35,
+          "best_sov": 1.0,
+          "rejected": 18,
+          "mutation": 0.02
+        },
+        {
+          "gen": 10,
+          "best": 54.27,
+          "best_vdr": 65.53,
+          "best_sov": 1.0,
+          "rejected": 18,
+          "mutation": 0.02
+        },
+        {
+          "gen": 11,
+          "best": 54.64,
+          "best_vdr": 66.35,
+          "best_sov": 1.0,
+          "rejected": 18,
+          "mutation": 0.02
+        },
+        {
+          "gen": 12,
+          "best": 54.89,
+          "best_vdr": 66.35,
+          "best_sov": 1.0,
+          "rejected": 22,
+          "mutation": 0.02
+        },
+        {
+          "gen": 13,
+          "best": 54.89,
+          "best_vdr": 66.35,
+          "best_sov": 1.0,
+          "rejected": 20,
+          "mutation": 0.02
+        },
+        {
+          "gen": 14,
+          "best": 55.22,
+          "best_vdr": 66.35,
+          "best_sov": 1.0,
+          "rejected": 20,
+          "mutation": 0.02
+        },
+        {
+          "gen": 15,
+          "best": 55.22,
+          "best_vdr": 66.35,
+          "best_sov": 1.0,
+          "rejected": 18,
+          "mutation": 0.02
+        },
+        {
+          "gen": 16,
+          "best": 55.26,
+          "best_vdr": 66.35,
+          "best_sov": 1.0,
+          "rejected": 18,
+          "mutation": 0.02
+        },
+        {
+          "gen": 17,
+          "best": 55.37,
+          "best_vdr": 66.35,
+          "best_sov": 1.0,
+          "rejected": 20,
+          "mutation": 0.02
+        },
+        {
+          "gen": 18,
+          "best": 55.66,
+          "best_vdr": 66.35,
+          "best_sov": 1.0,
+          "rejected": 17,
+          "mutation": 0.02
+        },
+        {
+          "gen": 19,
+          "best": 55.88,
+          "best_vdr": 66.35,
+          "best_sov": 1.0,
+          "rejected": 18,
+          "mutation": 0.02
+        },
+        {
+          "gen": 20,
+          "best": 55.88,
+          "best_vdr": 66.35,
+          "best_sov": 1.0,
+          "rejected": 19,
+          "mutation": 0.02
+        },
+        {
+          "gen": 21,
+          "best": 55.99,
+          "best_vdr": 66.35,
+          "best_sov": 1.0,
+          "rejected": 20,
+          "mutation": 0.02
+        },
+        {
+          "gen": 22,
+          "best": 55.99,
+          "best_vdr": 66.35,
+          "best_sov": 1.0,
+          "rejected": 19,
+          "mutation": 0.02
+        },
+        {
+          "gen": 23,
+          "best": 56.11,
+          "best_vdr": 66.35,
+          "best_sov": 1.0,
+          "rejected": 18,
+          "mutation": 0.02
+        },
+        {
+          "gen": 24,
+          "best": 56.15,
+          "best_vdr": 66.35,
+          "best_sov": 1.0,
+          "rejected": 22,
+          "mutation": 0.02
+        },
+        {
+          "gen": 25,
+          "best": 56.15,
+          "best_vdr": 66.35,
+          "best_sov": 1.0,
+          "rejected": 17,
+          "mutation": 0.02
+        },
+        {
+          "gen": 26,
+          "best": 56.27,
+          "best_vdr": 66.35,
+          "best_sov": 1.0,
+          "rejected": 21,
+          "mutation": 0.02
+        },
+        {
+          "gen": 27,
+          "best": 56.27,
+          "best_vdr": 66.35,
+          "best_sov": 1.0,
+          "rejected": 24,
+          "mutation": 0.02
+        },
+        {
+          "gen": 28,
+          "best": 56.27,
+          "best_vdr": 66.35,
+          "best_sov": 1.0,
+          "rejected": 22,
+          "mutation": 0.02
+        },
+        {
+          "gen": 29,
+          "best": 56.27,
+          "best_vdr": 66.35,
+          "best_sov": 1.0,
+          "rejected": 17,
+          "mutation": 0.02
+        },
+        {
+          "gen": 30,
+          "best": 56.28,
+          "best_vdr": 66.35,
+          "best_sov": 1.0,
+          "rejected": 19,
+          "mutation": 0.02
+        },
+        {
+          "gen": 31,
+          "best": 56.28,
+          "best_vdr": 66.35,
+          "best_sov": 1.0,
+          "rejected": 21,
+          "mutation": 0.02
+        },
+        {
+          "gen": 32,
+          "best": 56.4,
+          "best_vdr": 66.35,
+          "best_sov": 1.0,
+          "rejected": 15,
+          "mutation": 0.02
+        },
+        {
+          "gen": 33,
+          "best": 56.4,
+          "best_vdr": 66.35,
+          "best_sov": 1.0,
+          "rejected": 20,
+          "mutation": 0.02
+        },
+        {
+          "gen": 34,
+          "best": 56.4,
+          "best_vdr": 66.35,
+          "best_sov": 1.0,
+          "rejected": 18,
+          "mutation": 0.02
+        },
+        {
+          "gen": 35,
+          "best": 56.4,
+          "best_vdr": 66.35,
+          "best_sov": 1.0,
+          "rejected": 21,
+          "mutation": 0.02
+        },
+        {
+          "gen": 36,
+          "best": 56.4,
+          "best_vdr": 66.35,
+          "best_sov": 1.0,
+          "rejected": 12,
+          "mutation": 0.02
+        },
+        {
+          "gen": 37,
+          "best": 56.4,
+          "best_vdr": 66.35,
+          "best_sov": 1.0,
+          "rejected": 23,
+          "mutation": 0.02
+        },
+        {
+          "gen": 38,
+          "best": 56.4,
+          "best_vdr": 66.35,
+          "best_sov": 1.0,
+          "rejected": 16,
+          "mutation": 0.02
+        },
+        {
+          "gen": 39,
+          "best": 56.42,
+          "best_vdr": 66.35,
+          "best_sov": 1.0,
+          "rejected": 17,
+          "mutation": 0.02
+        },
+        {
+          "gen": 40,
+          "best": 56.48,
+          "best_vdr": 66.35,
+          "best_sov": 1.0,
+          "rejected": 23,
+          "mutation": 0.02
+        }
+      ]
+    },
+    "startup": {
+      "train_fitness": 54.86,
+      "held_out_fitness": 55.54,
+      "overfit_gap": -0.68,
+      "vdr": 67.67,
+      "sovereignty": 1.0,
+      "stress_test": {
+        "fitness": 54.45,
+        "vdr": 66.3
+      },
+      "total_rejected": 740,
+      "history": [
+        {
+          "gen": 1,
+          "best": 35.24,
+          "best_vdr": 48.9,
+          "best_sov": 0.25,
+          "rejected": 4,
+          "mutation": 0.02
+        },
+        {
+          "gen": 2,
+          "best": 38.84,
+          "best_vdr": 51.74,
+          "best_sov": 0.5,
+          "rejected": 17,
+          "mutation": 0.02
+        },
+        {
+          "gen": 3,
+          "best": 47.26,
+          "best_vdr": 63.12,
+          "best_sov": 0.85,
+          "rejected": 19,
+          "mutation": 0.02
+        },
+        {
+          "gen": 4,
+          "best": 47.26,
+          "best_vdr": 63.12,
+          "best_sov": 0.85,
+          "rejected": 16,
+          "mutation": 0.02
+        },
+        {
+          "gen": 5,
+          "best": 49.77,
+          "best_vdr": 64.91,
+          "best_sov": 0.85,
+          "rejected": 21,
+          "mutation": 0.02
+        },
+        {
+          "gen": 6,
+          "best": 50.11,
+          "best_vdr": 67.67,
+          "best_sov": 0.85,
+          "rejected": 19,
+          "mutation": 0.02
+        },
+        {
+          "gen": 7,
+          "best": 50.89,
+          "best_vdr": 67.67,
+          "best_sov": 0.85,
+          "rejected": 19,
+          "mutation": 0.02
+        },
+        {
+          "gen": 8,
+          "best": 50.91,
+          "best_vdr": 67.67,
+          "best_sov": 0.85,
+          "rejected": 19,
+          "mutation": 0.02
+        },
+        {
+          "gen": 9,
+          "best": 50.91,
+          "best_vdr": 67.67,
+          "best_sov": 0.85,
+          "rejected": 20,
+          "mutation": 0.02
+        },
+        {
+          "gen": 10,
+          "best": 50.98,
+          "best_vdr": 67.67,
+          "best_sov": 0.85,
+          "rejected": 18,
+          "mutation": 0.02
+        },
+        {
+          "gen": 11,
+          "best": 51.27,
+          "best_vdr": 67.67,
+          "best_sov": 0.85,
+          "rejected": 21,
+          "mutation": 0.02
+        },
+        {
+          "gen": 12,
+          "best": 52.49,
+          "best_vdr": 67.67,
+          "best_sov": 0.95,
+          "rejected": 21,
+          "mutation": 0.02
+        },
+        {
+          "gen": 13,
+          "best": 52.98,
+          "best_vdr": 67.67,
+          "best_sov": 0.95,
+          "rejected": 19,
+          "mutation": 0.02
+        },
+        {
+          "gen": 14,
+          "best": 52.98,
+          "best_vdr": 67.67,
+          "best_sov": 0.95,
+          "rejected": 21,
+          "mutation": 0.02
+        },
+        {
+          "gen": 15,
+          "best": 53.68,
+          "best_vdr": 67.67,
+          "best_sov": 1.0,
+          "rejected": 18,
+          "mutation": 0.02
+        },
+        {
+          "gen": 16,
+          "best": 53.75,
+          "best_vdr": 67.67,
+          "best_sov": 1.0,
+          "rejected": 18,
+          "mutation": 0.02
+        },
+        {
+          "gen": 17,
+          "best": 53.86,
+          "best_vdr": 67.67,
+          "best_sov": 1.0,
+          "rejected": 20,
+          "mutation": 0.02
+        },
+        {
+          "gen": 18,
+          "best": 53.88,
+          "best_vdr": 67.67,
+          "best_sov": 1.0,
+          "rejected": 12,
+          "mutation": 0.02
+        },
+        {
+          "gen": 19,
+          "best": 53.88,
+          "best_vdr": 67.67,
+          "best_sov": 1.0,
+          "rejected": 21,
+          "mutation": 0.02
+        },
+        {
+          "gen": 20,
+          "best": 53.88,
+          "best_vdr": 67.67,
+          "best_sov": 1.0,
+          "rejected": 19,
+          "mutation": 0.02
+        },
+        {
+          "gen": 21,
+          "best": 53.88,
+          "best_vdr": 67.67,
+          "best_sov": 1.0,
+          "rejected": 21,
+          "mutation": 0.02
+        },
+        {
+          "gen": 22,
+          "best": 53.89,
+          "best_vdr": 67.67,
+          "best_sov": 1.0,
+          "rejected": 14,
+          "mutation": 0.02
+        },
+        {
+          "gen": 23,
+          "best": 53.89,
+          "best_vdr": 67.67,
+          "best_sov": 1.0,
+          "rejected": 18,
+          "mutation": 0.02
+        },
+        {
+          "gen": 24,
+          "best": 53.89,
+          "best_vdr": 67.67,
+          "best_sov": 1.0,
+          "rejected": 22,
+          "mutation": 0.02
+        },
+        {
+          "gen": 25,
+          "best": 54.02,
+          "best_vdr": 67.67,
+          "best_sov": 1.0,
+          "rejected": 21,
+          "mutation": 0.02
+        },
+        {
+          "gen": 26,
+          "best": 54.02,
+          "best_vdr": 67.67,
+          "best_sov": 1.0,
+          "rejected": 13,
+          "mutation": 0.02
+        },
+        {
+          "gen": 27,
+          "best": 54.02,
+          "best_vdr": 67.67,
+          "best_sov": 1.0,
+          "rejected": 16,
+          "mutation": 0.02
+        },
+        {
+          "gen": 28,
+          "best": 54.14,
+          "best_vdr": 67.67,
+          "best_sov": 1.0,
+          "rejected": 20,
+          "mutation": 0.02
+        },
+        {
+          "gen": 29,
+          "best": 54.14,
+          "best_vdr": 67.67,
+          "best_sov": 1.0,
+          "rejected": 20,
+          "mutation": 0.02
+        },
+        {
+          "gen": 30,
+          "best": 54.15,
+          "best_vdr": 67.67,
+          "best_sov": 1.0,
+          "rejected": 21,
+          "mutation": 0.02
+        },
+        {
+          "gen": 31,
+          "best": 54.54,
+          "best_vdr": 67.67,
+          "best_sov": 1.0,
+          "rejected": 19,
+          "mutation": 0.02
+        },
+        {
+          "gen": 32,
+          "best": 54.55,
+          "best_vdr": 67.67,
+          "best_sov": 1.0,
+          "rejected": 21,
+          "mutation": 0.02
+        },
+        {
+          "gen": 33,
+          "best": 54.55,
+          "best_vdr": 67.67,
+          "best_sov": 1.0,
+          "rejected": 21,
+          "mutation": 0.02
+        },
+        {
+          "gen": 34,
+          "best": 54.68,
+          "best_vdr": 67.67,
+          "best_sov": 1.0,
+          "rejected": 22,
+          "mutation": 0.02
+        },
+        {
+          "gen": 35,
+          "best": 54.78,
+          "best_vdr": 67.67,
+          "best_sov": 1.0,
+          "rejected": 18,
+          "mutation": 0.02
+        },
+        {
+          "gen": 36,
+          "best": 54.78,
+          "best_vdr": 67.67,
+          "best_sov": 1.0,
+          "rejected": 17,
+          "mutation": 0.02
+        },
+        {
+          "gen": 37,
+          "best": 54.86,
+          "best_vdr": 67.67,
+          "best_sov": 1.0,
+          "rejected": 18,
+          "mutation": 0.02
+        },
+        {
+          "gen": 38,
+          "best": 54.86,
+          "best_vdr": 67.67,
+          "best_sov": 1.0,
+          "rejected": 17,
+          "mutation": 0.02
+        },
+        {
+          "gen": 39,
+          "best": 54.86,
+          "best_vdr": 67.67,
+          "best_sov": 1.0,
+          "rejected": 20,
+          "mutation": 0.02
+        },
+        {
+          "gen": 40,
+          "best": 54.86,
+          "best_vdr": 67.67,
+          "best_sov": 1.0,
+          "rejected": 19,
+          "mutation": 0.02
+        }
+      ]
+    },
+    "enterprise": {
+      "train_fitness": 56.8,
+      "held_out_fitness": 57.25,
+      "overfit_gap": -0.45,
+      "vdr": 67.98,
+      "sovereignty": 1.0,
+      "stress_test": {
+        "fitness": 56.44,
+        "vdr": 66.79
+      },
+      "total_rejected": 764,
+      "history": [
+        {
+          "gen": 1,
+          "best": 35.07,
+          "best_vdr": 52.15,
+          "best_sov": 0.25,
+          "rejected": 0,
+          "mutation": 0.02
+        },
+        {
+          "gen": 2,
+          "best": 39.96,
+          "best_vdr": 46.87,
+          "best_sov": 0.7,
+          "rejected": 18,
+          "mutation": 0.02
+        },
+        {
+          "gen": 3,
+          "best": 45.73,
+          "best_vdr": 57.38,
+          "best_sov": 0.85,
+          "rejected": 22,
+          "mutation": 0.02
+        },
+        {
+          "gen": 4,
+          "best": 48.48,
+          "best_vdr": 61.8,
+          "best_sov": 0.8,
+          "rejected": 17,
+          "mutation": 0.02
+        },
+        {
+          "gen": 5,
+          "best": 49.34,
+          "best_vdr": 61.86,
+          "best_sov": 0.8,
+          "rejected": 20,
+          "mutation": 0.02
+        },
+        {
+          "gen": 6,
+          "best": 49.92,
+          "best_vdr": 62.9,
+          "best_sov": 0.8,
+          "rejected": 18,
+          "mutation": 0.02
+        },
+        {
+          "gen": 7,
+          "best": 50.32,
+          "best_vdr": 62.22,
+          "best_sov": 0.85,
+          "rejected": 15,
+          "mutation": 0.02
+        },
+        {
+          "gen": 8,
+          "best": 50.93,
+          "best_vdr": 63.85,
+          "best_sov": 0.85,
+          "rejected": 19,
+          "mutation": 0.02
+        },
+        {
+          "gen": 9,
+          "best": 51.12,
+          "best_vdr": 63.85,
+          "best_sov": 0.85,
+          "rejected": 19,
+          "mutation": 0.02
+        },
+        {
+          "gen": 10,
+          "best": 51.33,
+          "best_vdr": 62.9,
+          "best_sov": 0.85,
+          "rejected": 21,
+          "mutation": 0.02
+        },
+        {
+          "gen": 11,
+          "best": 51.34,
+          "best_vdr": 62.9,
+          "best_sov": 0.85,
+          "rejected": 18,
+          "mutation": 0.02
+        },
+        {
+          "gen": 12,
+          "best": 51.99,
+          "best_vdr": 65.08,
+          "best_sov": 0.85,
+          "rejected": 17,
+          "mutation": 0.02
+        },
+        {
+          "gen": 13,
+          "best": 52.31,
+          "best_vdr": 62.9,
+          "best_sov": 0.9,
+          "rejected": 18,
+          "mutation": 0.02
+        },
+        {
+          "gen": 14,
+          "best": 52.96,
+          "best_vdr": 65.08,
+          "best_sov": 0.9,
+          "rejected": 19,
+          "mutation": 0.02
+        },
+        {
+          "gen": 15,
+          "best": 53.52,
+          "best_vdr": 65.08,
+          "best_sov": 0.9,
+          "rejected": 20,
+          "mutation": 0.02
+        },
+        {
+          "gen": 16,
+          "best": 53.68,
+          "best_vdr": 65.08,
+          "best_sov": 0.9,
+          "rejected": 18,
+          "mutation": 0.02
+        },
+        {
+          "gen": 17,
+          "best": 53.68,
+          "best_vdr": 65.08,
+          "best_sov": 0.9,
+          "rejected": 18,
+          "mutation": 0.02
+        },
+        {
+          "gen": 18,
+          "best": 54.02,
+          "best_vdr": 65.08,
+          "best_sov": 0.9,
+          "rejected": 22,
+          "mutation": 0.02
+        },
+        {
+          "gen": 19,
+          "best": 55.31,
+          "best_vdr": 65.51,
+          "best_sov": 1.0,
+          "rejected": 22,
+          "mutation": 0.02
+        },
+        {
+          "gen": 20,
+          "best": 55.52,
+          "best_vdr": 65.08,
+          "best_sov": 1.0,
+          "rejected": 20,
+          "mutation": 0.02
+        },
+        {
+          "gen": 21,
+          "best": 55.64,
+          "best_vdr": 65.57,
+          "best_sov": 1.0,
+          "rejected": 21,
+          "mutation": 0.02
+        },
+        {
+          "gen": 22,
+          "best": 55.64,
+          "best_vdr": 65.57,
+          "best_sov": 1.0,
+          "rejected": 20,
+          "mutation": 0.02
+        },
+        {
+          "gen": 23,
+          "best": 55.64,
+          "best_vdr": 65.57,
+          "best_sov": 1.0,
+          "rejected": 22,
+          "mutation": 0.02
+        },
+        {
+          "gen": 24,
+          "best": 55.64,
+          "best_vdr": 65.57,
+          "best_sov": 1.0,
+          "rejected": 19,
+          "mutation": 0.02
+        },
+        {
+          "gen": 25,
+          "best": 55.64,
+          "best_vdr": 65.57,
+          "best_sov": 1.0,
+          "rejected": 19,
+          "mutation": 0.02
+        },
+        {
+          "gen": 26,
+          "best": 55.89,
+          "best_vdr": 65.08,
+          "best_sov": 1.0,
+          "rejected": 22,
+          "mutation": 0.02
+        },
+        {
+          "gen": 27,
+          "best": 56.09,
+          "best_vdr": 65.57,
+          "best_sov": 1.0,
+          "rejected": 19,
+          "mutation": 0.02
+        },
+        {
+          "gen": 28,
+          "best": 56.09,
+          "best_vdr": 65.57,
+          "best_sov": 1.0,
+          "rejected": 17,
+          "mutation": 0.02
+        },
+        {
+          "gen": 29,
+          "best": 56.09,
+          "best_vdr": 65.57,
+          "best_sov": 1.0,
+          "rejected": 20,
+          "mutation": 0.02
+        },
+        {
+          "gen": 30,
+          "best": 56.09,
+          "best_vdr": 65.57,
+          "best_sov": 1.0,
+          "rejected": 21,
+          "mutation": 0.02
+        },
+        {
+          "gen": 31,
+          "best": 56.09,
+          "best_vdr": 65.57,
+          "best_sov": 1.0,
+          "rejected": 18,
+          "mutation": 0.02
+        },
+        {
+          "gen": 32,
+          "best": 56.49,
+          "best_vdr": 66.93,
+          "best_sov": 1.0,
+          "rejected": 21,
+          "mutation": 0.02
+        },
+        {
+          "gen": 33,
+          "best": 56.75,
+          "best_vdr": 67.8,
+          "best_sov": 1.0,
+          "rejected": 22,
+          "mutation": 0.02
+        },
+        {
+          "gen": 34,
+          "best": 56.75,
+          "best_vdr": 67.8,
+          "best_sov": 1.0,
+          "rejected": 21,
+          "mutation": 0.02
+        },
+        {
+          "gen": 35,
+          "best": 56.75,
+          "best_vdr": 67.8,
+          "best_sov": 1.0,
+          "rejected": 21,
+          "mutation": 0.02
+        },
+        {
+          "gen": 36,
+          "best": 56.75,
+          "best_vdr": 67.8,
+          "best_sov": 1.0,
+          "rejected": 22,
+          "mutation": 0.02
+        },
+        {
+          "gen": 37,
+          "best": 56.8,
+          "best_vdr": 67.98,
+          "best_sov": 1.0,
+          "rejected": 20,
+          "mutation": 0.02
+        },
+        {
+          "gen": 38,
+          "best": 56.8,
+          "best_vdr": 67.98,
+          "best_sov": 1.0,
+          "rejected": 21,
+          "mutation": 0.02
+        },
+        {
+          "gen": 39,
+          "best": 56.8,
+          "best_vdr": 67.98,
+          "best_sov": 1.0,
+          "rejected": 19,
+          "mutation": 0.02
+        },
+        {
+          "gen": 40,
+          "best": 56.8,
+          "best_vdr": 67.98,
+          "best_sov": 1.0,
+          "rejected": 18,
+          "mutation": 0.02
+        }
+      ]
+    },
+    "nonprofit": {
+      "train_fitness": 55.22,
+      "held_out_fitness": 56.18,
+      "overfit_gap": -0.96,
+      "vdr": 63.5,
+      "sovereignty": 1.0,
+      "stress_test": {
+        "fitness": 55.6,
+        "vdr": 64.75
+      },
+      "total_rejected": 767,
+      "history": [
+        {
+          "gen": 1,
+          "best": 34.17,
+          "best_vdr": 50.46,
+          "best_sov": 0.4,
+          "rejected": 6,
+          "mutation": 0.02
+        },
+        {
+          "gen": 2,
+          "best": 40.0,
+          "best_vdr": 49.86,
+          "best_sov": 0.7,
+          "rejected": 21,
+          "mutation": 0.02
+        },
+        {
+          "gen": 3,
+          "best": 41.21,
+          "best_vdr": 53.79,
+          "best_sov": 0.65,
+          "rejected": 23,
+          "mutation": 0.02
+        },
+        {
+          "gen": 4,
+          "best": 45.35,
+          "best_vdr": 49.86,
+          "best_sov": 0.95,
+          "rejected": 25,
+          "mutation": 0.02
+        },
+        {
+          "gen": 5,
+          "best": 47.78,
+          "best_vdr": 52.82,
+          "best_sov": 0.9,
+          "rejected": 20,
+          "mutation": 0.02
+        },
+        {
+          "gen": 6,
+          "best": 49.34,
+          "best_vdr": 52.82,
+          "best_sov": 0.95,
+          "rejected": 18,
+          "mutation": 0.02
+        },
+        {
+          "gen": 7,
+          "best": 49.75,
+          "best_vdr": 54.78,
+          "best_sov": 0.95,
+          "rejected": 19,
+          "mutation": 0.02
+        },
+        {
+          "gen": 8,
+          "best": 49.93,
+          "best_vdr": 54.78,
+          "best_sov": 0.95,
+          "rejected": 19,
+          "mutation": 0.02
+        },
+        {
+          "gen": 9,
+          "best": 49.99,
+          "best_vdr": 54.98,
+          "best_sov": 0.95,
+          "rejected": 19,
+          "mutation": 0.02
+        },
+        {
+          "gen": 10,
+          "best": 49.99,
+          "best_vdr": 54.98,
+          "best_sov": 0.95,
+          "rejected": 17,
+          "mutation": 0.02
+        },
+        {
+          "gen": 11,
+          "best": 50.2,
+          "best_vdr": 54.98,
+          "best_sov": 1.0,
+          "rejected": 20,
+          "mutation": 0.02
+        },
+        {
+          "gen": 12,
+          "best": 50.74,
+          "best_vdr": 54.98,
+          "best_sov": 1.0,
+          "rejected": 18,
+          "mutation": 0.02
+        },
+        {
+          "gen": 13,
+          "best": 50.74,
+          "best_vdr": 54.98,
+          "best_sov": 1.0,
+          "rejected": 17,
+          "mutation": 0.02
+        },
+        {
+          "gen": 14,
+          "best": 50.74,
+          "best_vdr": 54.98,
+          "best_sov": 1.0,
+          "rejected": 18,
+          "mutation": 0.02
+        },
+        {
+          "gen": 15,
+          "best": 50.74,
+          "best_vdr": 54.98,
+          "best_sov": 1.0,
+          "rejected": 20,
+          "mutation": 0.02
+        },
+        {
+          "gen": 16,
+          "best": 50.74,
+          "best_vdr": 54.98,
+          "best_sov": 1.0,
+          "rejected": 18,
+          "mutation": 0.02
+        },
+        {
+          "gen": 17,
+          "best": 50.79,
+          "best_vdr": 54.98,
+          "best_sov": 1.0,
+          "rejected": 22,
+          "mutation": 0.02
+        },
+        {
+          "gen": 18,
+          "best": 50.79,
+          "best_vdr": 54.98,
+          "best_sov": 1.0,
+          "rejected": 19,
+          "mutation": 0.02
+        },
+        {
+          "gen": 19,
+          "best": 50.79,
+          "best_vdr": 54.98,
+          "best_sov": 1.0,
+          "rejected": 20,
+          "mutation": 0.02
+        },
+        {
+          "gen": 20,
+          "best": 50.79,
+          "best_vdr": 54.98,
+          "best_sov": 1.0,
+          "rejected": 21,
+          "mutation": 0.02
+        },
+        {
+          "gen": 21,
+          "best": 50.79,
+          "best_vdr": 54.98,
+          "best_sov": 1.0,
+          "rejected": 20,
+          "mutation": 0.02
+        },
+        {
+          "gen": 22,
+          "best": 51.01,
+          "best_vdr": 54.98,
+          "best_sov": 1.0,
+          "rejected": 18,
+          "mutation": 0.02
+        },
+        {
+          "gen": 23,
+          "best": 51.01,
+          "best_vdr": 54.98,
+          "best_sov": 1.0,
+          "rejected": 19,
+          "mutation": 0.02
+        },
+        {
+          "gen": 24,
+          "best": 51.01,
+          "best_vdr": 54.98,
+          "best_sov": 1.0,
+          "rejected": 16,
+          "mutation": 0.02
+        },
+        {
+          "gen": 25,
+          "best": 51.64,
+          "best_vdr": 54.98,
+          "best_sov": 1.0,
+          "rejected": 21,
+          "mutation": 0.02
+        },
+        {
+          "gen": 26,
+          "best": 51.64,
+          "best_vdr": 54.98,
+          "best_sov": 1.0,
+          "rejected": 18,
+          "mutation": 0.02
+        },
+        {
+          "gen": 27,
+          "best": 51.82,
+          "best_vdr": 54.98,
+          "best_sov": 1.0,
+          "rejected": 20,
+          "mutation": 0.02
+        },
+        {
+          "gen": 28,
+          "best": 52.04,
+          "best_vdr": 54.98,
+          "best_sov": 1.0,
+          "rejected": 22,
+          "mutation": 0.02
+        },
+        {
+          "gen": 29,
+          "best": 52.22,
+          "best_vdr": 54.98,
+          "best_sov": 1.0,
+          "rejected": 19,
+          "mutation": 0.02
+        },
+        {
+          "gen": 30,
+          "best": 52.22,
+          "best_vdr": 54.98,
+          "best_sov": 1.0,
+          "rejected": 20,
+          "mutation": 0.02
+        },
+        {
+          "gen": 31,
+          "best": 52.51,
+          "best_vdr": 54.98,
+          "best_sov": 1.0,
+          "rejected": 24,
+          "mutation": 0.02
+        },
+        {
+          "gen": 32,
+          "best": 52.51,
+          "best_vdr": 54.98,
+          "best_sov": 1.0,
+          "rejected": 19,
+          "mutation": 0.02
+        },
+        {
+          "gen": 33,
+          "best": 53.43,
+          "best_vdr": 58.05,
+          "best_sov": 1.0,
+          "rejected": 17,
+          "mutation": 0.02
+        },
+        {
+          "gen": 34,
+          "best": 53.43,
+          "best_vdr": 58.05,
+          "best_sov": 1.0,
+          "rejected": 20,
+          "mutation": 0.02
+        },
+        {
+          "gen": 35,
+          "best": 53.58,
+          "best_vdr": 58.05,
+          "best_sov": 1.0,
+          "rejected": 14,
+          "mutation": 0.02
+        },
+        {
+          "gen": 36,
+          "best": 53.58,
+          "best_vdr": 58.05,
+          "best_sov": 1.0,
+          "rejected": 19,
+          "mutation": 0.02
+        },
+        {
+          "gen": 37,
+          "best": 53.59,
+          "best_vdr": 58.05,
+          "best_sov": 1.0,
+          "rejected": 18,
+          "mutation": 0.02
+        },
+        {
+          "gen": 38,
+          "best": 53.59,
+          "best_vdr": 58.05,
+          "best_sov": 1.0,
+          "rejected": 22,
+          "mutation": 0.02
+        },
+        {
+          "gen": 39,
+          "best": 53.59,
+          "best_vdr": 58.05,
+          "best_sov": 1.0,
+          "rejected": 21,
+          "mutation": 0.02
+        },
+        {
+          "gen": 40,
+          "best": 55.22,
+          "best_vdr": 63.5,
+          "best_sov": 1.0,
+          "rejected": 20,
+          "mutation": 0.02
+        }
+      ]
+    }
+  },
+  "best_island": "enterprise",
+  "best_genome": {
+    "tw_01_empty_generation": 5,
+    "tw_02_infinite_loop": 4,
+    "tw_03_credit_burn": 21,
+    "tw_04_approval_bypass": 1,
+    "tw_05_silent_failure": 2,
+    "tw_06_token_overflow": 94877,
+    "tw_07_duplicate_gen": 5,
+    "tw_08_timeout": 178,
+    "tw_09_unauthorized": 1,
+    "early_exit_threshold": 17,
+    "tripwire_sensitivity": 4,
+    "deployment_gate_score": 0.35,
+    "approval_timeout_hours": 135,
+    "research_depth": 3,
+    "retry_limit": 4,
+    "per_user_budget": 73,
+    "per_bot_budget": 32,
+    "conversation_turn_limit": 48,
+    "burn_rate_per_min": 10,
+    "agent_timeout_seconds": 70,
+    "agent_parallel": 1,
+    "agent_research_sources": 3,
+    "responsive_breakpoint_px": 507,
+    "content_density": 0.338,
+    "pipeline_mode": 1,
+    "discovery_impl_overlap": 1.0,
+    "agent_count": 4,
+    "agent_specialization": 0,
+    "feedback_loop_depth": 3,
+    "governance_gate_count": 4,
+    "primary_model": 2,
+    "research_model": 0,
+    "coding_model": 2,
+    "audit_model": 0,
+    "model_temperature": 0.3,
+    "ui_interaction_mode": 3,
+    "input_bandwidth": 3,
+    "response_format": 1,
+    "approval_flow": 0,
+    "feedback_mechanism": 1,
+    "error_recovery": 2,
+    "onboarding_depth": 3,
+    "accessibility_level": 3,
+    "context_window_utilization": 0.432,
+    "rerank_depth": 13,
+    "embedding_dimensions": 1,
+    "lattice_search_radius": 3,
+    "max_credit_burn_per_session": 100,
+    "min_usability_score": 0.5,
+    "max_response_time_ms": 2000,
+    "min_accessibility_score": 0.7,
+    "coworking_enabled": 0,
+    "crdt_type": 0,
+    "presence_indicators": 1,
+    "file_sync_mode": 0,
+    "voice_video_enabled": 0,
+    "shared_cursor": 0,
+    "team_session_max": 5,
+    "collab_persistence": 3,
+    "sso_provider": 2,
+    "rbac_enabled": 1,
+    "audit_log_retention_days": 254,
+    "rate_limit_strategy": 3,
+    "api_versioning": 1,
+    "multi_tenant_isolation": 2,
+    "chat_enabled": 1,
+    "chat_transport": 2,
+    "message_persistence": 0,
+    "typing_indicators": 0,
+    "push_notifications": 0,
+    "team_hierarchy": 0,
+    "role_set": 2,
+    "project_templates": 0,
+    "team_billing_model": 4,
+    "team_permissions": 0,
+    "health_score_enabled": 1,
+    "churn_prediction_model": 3,
+    "usage_anomaly_detection": 2,
+    "sentiment_analysis_source": 1,
+    "early_warning_threshold": 0.633,
+    "auto_intervention": 0,
+    "billing_model": 0,
+    "nonprofit_discount": 90,
+    "credit_refund_policy": 2,
+    "value_guarantee": 2
+  },
+  "genome_changes": {
+    "tw_01_empty_generation": {
+      "baseline": 2,
+      "evolved": 5,
+      "category": "tripwire"
+    },
+    "tw_02_infinite_loop": {
+      "baseline": 3,
+      "evolved": 4,
+      "category": "tripwire"
+    },
+    "tw_03_credit_burn": {
+      "baseline": 20,
+      "evolved": 21,
+      "category": "tripwire"
+    },
+    "tw_06_token_overflow": {
+      "baseline": 100000,
+      "evolved": 94877,
+      "category": "tripwire"
+    },
+    "tw_07_duplicate_gen": {
+      "baseline": 3,
+      "evolved": 5,
+      "category": "tripwire"
+    },
+    "tw_08_timeout": {
+      "baseline": 60,
+      "evolved": 178,
+      "category": "tripwire"
+    },
+    "early_exit_threshold": {
+      "baseline": 20,
+      "evolved": 17,
+      "category": "vdr"
+    },
+    "tripwire_sensitivity": {
+      "baseline": 2,
+      "evolved": 4,
+      "category": "vdr"
+    },
+    "deployment_gate_score": {
+      "baseline": 0.6,
+      "evolved": 0.35,
+      "category": "vdr"
+    },
+    "approval_timeout_hours": {
+      "baseline": 72,
+      "evolved": 135,
+      "category": "vdr"
+    },
+    "retry_limit": {
+      "baseline": 3,
+      "evolved": 4,
+      "category": "vdr"
+    },
+    "per_user_budget": {
+      "baseline": 100,
+      "evolved": 73,
+      "category": "credit"
+    },
+    "per_bot_budget": {
+      "baseline": 50,
+      "evolved": 32,
+      "category": "credit"
+    },
+    "conversation_turn_limit": {
+      "baseline": 30,
+      "evolved": 48,
+      "category": "credit"
+    },
+    "agent_timeout_seconds": {
+      "baseline": 60,
+      "evolved": 70,
+      "category": "agent"
+    },
+    "agent_parallel": {
+      "baseline": 0,
+      "evolved": 1,
+      "category": "agent"
+    },
+    "responsive_breakpoint_px": {
+      "baseline": 768,
+      "evolved": 507,
+      "category": "ui"
+    },
+    "content_density": {
+      "baseline": 0.7,
+      "evolved": 0.338,
+      "category": "ui"
+    },
+    "pipeline_mode": {
+      "baseline": 0,
+      "evolved": 1,
+      "category": "topology"
+    },
+    "discovery_impl_overlap": {
+      "baseline": 0.0,
+      "evolved": 1.0,
+      "category": "topology"
+    },
+    "agent_specialization": {
+      "baseline": 1,
+      "evolved": 0,
+      "category": "topology"
+    },
+    "feedback_loop_depth": {
+      "baseline": 1,
+      "evolved": 3,
+      "category": "topology"
+    },
+    "governance_gate_count": {
+      "baseline": 3,
+      "evolved": 4,
+      "category": "topology"
+    },
+    "primary_model": {
+      "baseline": 0,
+      "evolved": 2,
+      "category": "model"
+    },
+    "coding_model": {
+      "baseline": 1,
+      "evolved": 2,
+      "category": "model"
+    },
+    "ui_interaction_mode": {
+      "baseline": 0,
+      "evolved": 3,
+      "category": "uiux"
+    },
+    "input_bandwidth": {
+      "baseline": 0,
+      "evolved": 3,
+      "category": "uiux"
+    },
+    "response_format": {
+      "baseline": 0,
+      "evolved": 1,
+      "category": "uiux"
+    },
+    "feedback_mechanism": {
+      "baseline": 0,
+      "evolved": 1,
+      "category": "uiux"
+    },
+    "error_recovery": {
+      "baseline": 0,
+      "evolved": 2,
+      "category": "uiux"
+    },
+    "onboarding_depth": {
+      "baseline": 1,
+      "evolved": 3,
+      "category": "uiux"
+    },
+    "accessibility_level": {
+      "baseline": 1,
+      "evolved": 3,
+      "category": "uiux"
+    },
+    "context_window_utilization": {
+      "baseline": 0.5,
+      "evolved": 0.432,
+      "category": "discovery"
+    },
+    "rerank_depth": {
+      "baseline": 20,
+      "evolved": 13,
+      "category": "discovery"
+    },
+    "lattice_search_radius": {
+      "baseline": 2,
+      "evolved": 3,
+      "category": "discovery"
+    },
+    "presence_indicators": {
+      "baseline": 0,
+      "evolved": 1,
+      "category": "collab"
+    },
+    "collab_persistence": {
+      "baseline": 0,
+      "evolved": 3,
+      "category": "collab"
+    },
+    "sso_provider": {
+      "baseline": 0,
+      "evolved": 2,
+      "category": "enterprise"
+    },
+    "rbac_enabled": {
+      "baseline": 0,
+      "evolved": 1,
+      "category": "enterprise"
+    },
+    "audit_log_retention_days": {
+      "baseline": 30,
+      "evolved": 254,
+      "category": "enterprise"
+    },
+    "rate_limit_strategy": {
+      "baseline": 0,
+      "evolved": 3,
+      "category": "enterprise"
+    },
+    "api_versioning": {
+      "baseline": 0,
+      "evolved": 1,
+      "category": "enterprise"
+    },
+    "multi_tenant_isolation": {
+      "baseline": 0,
+      "evolved": 2,
+      "category": "enterprise"
+    },
+    "chat_enabled": {
+      "baseline": 0,
+      "evolved": 1,
+      "category": "chat"
+    },
+    "chat_transport": {
+      "baseline": 0,
+      "evolved": 2,
+      "category": "chat"
+    },
+    "role_set": {
+      "baseline": 0,
+      "evolved": 2,
+      "category": "team"
+    },
+    "team_billing_model": {
+      "baseline": 0,
+      "evolved": 4,
+      "category": "team"
+    },
+    "health_score_enabled": {
+      "baseline": 0,
+      "evolved": 1,
+      "category": "proactive"
+    },
+    "churn_prediction_model": {
+      "baseline": 0,
+      "evolved": 3,
+      "category": "proactive"
+    },
+    "usage_anomaly_detection": {
+      "baseline": 0,
+      "evolved": 2,
+      "category": "proactive"
+    },
+    "sentiment_analysis_source": {
+      "baseline": 0,
+      "evolved": 1,
+      "category": "proactive"
+    },
+    "early_warning_threshold": {
+      "baseline": 0.5,
+      "evolved": 0.633,
+      "category": "proactive"
+    },
+    "nonprofit_discount": {
+      "baseline": 0,
+      "evolved": 90,
+      "category": "billing"
+    },
+    "credit_refund_policy": {
+      "baseline": 0,
+      "evolved": 2,
+      "category": "billing"
+    },
+    "value_guarantee": {
+      "baseline": 0,
+      "evolved": 2,
+      "category": "billing"
+    }
+  }
+}

@@ -1,0 +1,423 @@
+# Cloudflare Workers configuration for @bicameral/web
+# https://developers.cloudflare.com/workers/wrangler/configuration/
+# Mirrors the root wrangler.toml (the pre-apps/web stub) — see CLAUDE.md
+# "Current State": once this package is the real deploy target, the root
+# wrangler.toml / src/server/index.ts stub can be retired.
+
+name = "bicameral"
+main = "src/index.ts"
+compatibility_date = "2026-08-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Environment variables (non-secret — secrets via `wrangler secret put`)
+[vars]
+ENVIRONMENT = "production"
+# Must equal max_instances in the [[containers]] block below. The Worker cannot
+# read its own container config, so admission control (durable-objects/
+# PreviewCapacity.ts) reads this instead — change both or the queue will admit
+# past the ceiling and the platform will refuse the overflow.
+PREVIEW_MAX_INSTANCES = "20"
+APP_URL = "https://discomplemented.com"
+COHERE_BASE_URL = "https://api.cohere.com/v2"
+OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+# Overrides the pinned auditor model (packages/cohere/src/auditor-model.ts).
+# Empty means "use the pin". Must be an OpenRouter slug — a Cohere model here
+# would put the auditor back on the researcher's own provider, and
+# resolveAuditorModel() throws rather than allow that.
+AUDITOR_MODEL = ""
+# FLUXYCHAT_API_KEY (secret, `wrangler secret put`) authenticates against it.
+FLUXYCHAT_WORKER_URL = "https://fluxychat.johnathanallen1998.workers.dev"
+# Coder-loop security gate (see pipeline/tools/security-scan-gh.ts) —
+# GITHUB_ACTIONS_TOKEN and SECURITY_GATE_WEBHOOK_SECRET are secrets, set
+# via `wrangler secret put`.
+GITHUB_REPO = "libriopal/DISCOMPLEMENTED_LIVE"
+# Resend transactional email (see lib/email.ts, lib/auth.ts). RESEND_API_KEY
+# is a secret set via `wrangler secret put` — never a var, never in this file.
+#
+# No longer the `onboarding@resend.dev` sandbox. That address can only deliver
+# to the Resend account owner's own address, so every real signup's
+# verification email was rejected. discomplemented.com is set up as a Resend
+# sending domain in Cloudflare DNS — DKIM at resend._domainkey, and the
+# return-path pair (MX to feedback-smtp.us-east-1.amazonses.com plus
+# "v=spf1 include:amazonses.com ~all") on send.discomplemented.com — so the
+# domain's own address is the correct sender. Display name matches the public
+# brand shipped in components/MarketingScreen.tsx ("Discomplement").
+RESEND_FROM_EMAIL = "Discomplement <noreply@discomplemented.com>"
+
+# Static assets (built frontend)
+# run_worker_first: without this, Workers Assets intercepts GET requests
+# with `Sec-Fetch-Mode: navigate` (i.e. real browser top-level navigations,
+# not fetch/XHR) BEFORE the Worker ever runs, and — because of
+# not_found_handling below — serves the SPA shell instead. That silently
+# breaks the GitHub OAuth callback: GitHub redirects the browser (a real
+# navigation) to /api/auth/callback/github, which has no matching static
+# file, so it got served index.html instead of ever reaching Better Auth's
+# handler — no session was ever created. /api/* must always hit the Worker.
+[assets]
+directory = "./dist/client"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+run_worker_first = true
+
+# D1 Database — 11 tables (7 core + 3 pipeline + 1 admin)
+[[d1_databases]]
+binding = "DB"
+database_name = "bicameral"
+database_id = "24dd57ec-9c20-46df-aaa9-d4f99dc570bb"
+migrations_dir = "migrations"
+
+# R2 Bucket — file storage for generated projects
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "bicameral-assets"
+
+# Vectorize — Memory Lattice embeddings (1536 dims, cosine — set at index
+# creation via `wrangler vectorize create`, not here; `dimensions`/`metric`
+# in this block are not valid binding fields and wrangler warns on every
+# run if present).
+[[vectorize]]
+binding = "LATTICE_INDEX"
+index_name = "bicameral-lattice"
+
+# KV — Kill switch, maintenance mode, config flags (admin panel)
+[[kv_namespaces]]
+binding = "CONFIG_KV"
+id = "9c90b022d521458a9361f7868c1e9d9e"
+
+# Analytics Engine — Telemetry for admin panel (CPU time, D1 latency, per-route P95)
+[[analytics_engine_datasets]]
+binding = "ANALYTICS_ENGINE"
+dataset = "bicameral_metrics"
+
+# Durable Objects — Pipeline orchestration + lattice state + preview sandboxes
+[durable_objects]
+bindings = [
+  { name = "GENERATION_DO", class_name = "GenerationOrchestrator" },
+  { name = "LATTICE_DO", class_name = "LatticeManager" },
+  { name = "PREVIEW_SANDBOX", class_name = "Sandbox" },
+  { name = "PREVIEW_CAPACITY", class_name = "PreviewCapacity" },
+  { name = "GLASS_ENGINE_DO", class_name = "GlassEngineDO" }
+]
+
+# Migrations — register DO classes
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["GenerationOrchestrator", "LatticeManager"]
+
+[[migrations]]
+tag = "v2"
+new_sqlite_classes = ["Sandbox"]
+
+[[migrations]]
+tag = "v3"
+new_sqlite_classes = ["GlassEngineDO"]
+
+# PreviewCapacity — admission control for the container pool. A new class needs
+# its own migration tag; adding it to an existing tag's list is a no-op on an
+# already-applied tag and the binding would resolve to nothing at runtime.
+[[migrations]]
+tag = "v4"
+new_sqlite_classes = ["PreviewCapacity"]
+
+# Container — Tier 3 preview sandboxes (Phase 6; Dockerfile.preview created)
+[[containers]]
+class_name = "Sandbox"
+# The published digest of Dockerfile.preview, not the Dockerfile path.
+# `image = "./Dockerfile.preview"` makes every deploy that touches containers
+# run `docker build --load`, which needs buildx — so on a host without it the
+# whole deploy fails and container *config* (instance_type, max_instances)
+# can never be changed, even when the image itself is untouched. Pointing at
+# the digest decouples the two. The env blocks used to say `image_uri`, which
+# this wrangler rejects outright ("containers.image field must be defined");
+# --containers-rollout none had been hiding that.
+#
+# CHANGING Dockerfile.preview MEANS REPUBLISHING: on a host with buildx,
+#   wrangler containers build ./Dockerfile.preview --push
+# then paste the new digest over the three copies below.
+image = "registry.cloudflare.com/8f1ea7b43bc1ba3fd34945ecec672840/bicameral-sandbox-production@sha256:f1a5a89194ecfdc72d577952e93800c190eb3f10ecd980acf8ff7399f936650f"
+# Sizing. Read this before changing either number — both were measured, and
+# the previous values were measured too, against a container that did less.
+#
+# "lite" was right while the container only served static files from a Vite
+# dev server: measured through the proxy on 2026-08-28, index.html, a
+# transformed JSX module and a pre-bundled react chunk each came back 200 in
+# 0.44-0.49s. (The hangs that preceded that were never CPU — exec() starts in
+# "/" regardless of the image's WORKDIR, so Vite was rooted at the filesystem
+# root and crawling /proc, /sys and /usr on every request. See
+# durable-objects/sandbox-preview.ts. Resizing to "standard-1" moved 51s to
+# 13.5s; the cd fixed it outright.)
+#
+# The container now also runs `npm install` and the generated app's own server
+# process, and 256 MiB does not hold either. `wrangler containers info` reports
+# this application's real allocation as vcpu 0.0625 / 256 MiB / 2 GB — 1/16 of
+# a vCPU, not the "1/2 vCPU" an older comment in sandbox-preview.ts claimed.
+# Measured peak RSS of the exact install command sandbox-install.ts builds,
+# summed over the whole npm process tree (scripts/ has no runner for this; the
+# probe polled /proc):
+#   zustand + date-fns + clsx                    184 MiB, 8.8s, 27 MB on disk
+#   recharts + react-router-dom + zod + lucide   251 MiB, 19.9s, 73 MB on disk
+# The second number is the whole 256 MiB budget spent before Vite or the
+# generated server start. "basic" (1/4 vCPU, 1 GiB, 4 GB disk) clears it with
+# room for the dev server alongside; the install phase completes before either
+# long-lived process starts, so the peaks do not stack.
+#
+# NOT the final number. §5's acceptance application 3 is a deployed full-stack
+# app, and re-sizing against a measured run of it is a §3.2 task in its own
+# right. This is the smallest type that can run what the container is now asked
+# to run, chosen so the ceiling is capacity rather than OOM.
+instance_type = "basic"
+# 20 is Cloudflare's default per-application ceiling, so it needs no
+# entitlement request — the previous 10 was *below* the default and had been
+# read here as a platform limit rather than a choice.
+#
+# What the account actually shows, measured 2026-08-29 (`wrangler containers
+# instances a0340b59-...`): 8 instance records, every one of them `inactive`,
+# the oldest created 2026-08-26; `wrangler containers info` reports 7 healthy
+# and 0 active. Inactive instances are not running, so this is NOT evidence
+# that 7 of 10 slots were consumed — but it is evidence that nothing ever
+# cleaned them up, because until now only an explicit DELETE destroyed a
+# sandbox. That is what setInactivityTimeout in Sandbox.ts and the
+# destroy-on-close path exist to fix. Raising the ceiling without them would
+# only move the eventual wall further out.
+#
+# Going past 20 requires an entitlement increase on the account, which is
+# Johnathan's to request.
+max_instances = 20
+
+# NOTE: bare key/values used to sit here, after the [[containers]] table
+# header — TOML therefore parsed them as fields OF that container, not as
+# top-level vars ("Unexpected fields found in containers field"). They never
+# reached the Worker. GITHUB_REPO and RESEND_FROM_EMAIL, which existed only
+# here, are now in [vars] above; the FLUXYCHAT_WORKER_URL/APP_URL/ENVIRONMENT
+# localhost copies were dropped, since [vars] already sets all three. Anything
+# added later must go above the first [[...]] header, not below one.
+#
+# Stripe billing (see lib/stripe.ts, routes/billing.ts). No new non-secret
+# vars needed here — checkout/portal redirect URLs are built from APP_URL
+# above, and prices are defined inline via Stripe's price_data (no
+# dashboard-created Price IDs to track). STRIPE_PUBLISHABLE_KEY,
+# STRIPE_SECRET_KEY, and STRIPE_WEBHOOK_SECRET are all secrets (env.ts) —
+# NOT YET PROVISIONED, no real Stripe account exists. `wrangler secret put`
+# is intentionally NOT run as part of this phase.
+
+# Cron Workers
+[triggers]
+crons = [
+  "0 3 * * *",     # Daily at 3 AM UTC: credit reset + audit log archival
+  "*/15 * * * *",  # Every 15 min: tripwire engine (evaluate, execute remedies, retries)
+  "0 * * * *",     # Hourly: dunning worker (decline recovery, retry scheduling)
+  "0 4 * * *",     # Daily at 4 AM UTC: nightly preference learning (clustering, rules)
+  "0 6 * * *",     # Daily at 6 AM UTC: Monte Carlo watchdog — reads the last two
+                   # reports and alerts on a new exploit class, a material VDR
+                   # drop, a tripwire spike, or a nightly that stopped reporting.
+                   # It does NOT run the simulation: that is Python, spends real
+                   # credits against production, and lives in
+                   # .github/workflows/simulation.yml on a 4 AM schedule.
+]
+
+# ============ PRODUCTION ============
+# Named environments do NOT inherit top-level bindings/vars in wrangler v4 —
+# everything below is a required duplicate of the top-level config, not an
+# override. Keep both in sync when adding a new binding.
+[env.production]
+name = "bicameral"
+
+[env.production.assets]
+directory = "./dist/client"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+run_worker_first = true
+
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "bicameral"
+database_id = "24dd57ec-9c20-46df-aaa9-d4f99dc570bb"
+migrations_dir = "migrations"
+
+[[env.production.r2_buckets]]
+binding = "BUCKET"
+bucket_name = "bicameral-assets"
+
+[[env.production.vectorize]]
+binding = "LATTICE_INDEX"
+index_name = "bicameral-lattice"
+
+[[env.production.kv_namespaces]]
+binding = "CONFIG_KV"
+id = "9c90b022d521458a9361f7868c1e9d9e"
+
+[[env.production.analytics_engine_datasets]]
+binding = "ANALYTICS_ENGINE"
+dataset = "bicameral_metrics"
+
+[env.production.durable_objects]
+bindings = [
+  { name = "GENERATION_DO", class_name = "GenerationOrchestrator" },
+  { name = "LATTICE_DO", class_name = "LatticeManager" },
+  { name = "PREVIEW_SANDBOX", class_name = "Sandbox" },
+  { name = "PREVIEW_CAPACITY", class_name = "PreviewCapacity" },
+  { name = "GLASS_ENGINE_DO", class_name = "GlassEngineDO" }
+]
+
+[env.production.triggers]
+crons = [
+  "0 3 * * *",
+  "*/15 * * * *",
+  "0 * * * *",
+  "0 4 * * *",
+  "0 6 * * *",
+]
+
+# Container — Tier 3 preview sandbox (Workers Paid plan enabled Aug 21 2026)
+[[env.production.containers]]
+class_name = "Sandbox"
+# The published digest of Dockerfile.preview, not the Dockerfile path.
+# `image = "./Dockerfile.preview"` makes every deploy that touches containers
+# run `docker build --load`, which needs buildx — so on a host without it the
+# whole deploy fails and container *config* (instance_type, max_instances)
+# can never be changed, even when the image itself is untouched. Pointing at
+# the digest decouples the two. The env blocks used to say `image_uri`, which
+# this wrangler rejects outright ("containers.image field must be defined");
+# --containers-rollout none had been hiding that.
+#
+# CHANGING Dockerfile.preview MEANS REPUBLISHING: on a host with buildx,
+#   wrangler containers build ./Dockerfile.preview --push
+# then paste the new digest over the three copies below.
+image = "registry.cloudflare.com/8f1ea7b43bc1ba3fd34945ecec672840/bicameral-sandbox-production@sha256:f1a5a89194ecfdc72d577952e93800c190eb3f10ecd980acf8ff7399f936650f"
+# Sized in the top-level [[containers]] block above — see the note there for
+# the measurements behind these two numbers. Named-environment blocks inherit
+# nothing, so these are required duplicates, not overrides.
+instance_type = "basic"
+max_instances = 20
+
+[env.production.vars]
+COHERE_BASE_URL = "https://api.cohere.com/v2"
+OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+# Overrides the pinned auditor model (packages/cohere/src/auditor-model.ts).
+# Empty means "use the pin". Must be an OpenRouter slug — a Cohere model here
+# would put the auditor back on the researcher's own provider, and
+# resolveAuditorModel() throws rather than allow that.
+AUDITOR_MODEL = ""
+# Was "http://localhost:8788" — in the production environment that made every
+# support-chat call (lib/fluxychat.ts) fetch localhost from the edge. Same
+# deployed worker the top-level [vars] block points at.
+FLUXYCHAT_WORKER_URL = "https://fluxychat.johnathanallen1998.workers.dev"
+# Must match the GitHub OAuth App's registered callback exactly (www) —
+# classic OAuth Apps support only one callback URL, and GitHub matches it
+# as an exact string, not per-domain.
+APP_URL = "https://www.discomplemented.com"
+ENVIRONMENT = "production"
+# Must equal max_instances in the [[containers]] block below. The Worker cannot
+# read its own container config, so admission control (durable-objects/
+# PreviewCapacity.ts) reads this instead — change both or the queue will admit
+# past the ceiling and the platform will refuse the overflow.
+PREVIEW_MAX_INSTANCES = "20"
+GITHUB_REPO = "libriopal/DISCOMPLEMENTED_LIVE"
+# This key was missing from this block entirely (the comment above it was left
+# dangling by an earlier edit), so `env.RESEND_FROM_EMAIL` was undefined in
+# production and every Resend send in lib/email.ts — including the
+# email-verification link — was rejected for a missing `from`. See the
+# top-level [vars] block for why this is the domain address and not the
+# resend.dev sandbox.
+RESEND_FROM_EMAIL = "Discomplement <noreply@discomplemented.com>"
+
+# Custom Domains bind to an exact hostname — no wildcard, no path.
+[[env.production.routes]]
+pattern = "discomplemented.com"
+custom_domain = true
+
+[[env.production.routes]]
+pattern = "www.discomplemented.com"
+custom_domain = true
+
+# ============ STAGING ============
+[env.staging]
+name = "bicameral-staging"
+
+[env.staging.assets]
+directory = "./dist/client"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+run_worker_first = true
+
+[[env.staging.d1_databases]]
+binding = "DB"
+database_name = "bicameral"
+database_id = "24dd57ec-9c20-46df-aaa9-d4f99dc570bb"
+migrations_dir = "migrations"
+
+[[env.staging.r2_buckets]]
+binding = "BUCKET"
+bucket_name = "bicameral-assets"
+
+[[env.staging.vectorize]]
+binding = "LATTICE_INDEX"
+index_name = "bicameral-lattice"
+
+[[env.staging.kv_namespaces]]
+binding = "CONFIG_KV"
+id = "9c90b022d521458a9361f7868c1e9d9e"
+
+[[env.staging.analytics_engine_datasets]]
+binding = "ANALYTICS_ENGINE"
+dataset = "bicameral_metrics"
+
+[env.staging.durable_objects]
+bindings = [
+  { name = "GENERATION_DO", class_name = "GenerationOrchestrator" },
+  { name = "LATTICE_DO", class_name = "LatticeManager" },
+  { name = "PREVIEW_SANDBOX", class_name = "Sandbox" },
+  { name = "PREVIEW_CAPACITY", class_name = "PreviewCapacity" },
+  { name = "GLASS_ENGINE_DO", class_name = "GlassEngineDO" }
+]
+
+[[env.staging.routes]]
+pattern = "test.discomplemented.com"
+custom_domain = true
+
+[env.staging.triggers]
+crons = [
+  "0 3 * * *",
+  "*/15 * * * *",
+  "0 * * * *",
+  "0 4 * * *",
+  "0 6 * * *",
+]
+
+# Container — Tier 3 preview sandbox (Workers Paid plan enabled Aug 21 2026)
+[[env.staging.containers]]
+class_name = "Sandbox"
+# The published digest of Dockerfile.preview, not the Dockerfile path.
+# `image = "./Dockerfile.preview"` makes every deploy that touches containers
+# run `docker build --load`, which needs buildx — so on a host without it the
+# whole deploy fails and container *config* (instance_type, max_instances)
+# can never be changed, even when the image itself is untouched. Pointing at
+# the digest decouples the two. The env blocks used to say `image_uri`, which
+# this wrangler rejects outright ("containers.image field must be defined");
+# --containers-rollout none had been hiding that.
+#
+# CHANGING Dockerfile.preview MEANS REPUBLISHING: on a host with buildx,
+#   wrangler containers build ./Dockerfile.preview --push
+# then paste the new digest over the three copies below.
+image = "registry.cloudflare.com/8f1ea7b43bc1ba3fd34945ecec672840/bicameral-sandbox-production@sha256:f1a5a89194ecfdc72d577952e93800c190eb3f10ecd980acf8ff7399f936650f"
+# Sized in the top-level [[containers]] block above — see the note there for
+# the measurements behind these two numbers. Named-environment blocks inherit
+# nothing, so these are required duplicates, not overrides.
+instance_type = "basic"
+max_instances = 20
+
+[env.staging.vars]
+COHERE_BASE_URL = "https://api.cohere.com/v2"
+OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+# Overrides the pinned auditor model (packages/cohere/src/auditor-model.ts).
+# Empty means "use the pin". Must be an OpenRouter slug — a Cohere model here
+# would put the auditor back on the researcher's own provider, and
+# resolveAuditorModel() throws rather than allow that.
+AUDITOR_MODEL = ""
+FLUXYCHAT_WORKER_URL = "http://localhost:8788"
+APP_URL = "https://bicameral-staging.johnathanallen1998.workers.dev"
+ENVIRONMENT = "development"
+# See the note in the top-level [vars] block.
+PREVIEW_MAX_INSTANCES = "20"
+GITHUB_REPO = "libriopal/DISCOMPLEMENTED_LIVE"
+RESEND_FROM_EMAIL = "Bicameral <onboarding@resend.dev>"

@@ -1,0 +1,306 @@
+/**
+ * Dual theme — the role tokens, in parchment and in void.
+ *
+ * PARCHMENT (light, default) is the prototype identity the account owner
+ *   approved, with four tokens corrected to clear WCAG AA. Hues held; only
+ *   value and saturation moved, so the design reads identically.
+ *
+ * VOID (dark) is derived from the design corpus
+ *   (libriopal/magentadice-cyancode/data, 1116 images). The hues are MEASURED,
+ *   not chosen: a 400-image pixel sample gives gold 24–33°, cyan 192–207°,
+ *   magenta 300–319°, and dark grounds clustering at #000000 / #080810 /
+ *   #000008 / #101010 — black with a consistent blue shift, never neutral.
+ *
+ * Note the cyan. The marketing surface shipped `#3ac9d4`, which sits at 184°.
+ * The corpus renders its cyan at ~200°, and `#65b7e0` is the measured value.
+ * The shipped one was not wrong by eye; it was simply not the corpus's.
+ *
+ * ROLE STRUCTURE IS IDENTICAL ACROSS BOTH THEMES. Only values change:
+ *   ground / raised   the surface
+ *   ink               text
+ *   contour           accent    — everyday interactive
+ *   benchmark         structure — rules, borders, badges
+ *   checkpoint        SIGNAL    — at most twice per surface
+ *
+ * One divergence is deliberate: the signal hue differs between themes,
+ * terracotta (13°) on parchment and magenta (310°) on void. Neither works on
+ * the other ground — magenta on parchment is garish, terracotta on void is
+ * muddy. What stays constant is the role, which is the part that is a system.
+ *
+ * Every ratio in the comments was computed (WCAG 2.1 relative luminance), not
+ * estimated, and `contrast.test.ts` recomputes them from THIS FILE on every
+ * run. A number in a comment is a claim; the test is the evidence, and it is
+ * why the four failures below were found at all — they had shipped in a
+ * prototype that looked, to the eye, entirely fine.
+ *
+ * Defined in three places on purpose — the explicit attribute, the system
+ * preference, and a `.theme-void` utility — so that no colour is defined ONLY
+ * inside a media query. A token that exists only under `prefers-color-scheme`
+ * is undefined for every reader who has explicitly chosen, and the failure is
+ * silent.
+ */
+
+:root {
+  color-scheme: light;
+
+  /* ---- PARCHMENT: surfaces ---- */
+  --sur-ground: #f5efe4;
+  --sur-ground-2: #efe7d6;
+  --sur-ground-3: #e8dec9;
+  --sur-ground-deep: #e0d4bc;
+
+  /* ---- PARCHMENT: ink ---- */
+  --sur-ink: #232a25; /* 12.84:1 on ground — AAA */
+  --sur-ink-muted: #5d6358; /*  5.41:1 — AA */
+  --sur-ink-faint: #656359; /*  5.27 / 4.90 / 4.52:1 on the three grounds — AA
+                                on all of them.
+
+                                Two corrections deep. It shipped as #8f8d80 at
+                                2.92:1, failing even the relaxed 3:1 threshold —
+                                not usable for text at any size. The audit
+                                corrected it to #706d5d at 4.55:1, but computed
+                                that against the BASE ground only; this palette
+                                has three, and on --sur-ground-2 the same value
+                                is 4.23 and on --sur-ground-3 it is 3.90. Faint
+                                ink on a banded section is exactly where it
+                                would have been used. Darkened along its own
+                                hue (52° → 50° after 8-bit rounding) until it
+                                clears 4.5:1 on the DEEPEST ground it can
+                                appear on. */
+
+  /* ---- PARCHMENT: roles ----
+   * All three below were under 4.5:1 as the prototype ships them. Each is
+   * darkened along its own hue until it clears AA for body text.
+   *
+   * `-bright` IS the original shipped value in each case — that is what "keep
+   * the brighter value for hover and active" means, and it is the pairing that
+   * makes the correction reversible at a glance. The audit's own sheet instead
+   * kept the prototype's separate `-bright` colours and dropped these three
+   * entirely, which lost the originals and left --sur-benchmark-bright at
+   * #b08a2e / 2.81:1 — under even the 3:1 UI threshold, for a hover state of a
+   * colour that draws structure. These three all clear 3:1 (4.25 / 3.78 /
+   * 3.86), which is the applicable threshold: they are never body text. */
+  --sur-contour: #296d68; /* 5.27 / 4.90 / 4.52:1 on the three grounds.
+                             Same two-corrections-deep story as --sur-ink-faint:
+                             shipped #2f7d77 at 4.25, audited to #2c7873 at
+                             4.54 against the base ground alone, which is 4.22
+                             on ground-2 and 3.89 on ground-3. This is the
+                             primary button's background, so a button label
+                             placed on a banded section depended on it. Hue 175
+                             held. */
+  --sur-contour-bright: #2f7d77; /* 4.25:1 — hover/active only */
+  --sur-benchmark: #7d5d1c; /* 5.31 / 4.94 / 4.55:1 on the three grounds.
+                               Shipped #9a7322 at 3.78; audited to #8c671b at
+                               4.51 against the base ground alone, which is 4.19
+                               on ground-2 and 3.86 on ground-3. Hue 40 held. */
+  --sur-benchmark-bright: #9a7322; /* 3.78:1 — hover/active only */
+  --sur-checkpoint: #9e4a34; /* 5.27 / 4.90 / 4.51:1 on the three grounds.
+                                Shipped #bf5a3f at 3.86; audited to #b15036 at
+                                4.51 against the base ground alone. Hue 13
+                                held. */
+  --sur-checkpoint-bright: #bf5a3f; /* 3.86:1 — hover/active only */
+
+  --sur-thread: #c98a4e;
+  --sur-thread-soft: rgba(201, 138, 78, 0.4);
+
+  --sur-line: rgba(28, 38, 34, 0.14);
+  --sur-line-strong: rgba(28, 38, 34, 0.3);
+  --sur-on-signal: #f5efe4;
+
+  --lattice-opacity: 0.1;
+}
+
+/* ------------------------------------------------------------------ VOID --
+ * The explicit choice. Highest specificity of the three, so a reader who has
+ * picked dark gets dark regardless of what their OS says.
+ * ------------------------------------------------------------------------ */
+:root[data-theme='dark'],
+:root[data-theme='scorpio'],
+.theme-void {
+  color-scheme: dark;
+
+  --sur-ground: #08080f;
+  --sur-ground-2: #101018;
+  --sur-ground-3: #16161f;
+  --sur-ground-deep: #040407;
+
+  --sur-ink: #f4f2ef; /* 17.87:1 on ground — AAA */
+  --sur-ink-muted: #a9a6a0; /*  8.22:1 — AAA */
+  --sur-ink-faint: #8f8d86; /*  6.01:1 — AA+ */
+
+  --sur-contour: #65b7e0; /* hue 200. 8.94:1 — AAA */
+  --sur-contour-bright: #8ccdec;
+  --sur-benchmark: #d99a5b; /* hue  30. 8.29:1 — AAA */
+  --sur-benchmark-bright: #e6a667;
+  --sur-checkpoint: #e660cf; /* hue 310. 6.60:1 — AA+ */
+  --sur-checkpoint-bright: #ef7ad9;
+
+  --sur-thread: #c98a4e;
+  --sur-thread-soft: rgba(201, 138, 78, 0.35);
+
+  --sur-line: rgba(244, 242, 239, 0.12);
+  --sur-line-strong: rgba(244, 242, 239, 0.26);
+  --sur-on-signal: #0b0b10;
+
+  /* The corpus is dense; the page is not. This is a quotation of it, not a
+     reproduction — above ~0.09 the field competes with body text. */
+  --lattice-opacity: 0.055;
+}
+
+/* The system preference, for a reader who has not chosen. Guarded on
+   `:not([data-theme='light'])` so an explicit light choice still wins. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']):not([data-theme='libra']) {
+    color-scheme: dark;
+
+    --sur-ground: #08080f;
+    --sur-ground-2: #101018;
+    --sur-ground-3: #16161f;
+    --sur-ground-deep: #040407;
+
+    --sur-ink: #f4f2ef;
+    --sur-ink-muted: #a9a6a0;
+    --sur-ink-faint: #8f8d86;
+
+    --sur-contour: #65b7e0;
+    --sur-contour-bright: #8ccdec;
+    --sur-benchmark: #d99a5b;
+    --sur-benchmark-bright: #e6a667;
+    --sur-checkpoint: #e660cf;
+    --sur-checkpoint-bright: #ef7ad9;
+
+    --sur-thread: #c98a4e;
+    --sur-thread-soft: rgba(201, 138, 78, 0.35);
+
+    --sur-line: rgba(244, 242, 239, 0.12);
+    --sur-line-strong: rgba(244, 242, 239, 0.26);
+    --sur-on-signal: #0b0b10;
+
+    --lattice-opacity: 0.055;
+  }
+}
+
+/* ------------------------------------------------------------- MOBILE -----
+ * Measured on a 390×844 viewport with touch emulation.
+ *
+ * These are the rules that apply to markup this repo actually renders. The
+ * wiring kit's sheet also carries rules for `.mk-drawer`, `.survey-sheet`,
+ * `.gate__blueprint` and `.lattice-wrap` — prototype classes with nothing on
+ * this side to match. They are deliberately NOT copied in: a rule that matches
+ * nothing is indistinguishable from a rule that works, and carrying it here
+ * would make this file look like it covers a drawer that does not exist yet.
+ * They belong with the components, when those are ported.
+ * ------------------------------------------------------------------------ */
+
+/* 1. TAP TARGETS.
+ *
+ * Measured at 390x844 with touch emulation, on `/`, `/signin` and
+ * `/legal/terms`. The wiring kit reports "10 controls under 44px on the home
+ * page", with a 350x33 drawer link and a 52x38 `Open menu` button. Neither
+ * exists here: this repo's marketing nav has no drawer and no menu button, and
+ * the home page had THREE undersized controls, all of them failing on WIDTH
+ * with the height already correct. The kit's numbers are the prototype's.
+ *
+ * What was actually measured, before these rules:
+ *   /        theme-toggle 36x44, footer "Terms" 40x44, footer "AUP" 29x44
+ *   /signin  four text inputs 317x43 at 14px type (fixed in LoginScreen.tsx,
+ *            where an inline style was beating the floor in section 2 below)
+ *   /legal   clean
+ * No route scrolled horizontally: scrollWidth == clientWidth == 390 on all
+ * three, and the viewport meta was already correct.
+ */
+@media (pointer: coarse) {
+  a,
+  button,
+  [role='button'],
+  input,
+  select,
+  textarea,
+  summary {
+    min-height: 44px;
+  }
+
+  /* Inline links inside prose must NOT get 44px — it wrecks the leading and
+     makes a paragraph of links overlap. An unclassed link inside running text
+     is the shape to exclude. */
+  p a,
+  label a,
+  li > a:not([class]) {
+    min-height: 0;
+  }
+
+  /* A checkbox is not its own target: both here and on the sign-in consent
+     gate it sits inside a <label> that wraps the prose, and the label is the
+     activation area — well over 44px. Stretching the box itself to 44px would
+     produce a checkbox the size of a button for no gain in reach. */
+  input[type='checkbox'],
+  input[type='radio'] {
+    min-height: 0;
+  }
+
+  /* Width, which is the half that was actually failing. `min-width` on every
+     link would stretch inline prose links into gappy running text, so this is
+     scoped to the controls that stand alone. */
+  .mkt-nav__link,
+  .mkt-footer__links a,
+  .theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* 2. iOS ZOOM ON FOCUS. Any input under 16px makes mobile Safari zoom the page
+ *    in, and it does not zoom back out. The hero prompt is the first thing a
+ *    mobile visitor touches, so this matters more than it looks. */
+@media (max-width: 640px) {
+  input,
+  textarea,
+  select {
+    font-size: max(16px, 1rem);
+  }
+}
+
+/* 3. SAFE AREAS. Notches and home indicators. */
+@supports (padding: max(0px)) {
+  .mkt-nav__inner,
+  .mkt-footer__inner {
+    padding-left: max(var(--space-8, 2rem), env(safe-area-inset-left));
+    padding-right: max(var(--space-8, 2rem), env(safe-area-inset-right));
+  }
+  .mkt-footer {
+    padding-bottom: max(var(--space-8, 2rem), env(safe-area-inset-bottom));
+  }
+}
+
+/* 4. THE REAL VIEWPORT HEIGHT. 100vh is wrong on mobile Safari — it excludes
+ *    the collapsing toolbar, so a 100vh block is always slightly cut off. */
+@supports (height: 100dvh) {
+  .mkt {
+    min-height: 100dvh;
+  }
+}
+
+/* 5. Wide content scrolls inside its own container, never the page. A `pre`
+ *    wider than 390px is the usual cause of a horizontal scrollbar. */
+@media (max-width: 720px) {
+  pre,
+  .mkt-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* ------------------------------------------------------------- MOTION ----- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

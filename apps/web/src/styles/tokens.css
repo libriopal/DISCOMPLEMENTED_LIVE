@@ -1,0 +1,234 @@
+/**
+ * Design tokens — extracted from design/03-design-system-tokens.html
+ * (Tier 1 primitives -> Tier 2 semantic aliases) and design/07-astroapp-concept.html
+ * (Scorpio Dark / Libra Light theme bases). Components consume Tier 2 only.
+ * Theme switch = swap `data-theme` on <html>; defaults to Libra Light.
+ */
+
+:root {
+  /* ---- Tier 1: color primitives ---- */
+  --indigo-50: #eef1fd;
+  --indigo-100: #d5ddfb;
+  --indigo-200: #aebcf6;
+  --indigo-300: #7f92ee;
+  --indigo-400: #5a6fe6;
+  --indigo-500: #3b4fd6;
+  --indigo-600: #2a3bb5;
+  --indigo-700: #1f2c8f;
+  --indigo-800: #182069;
+  --indigo-900: #101445;
+
+  --violet-50: #f6eefc;
+  --violet-100: #ebd6f9;
+  --violet-200: #d6aef2;
+  --violet-300: #bd82e9;
+  --violet-400: #a55ee0;
+  --violet-500: #8b3fd6;
+  --violet-600: #732fb5;
+  --violet-700: #5b248f;
+  --violet-800: #431a69;
+  --violet-900: #2c1145;
+
+  --pink-50: #fdeef6;
+  --pink-100: #fbd6ea;
+  --pink-200: #f6aed4;
+  --pink-300: #ef82ba;
+  --pink-400: #e85ea1;
+  --pink-500: #db3f88;
+  --pink-600: #b82f6f;
+  --pink-700: #922456;
+  --pink-800: #6c1a40;
+  --pink-900: #46112a;
+
+  --neutral-0: #ffffff;
+  --neutral-50: #fafafa;
+  --neutral-100: #f2f2f2;
+  --neutral-200: #d9d9dd;
+  --neutral-400: #93939f;
+  --neutral-600: #5c5c66;
+  --neutral-800: #17171c;
+  --neutral-900: #0d0a14;
+
+  --success: #0a8a5c;
+  --warning: #b36a00;
+  --danger: #c0362c;
+  --info: #1863dc;
+
+  /* ---- Spacing (8px base) ---- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-14: 56px;
+
+  /* ---- Radii ---- */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+  --radius-card: 22px;
+  --radius-pill: 9999px;
+
+  /* ---- Elevation ---- */
+  --shadow-e1: 0 1px 3px rgba(13, 10, 20, 0.06);
+  --shadow-e2: 0 6px 20px rgba(13, 10, 20, 0.1);
+  --shadow-e3: 0 16px 40px rgba(13, 10, 20, 0.18);
+
+  /* ---- Z-index ---- */
+  --z-base: 0;
+  --z-sticky: 100;
+  --z-drawer: 300;
+  --z-overlay: 400;
+  --z-modal: 500;
+  --z-toast: 700;
+  --z-command: 900;
+
+  /* ---- Motion ---- */
+  --dur-instant: 80ms;
+  --dur-fast: 160ms;
+  --dur-base: 240ms;
+  --dur-slow: 400ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-enter: cubic-bezier(0, 0, 0, 1);
+  --ease-spring: cubic-bezier(0.5, 1.4, 0.5, 1);
+
+  /* ---- Typography ---- */
+  --font-display: 'Space Grotesk', ui-sans-serif, sans-serif;
+  --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Fira Code', ui-monospace, monospace;
+
+  /* ---- Tier 2: semantic aliases (Libra Light default) ---- */
+  --surface-base: var(--neutral-0);
+  --surface-raised: var(--neutral-50);
+  --text-primary: var(--neutral-900);
+  --text-secondary: var(--neutral-400);
+  --color-accent: var(--info);
+  --hemisphere-left: var(--indigo-500);
+  --hemisphere-right: var(--violet-500);
+  --bridge-align: var(--pink-500);
+  --border-default: var(--neutral-200);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --surface-base: #0a070a; /* Scorpio Dark base */
+    --surface-raised: var(--neutral-800);
+    --text-primary: var(--neutral-50);
+    --text-secondary: var(--neutral-400);
+    --color-accent: var(--indigo-400);
+    --hemisphere-left: var(--indigo-300);
+    --hemisphere-right: var(--violet-300);
+    --bridge-align: var(--pink-300);
+    --border-default: #2c2c33;
+  }
+}
+
+:root[data-theme='dark'] {
+  --surface-base: #0a070a;
+  --surface-raised: var(--neutral-800);
+  --text-primary: var(--neutral-50);
+  --text-secondary: var(--neutral-400);
+  --color-accent: var(--indigo-400);
+  --hemisphere-left: var(--indigo-300);
+  --hemisphere-right: var(--violet-300);
+  --bridge-align: var(--pink-300);
+  --border-default: #2c2c33;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--surface-base);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  margin: 0;
+}
+
+code,
+pre {
+  font-family: var(--font-mono);
+}
+
+a {
+  color: var(--color-accent);
+}
+
+button {
+  font-family: var(--font-body);
+}
+
+/*
+ * Mobile layout (< 500px, simulation-evolved breakpoint — Butterfly v7):
+ * the desktop icon-rail sidebar converts to a bottom tab bar. Sidebar.tsx
+ * and App.tsx style their elements inline (design-token driven), which
+ * always outranks a plain class selector — these overrides use
+ * !important deliberately, only at this one breakpoint, only for the
+ * layout properties that must flip for the bar to dock at the bottom.
+ */
+@media (max-width: 499px) {
+  /* simulation-evolved: 500px breakpoint (Butterfly v7) */
+  .app-shell {
+    flex-direction: column !important;
+  }
+
+  .app-main {
+    padding-bottom: 64px !important;
+  }
+
+  .app-sidebar {
+    position: fixed !important;
+    top: auto !important;
+    bottom: 0 !important;
+    left: 0;
+    right: 0;
+    width: 100% !important;
+    height: auto !important;
+    flex-direction: row !important;
+    align-items: center;
+    overflow-x: auto;
+    border-right: none !important;
+    border-top: 1px solid var(--border-default);
+    padding: var(--space-2) !important;
+    z-index: var(--z-sticky);
+  }
+
+  /* collapses the two direct child <div>s so their contents (logo, nav
+     list, email, sign-out) all become items of the same horizontal row */
+  .app-sidebar > div {
+    display: contents;
+  }
+
+  .app-sidebar-brand {
+    display: none !important;
+  }
+
+  .app-sidebar-nav {
+    flex-direction: row !important;
+  }
+
+  .app-sidebar-email {
+    display: none !important;
+  }
+
+  .fluxy-chat-widget {
+    bottom: 72px !important;
+  }
+}

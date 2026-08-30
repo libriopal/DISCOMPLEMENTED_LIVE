@@ -1,0 +1,195 @@
+name: Coder Loop Security Gate
+
+# Dispatched by GenerationOrchestrator.runCoderStep (see
+# apps/web/src/pipeline/tools/security-scan-gh.ts) once the Coder loop
+# returns a functionally-passing build. Runs Semgrep against the generated
+# files here — on a free GitHub-hosted runner — instead of the Sandbox DO's
+# container-based scan (apps/web/src/pipeline/tools/security-scan.ts), which
+# needs the Workers Paid plan the account doesn't have (see
+# bicameral_zero-budget-constraint memory / Task 5, on hold).
+#
+# A Worker/Durable Object can't block a request for the ~1-2 minutes this
+# takes, so the callback at the end is what actually resumes the pipeline —
+# see apps/web/src/routes/security-gate-webhook.ts. The report job always
+# runs (`if: always()`) so a failure earlier (fetch, materialize, scan)
+# still gets reported as an error rather than stranding the pipeline run in
+# 'scanning' forever.
+
+on:
+  workflow_dispatch:
+    inputs:
+      pipelineRunId:
+        description: 'pipeline_runs.id being scanned'
+        required: true
+      scanId:
+        description: 'security_gate_runs.id to report against'
+        required: true
+      environment:
+        description: 'Which deployment dispatched this scan'
+        required: false
+        default: 'production'
+        type: choice
+        options: [production, staging]
+
+# Explicit least-privilege default. This workflow never checks out or writes
+# to the repo — it only fetches generated (untrusted) files over HTTPS,
+# scans them in an isolated container, and POSTs findings back. See
+# vault/vault_saas_blueprint_v6_addendum_free-trials.md §6 and
+# vault/vault_saas_blueprint_v4_implementation_plan.md §2.3.1 for why: GitHub
+# Actions' default GITHUB_TOKEN permissions are broad unless narrowed, and
+# untrusted-code handling + credentialed callbacks are kept in separate jobs
+# so a compromise during the scan step can't reach the report step's job
+# context directly.
+permissions: {}
+
+jobs:
+  # Handles untrusted input: fetches Coder-generated files (arbitrary LLM
+  # output) and runs Semgrep against them. WEBHOOK_SECRET is still needed
+  # here for the authenticated fetch (accepted trade-off — it's a read,
+  # scoped to this internal API, not GITHUB_TOKEN), but this job has no
+  # `permissions:` and never re-sends the secret anywhere, so it can't be
+  # used to write back to the pipeline even if the scan step were
+  # compromised — that capability lives only in the report job below.
+  scan:
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: Resolve app URL
+        run: |
+          if [ "${{ inputs.environment }}" = "staging" ]; then
+            echo "APP_URL=https://bicameral-staging.johnathanallen1998.workers.dev" >> "$GITHUB_ENV"
+          else
+            echo "APP_URL=https://www.discomplemented.com" >> "$GITHUB_ENV"
+          fi
+
+      - name: Fetch generated files
+        continue-on-error: true
+        env:
+          WEBHOOK_SECRET: ${{ secrets.SECURITY_GATE_WEBHOOK_SECRET }}
+        run: |
+          curl -sf "$APP_URL/api/security-gate/${{ inputs.pipelineRunId }}/files" \
+            -H "x-webhook-secret: $WEBHOOK_SECRET" \
+            -o files.json
+
+      - name: Materialize files
+        if: hashFiles('files.json') != ''
+        run: |
+          mkdir -p project
+          node -e '
+            const fs = require("fs");
+            const path = require("path");
+            const { files } = JSON.parse(fs.readFileSync("files.json", "utf8"));
+            for (const f of files) {
+              const dest = path.join("project", f.path);
+              fs.mkdirSync(path.dirname(dest), { recursive: true });
+              fs.writeFileSync(dest, f.content);
+            }
+            console.log(`Wrote ${files.length} file(s)`);
+          '
+
+      - name: Run Semgrep
+        if: hashFiles('files.json') != ''
+        continue-on-error: true
+        run: |
+          mkdir -p out
+          docker run --rm \
+            --read-only \
+            --security-opt=no-new-privileges:true \
+            --cap-drop=ALL \
+            --network=none \
+            -v "$PWD/project:/src:ro" \
+            -v "$PWD/out:/out" \
+            semgrep/semgrep \
+            semgrep scan --config p/security-audit --config p/owasp-top-ten \
+            --json --output /out/semgrep-results.json /src
+          mv out/semgrep-results.json semgrep-results.json
+
+      - name: Format findings
+        if: always()
+        run: |
+          node -e '
+            const fs = require("fs");
+            let findings = [];
+            let error = null;
+            if (!fs.existsSync("files.json")) {
+              error = "Failed to fetch generated files from the app";
+            } else {
+              try {
+                const raw = JSON.parse(fs.readFileSync("semgrep-results.json", "utf8"));
+                findings = (raw.results || []).map((r) => ({
+                  path: r.path.replace(/^\/src\//, ""),
+                  line: r.start && r.start.line ? r.start.line : 0,
+                  ruleId: r.check_id,
+                  message: (r.extra && r.extra.message) || "Security finding",
+                  severity: (r.extra && r.extra.severity) || "WARNING",
+                }));
+              } catch (err) {
+                error = `Semgrep did not produce results: ${err.message}`;
+              }
+            }
+            fs.writeFileSync("callback-body.json", JSON.stringify({
+              scanId: process.env.SCAN_ID,
+              findings,
+              error,
+            }));
+            console.log(error ? `Error: ${error}` : `${findings.length} finding(s)`);
+          '
+        env:
+          SCAN_ID: ${{ inputs.scanId }}
+
+      - name: Upload findings
+        if: always()
+        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
+        with:
+          name: callback-body
+          path: callback-body.json
+          retention-days: 7
+
+  # Separate job, fresh runner: only this job holds the credential needed to
+  # resume the pipeline. It never executes anything derived from the
+  # generated (untrusted) files — it only reads the JSON findings artifact
+  # the scan job already produced and POSTs it.
+  report:
+    needs: scan
+    if: always()
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: Resolve app URL
+        run: |
+          if [ "${{ inputs.environment }}" = "staging" ]; then
+            echo "APP_URL=https://bicameral-staging.johnathanallen1998.workers.dev" >> "$GITHUB_ENV"
+          else
+            echo "APP_URL=https://www.discomplemented.com" >> "$GITHUB_ENV"
+          fi
+
+      - name: Download findings
+        id: download
+        continue-on-error: true
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+        with:
+          name: callback-body
+
+      - name: Fall back if scan job never produced output
+        if: steps.download.outcome != 'success'
+        run: |
+          node -e '
+            const fs = require("fs");
+            fs.writeFileSync("callback-body.json", JSON.stringify({
+              scanId: process.env.SCAN_ID,
+              findings: [],
+              error: "Scan job did not complete or produced no results",
+            }));
+          '
+        env:
+          SCAN_ID: ${{ inputs.scanId }}
+
+      - name: Report findings
+        if: always()
+        env:
+          WEBHOOK_SECRET: ${{ secrets.SECURITY_GATE_WEBHOOK_SECRET }}
+        run: |
+          curl -sf -X POST "$APP_URL/api/security-gate/${{ inputs.pipelineRunId }}/callback" \
+            -H "x-webhook-secret: $WEBHOOK_SECRET" \
+            -H "Content-Type: application/json" \
+            -d @callback-body.json

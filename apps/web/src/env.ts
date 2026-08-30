@@ -1,0 +1,141 @@
+/**
+ * Env — Cloudflare Workers bindings + secrets for @bicameral/web.
+ * Mirrors wrangler.toml exactly. Phase 3's `src/index.ts` (route mounting)
+ * and Phase 4's Durable Objects both bind against this same interface.
+ */
+export interface Env {
+  // Static assets
+  ASSETS: Fetcher;
+
+  // D1 Database (11+ tables — see migrations/)
+  DB: D1Database;
+
+  // R2 Bucket (file storage)
+  BUCKET: R2Bucket;
+
+  // Vectorize (Memory Lattice embeddings — 1536 dims, cosine)
+  LATTICE_INDEX: VectorizeIndex;
+
+  // KV (kill switch, maintenance mode, config flags)
+  CONFIG_KV: KVNamespace;
+
+  // Analytics Engine (admin panel telemetry)
+  ANALYTICS_ENGINE: AnalyticsEngineDataset;
+
+  // Durable Objects
+  GENERATION_DO: DurableObjectNamespace;
+  LATTICE_DO: DurableObjectNamespace;
+  PREVIEW_SANDBOX: DurableObjectNamespace;
+  /** Admission control for the preview pool — see PreviewCapacity.ts. */
+  PREVIEW_CAPACITY: DurableObjectNamespace;
+  GLASS_ENGINE_DO: DurableObjectNamespace;
+
+  // Secrets (set via `wrangler secret put`)
+  COHERE_API_KEY: string;
+  YDC_API_KEY: string;
+  // Optional at the type level because it is optional in fact: predeploy
+  // reports it unset as a warning, not a failure, and the research path
+  // degrades without it (routes/pipeline.ts already coerces with `?? ''`).
+  // Declaring it `string` told every new call site the key was guaranteed.
+  SCITE_API_KEY?: string;
+  // Tavily — web search + extraction for the research engine. Optional for
+  // the same reason as SCITE_API_KEY: the phase degrades to "no Tavily
+  // findings" rather than failing the run. Never declare it `string`.
+  TAVILY_API_KEY?: string;
+  GITHUB_TOKEN: string;
+  // OpenRouter — alternate LLM provider (see lib/cohere.ts fallback)
+  OPENROUTER_API_KEY: string;
+  BETTER_AUTH_SECRET: string;
+  // GitHub OAuth — dual apps (dev app callback = localhost/*.workers.dev,
+  // prod app callback = custom domain). See lib/auth.ts.
+  GITHUB_OAUTH_CLIENT_ID_DEV: string;
+  GITHUB_OAUTH_CLIENT_SECRET_DEV: string;
+  GITHUB_OAUTH_CLIENT_ID_PROD: string;
+  GITHUB_OAUTH_CLIENT_SECRET_PROD: string;
+  // FluxyChat — self-hosted chat Worker (separate deployment, see
+  // agent_docs/live-chat.md). FLUXYCHAT_API_KEY is the project API key
+  // (mints member JWTs server-side, also the shared secret FluxyChat's
+  // agent runtime sends back on tool-execute callbacks).
+  // Optional for the same reason as SCITE_API_KEY — unset in production
+  // today, and `verifyToolWebhookSecret` already fails closed without it.
+  FLUXYCHAT_API_KEY?: string;
+  // Stripe — billing (routes wired in routes/billing.ts + lib/stripe.ts;
+  // LIVE as of Aug 21, 2026 — Stripe account connected, all 3 secrets
+  // provisioned on the worker. lib/stripe.ts makes real API calls.
+  STRIPE_PUBLISHABLE_KEY: string;
+  STRIPE_SECRET_KEY: string;
+  // Verifies the `Stripe-Signature` header on inbound webhook deliveries
+  // (routes/billing.ts POST /api/billing/webhook) — see
+  // https://docs.stripe.com/webhooks#verify-manually for the HMAC-SHA256
+  // scheme lib/stripe.ts implements by hand (fetch-only, no stripe SDK).
+  // Also unset — provisioned together with the two keys above once a real
+  // Stripe account + webhook endpoint exist.
+  STRIPE_WEBHOOK_SECRET: string;
+  // Resend — transactional email (verification + password reset) for the
+  // email/password auth path, see lib/auth.ts + lib/email.ts. Free tier:
+  // 3,000 emails/mo, 100/day, no card required, 1 verified sending domain
+  // (confirmed against resend.com/pricing 2026-08-11). PROVISIONED as a
+  // production Worker secret — `wrangler secret list --env production` shows
+  // it. If it is ever missing, lib/email.ts throws a clear error rather than
+  // silently no-op'ing.
+  RESEND_API_KEY: string;
+  // Non-secret: the verified sending address, set in wrangler.toml [vars].
+  // discomplemented.com carries Resend's DNS record set in Cloudflare (DKIM
+  // at resend._domainkey; return-path MX + SPF on send.discomplemented.com),
+  // so this is an address on that domain — NOT the onboarding@resend.dev
+  // sandbox, which only delivers to the Resend account owner.
+  RESEND_FROM_EMAIL: string;
+  // Non-secret: where the support-chat escalation tool (lib/fluxychat.ts's
+  // escalate_to_human) sends the founder-facing summary + transcript hint
+  // for security/billing/legal issues the AI agent shouldn't try to
+  // resolve itself. Optional — if unset, escalation is logged only (no
+  // email sent), same "fail loud but don't break the chat" pattern as
+  // RESEND_API_KEY above.
+  SUPPORT_ESCALATION_EMAIL?: string;
+  // Analytics Engine SQL API (admin panel bottleneck/metrics queries — the
+  // ANALYTICS_ENGINE binding above is write-only). Optional: unset in local
+  // dev, where lib/analytics-engine.ts degrades to an empty result set.
+  CF_ACCOUNT_ID?: string;
+  CF_ANALYTICS_API_TOKEN?: string;
+
+  // Coder-loop security gate (GitHub Actions — see
+  // pipeline/tools/security-scan-gh.ts). GITHUB_ACTIONS_TOKEN is a PAT with
+  // `actions:write` on GITHUB_REPO (to dispatch security-gate.yml);
+  // SECURITY_GATE_WEBHOOK_SECRET authenticates both the workflow's file
+  // fetch and its findings callback.
+  GITHUB_ACTIONS_TOKEN: string;
+  SECURITY_GATE_WEBHOOK_SECRET: string;
+  GITHUB_REPO: string;
+
+  // EICCA webhook authentication — verifies x-eicca-webhook-secret header
+  // on the repayment webhook (routes/eicca.ts POST /api/eicca/webhook).
+  // Uses timingSafeEqual against this shared secret.
+  EICCA_WEBHOOK_SECRET: string;
+
+  // Figma OAuth integration
+  FIGMA_CLIENT_ID: string;
+  FIGMA_CLIENT_SECRET: string;
+
+  // Non-secret vars (from wrangler.toml [vars])
+  COHERE_BASE_URL: string;
+  OPENROUTER_BASE_URL: string;
+  /**
+   * Overrides the pinned independent-auditor model. Optional and usually
+   * empty — see packages/cohere/src/auditor-model.ts for the pin and for why
+   * it must stay a non-Cohere slug.
+   */
+  AUDITOR_MODEL?: string;
+  FLUXYCHAT_WORKER_URL: string;
+  APP_URL: string;
+  ENVIRONMENT: string;
+  /**
+   * The preview pool's ceiling, as a string because vars are strings.
+   *
+   * Must equal `max_instances` in the `[[containers]]` blocks. Optional at the
+   * type level so a local run with no vars still works: `resolveCapacity`
+   * falls back to the same number rather than to unbounded, because unbounded
+   * would hand the overflow straight to a platform refusal — which is the
+   * behaviour admission control exists to remove.
+   */
+  PREVIEW_MAX_INSTANCES?: string;
+}

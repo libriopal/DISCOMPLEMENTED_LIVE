@@ -1,0 +1,6 @@
+# This is a stub — the real deployment config is at apps/web/wrangler.toml
+# Deploy from the apps/web directory: cd apps/web && wrangler deploy
+# The root wrangler.toml is retired per CLAUDE.md "Current State"
+name = "discomplement"
+main = "apps/web/src/index.ts"
+compatibility_date = "2026-08-01"

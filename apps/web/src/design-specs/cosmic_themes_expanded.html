@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosmic Themes Expansion: Scorpio & Libra Spectrum</title>
+    <style>
+        :root {
+            --scorpio-dark-bg: #0B0B0B;
+            --scorpio-dark-surface: #141215;
+            --scorpio-dark-border: #2A222B;
+            --scorpio-dark-text: #E2D9D8;
+            --scorpio-dark-keyword: #B11226;
+            --scorpio-dark-string: #900000;
+            --scorpio-dark-function: #6E1283;
+            --scorpio-dark-variable: #BD5338;
+            --scorpio-dark-comment: #524747;
+
+            --libra-light-bg: #FAF8F5;
+            --libra-light-surface: #FFFFFF;
+            --libra-light-border: #E2B4C5;
+            --libra-light-text: #3A3F47;
+            --libra-light-keyword: #B984DF;
+            --libra-light-string: #91A8D0;
+            --libra-light-function: #F7CAC9;
+            --libra-light-variable: #5B8266;
+            --libra-light-comment: #8E9AAF;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            margin: 0 0 10px 0;
+            color: #fff;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .theme-section {
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .scorpio-theme {
+            background-color: var(--scorpio-dark-bg);
+            color: var(--scorpio-dark-text);
+            border: 1px solid var(--scorpio-dark-border);
+        }
+
+        .libra-theme {
+            background-color: var(--libra-light-bg);
+            color: var(--libra-light-text);
+            border: 1px solid var(--libra-light-border);
+        }
+
+        .theme-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 0;
+            margin-bottom: 20px;
+            border-bottom: 2px solid;
+            padding-bottom: 10px;
+        }
+
+        .scorpio-theme .theme-title {
+            border-color: var(--scorpio-dark-keyword);
+        }
+
+        .libra-theme .theme-title {
+            border-color: var(--libra-light-keyword);
+        }
+
+        .palette {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .swatch {
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .swatch-color {
+            height: 60px;
+        }
+
+        .swatch-info {
+            padding: 8px;
+            font-size: 12px;
+            font-family: monospace;
+        }
+
+        .editor {
+            font-family: 'Courier New', Courier, monospace;
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 30px;
+            overflow-x: auto;
+        }
+
+        .scorpio-theme .editor {
+            background-color: var(--scorpio-dark-surface);
+            border: 1px solid var(--scorpio-dark-border);
+        }
+
+        .libra-theme .editor {
+            background-color: var(--libra-light-surface);
+            border: 1px solid var(--libra-light-border);
+        }
+
+        .scorpio-theme .keyword { color: var(--scorpio-dark-keyword); font-weight: bold; }
+        .scorpio-theme .string { color: var(--scorpio-dark-string); }
+        .scorpio-theme .function { color: var(--scorpio-dark-function); }
+        .scorpio-theme .variable { color: var(--scorpio-dark-variable); }
+        .scorpio-theme .comment { color: var(--scorpio-dark-comment); font-style: italic; }
+
+        .libra-theme .keyword { color: var(--libra-light-keyword); font-weight: bold; }
+        .libra-theme .string { color: var(--libra-light-string); }
+        .libra-theme .function { color: var(--libra-light-function); }
+        .libra-theme .variable { color: var(--libra-light-variable); }
+        .libra-theme .comment { color: var(--libra-light-comment); font-style: italic; }
+
+        .app-preview {
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .scorpio-theme .app-preview {
+            background-color: var(--scorpio-dark-surface);
+            border: 1px dashed var(--scorpio-dark-border);
+        }
+
+        .libra-theme .app-preview {
+            background-color: var(--libra-light-surface);
+            border: 1px dashed var(--libra-light-border);
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .scorpio-theme .btn {
+            background-color: var(--scorpio-dark-keyword);
+            color: #fff;
+        }
+
+        .libra-theme .btn {
+            background-color: var(--libra-light-string);
+            color: #fff;
+        }
+
+        .input-box {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .scorpio-theme .input-box {
+            background-color: var(--scorpio-dark-bg);
+            border: 1px solid var(--scorpio-dark-border);
+            color: var(--scorpio-dark-text);
+        }
+
+        .libra-theme .input-box {
+            background-color: var(--libra-light-bg);
+            border: 1px solid var(--libra-light-border);
+            color: var(--libra-light-text);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Cosmic Code Spectrums</h1>
+        <p>An expanded visual showcase comparing Scorpio Dark and Libra Light development environments.</p>
+    </header>
+
+    <div class="container">
+        <!-- Scorpio Dark Section -->
+        <section class="theme-section scorpio-theme">
+            <h2 class="theme-title">Scorpio Dark (Intensity & Mystery)</h2>
+            
+            <h3>Color Palette</h3>
+            <div class="palette">
+                <div class="swatch"><div class="swatch-color" style="background-color: var(--scorpio-dark-bg);"></div><div class="swatch-info">BG<br>#0B0B0B</div></div>
+                <div class="swatch"><div class="swatch-color" style="background-color: var(--scorpio-dark-surface);"></div><div class="swatch-info">Surface<br>#141215</div></div>
+                <div class="swatch"><div class="swatch-color" style="background-color: var(--scorpio-dark-keyword);"></div><div class="swatch-info">Keyword<br>#B11226</div></div>
+                <div class="swatch"><div class="swatch-color" style="background-color: var(--scorpio-dark-string);"></div><div class="swatch-info">String<br>#900000</div></div>
+                <div class="swatch"><div class="swatch-color" style="background-color: var(--scorpio-dark-function);"></div><div class="swatch-info">Func<br>#6E1283</div></div>
+                <div class="swatch"><div class="swatch-color" style="background-color: var(--scorpio-dark-variable);"></div><div class="swatch-info">Var<br>#BD5338</div></div>
+            </div>
+
+            <h3>Syntax Highlighting Preview</h3>
+            <div class="editor">
+                <span class="comment">// Scorpio Code Block</span><br>
+                <span class="keyword">const</span> <span class="function">generateApp</span> = (<span class="variable">prompt</span>) =&gt; {<br>
+                &nbsp;&nbsp;<span class="keyword">if</span> (!<span class="variable">prompt</span>) <span class="keyword">return</span> <span class="string">"Empty payload"</span>;<br>
+                &nbsp;&nbsp;<span class="keyword">return</span> `Deploying intense node with hash: ${<span class="variable">prompt</span>}`;<br>
+                };
+            </div>
+
+            <h3>Prompt-to-App Interface Mockup</h3>
+            <div class="app-preview">
+                <p>Enter your design parameters:</p>
+                <input type="text" class="input-box" value="Build a dark decentralized dashboard..." readonly>
+                <button class="btn">Generate Application</button>
+            </div>
+        </section>
+
+        <!-- Libra Light Section -->
+        <section class="theme-section libra-theme">
+            <h2 class="theme-title">Libra Light (Harmony & Balance)</h2>
+            
+            <h3>Color Palette</h3>
+            <div class="palette">
+                <div class="swatch"><div class="swatch-color" style="background-color: var(--libra-light-bg);"></div><div class="swatch-info">BG<br>#FAF8F5</div></div>
+                <div class="swatch"><div class="swatch-color" style="background-color: var(--libra-light-surface);"></div><div class="swatch-info">Surface<br>#FFFFFF</div></div>
+                <div class="swatch"><div class="swatch-color" style="background-color: var(--libra-light-keyword);"></div><div class="swatch-info">Keyword<br>#B984DF</div></div>
+                <div class="swatch"><div class="swatch-color" style="background-color: var(--libra-light-string);"></div><div class="swatch-info">String<br>#91A8D0</div></div>
+                <div class="swatch"><div class="swatch-color" style="background-color: var(--libra-light-function);"></div><div class="swatch-info">Func<br>#F7CAC9</div></div>
+                <div class="swatch"><div class="swatch-color" style="background-color: var(--libra-light-variable);"></div><div class="swatch-info">Var<br>#5B8266</div></div>
+            </div>
+
+            <h3>Syntax Highlighting Preview</h3>
+            <div class="editor">
+                <span class="comment">// Libra Code Block</span><br>
+                <span class="keyword">const</span> <span class="function">generateApp</span> = (<span class="variable">prompt</span>) =&gt; {<br>
+                &nbsp;&nbsp;<span class="keyword">if</span> (!<span class="variable">prompt</span>) <span class="keyword">return</span> <span class="string">"Balanced fallback"</span>;<br>
+                &nbsp;&nbsp;<span class="keyword">return</span> `Deploying serene interface with: ${<span class="variable">prompt</span>}`;<br>
+                };
+            </div>
+
+            <h3>Prompt-to-App Interface Mockup</h3>
+            <div class="app-preview">
+                <p>Enter your design parameters:</p>
+                <input type="text" class="input-box" value="Build a crisp, light mood tracker..." readonly>
+                <button class="btn">Generate Application</button>
+            </div>
+        </section>
+    </div>
+
+</body>
+</html>

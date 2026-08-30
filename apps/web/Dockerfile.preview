@@ -1,0 +1,55 @@
+# Tier 3 preview sandbox — a plain Node.js + Vite dev server the Sandbox DO
+# (src/durable-objects/Sandbox.ts) writes generated files into via `exec`
+# and proxies HTTP requests to (container.getTcpPort(5173)). See
+# @agent_docs/preview-tiers.md.
+#
+# The image intentionally has no build step and no baked-in app — files are
+# written at runtime per pipeline run, so the CMD just keeps the container
+# alive (as PID 1) while the Sandbox DO execs the dev server into it after
+# start().
+FROM node:22-slim
+
+WORKDIR /app
+
+# Vite + the React runtime, baked in.
+#
+# These four are here rather than installed at runtime because they are needed
+# by every preview: baking them means the common case — a React app with no
+# other dependencies — never opens egress at all, and never pays the install
+# phase's latency. Anything else the generated app declares is fetched during
+# the bounded install phase (sandbox-install.ts). The Sandbox DO runs
+# /app/node_modules/.bin/vite directly rather than `npm run dev`, because the
+# dev script belongs to whatever package.json the Coder agent wrote.
+RUN npm init -y >/dev/null \
+  && npm install --no-audit --no-fund vite@6 @vitejs/plugin-react@4 react@19 react-dom@19 >/dev/null
+
+# Semgrep (OSS, pip-distributed by the Semgrep project itself) for the
+# Coder-loop security gate — see src/durable-objects/Sandbox.ts's /scan
+# route. Installed at build time so a per-run `exec` never pays for it.
+# The rule packs are fetched to local files at build time too, since the
+# running container has enableInternet: false (Sandbox.ts's start()) — a
+# runtime registry fetch would just fail.
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends python3-pip curl ca-certificates \
+  && pip install --no-cache-dir --break-system-packages semgrep \
+  && mkdir -p /app/.semgrep \
+  && curl -fsSL https://semgrep.dev/p/security-audit -o /app/.semgrep/security-audit.yml \
+  && curl -fsSL https://semgrep.dev/p/owasp-top-ten -o /app/.semgrep/owasp-top-ten.yml \
+  && apt-get purge -y curl && apt-get autoremove -y \
+  && rm -rf /var/lib/apt/lists/*
+
+# `ca-certificates` above is kept (not purged with curl) because it provides
+# `update-ca-certificates`, which the install phase runs to trust Cloudflare's
+# HTTPS-interception CA. That CA is ephemeral — it appears at
+# /etc/cloudflare/certs/cloudflare-containers-ca.crt only once the container is
+# running and an outbound handler is installed — so it cannot be added here at
+# build time. See src/durable-objects/sandbox-install.ts.
+#
+# The container still starts with enableInternet: false. Dependencies are
+# fetched during a bounded install phase through a Worker that allows exactly
+# one host, read-only, and that phase is closed again before any generated code
+# executes — see src/durable-objects/sandbox-egress.ts for the phase machine.
+
+EXPOSE 5173
+
+CMD ["tail", "-f", "/dev/null"]

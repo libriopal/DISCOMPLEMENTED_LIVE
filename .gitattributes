@@ -1,0 +1,22 @@
+# .gitattributes — Controls how git handles files for the public release
+
+# packages/admin/ used to be tracked here with an export-ignore. That only
+# affects `git archive`, never a clone, so it was never what kept admin code
+# private. The package now lives in DISCOMPLEMENTED_ADMIN and this repo carries
+# packages/admin-stub instead; .github/workflows/security.yml fails the build if
+# packages/admin ever reappears in the tree.
+
+# Normalize line endings
+* text=auto eol=lf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.zip binary

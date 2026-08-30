@@ -1,0 +1,41 @@
+---
+name: Feature Request
+about: Suggest a new feature or improvement
+title: "[FEATURE] "
+labels: feature
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Feature Description
+      description: Clear description of the feature
+    validations:
+      required: true
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use Case
+      description: Why is this feature needed? What problem does it solve?
+    validations:
+      required: true
+  - type: dropdown
+    id: phase
+    attributes:
+      label: Implementation Phase
+      options:
+        - Phase A (Scaffolding)
+        - Phase B (Auth/Data)
+        - Phase C (Billing)
+        - Phase D (Cohere)
+        - Phase E (Templates/Generation)
+        - Phase F (Memory Lattice)
+        - Phase G (CERL Research)
+        - Phase H (Governance)
+        - Phase I (Frontend)
+        - Phase J (Testing/Security)
+        - Phase K (Deploy)
+        - Post-MVP
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered

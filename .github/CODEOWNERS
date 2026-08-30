@@ -1,0 +1,30 @@
+# Dependency
+Updates to dependencies (npm packages, GitHub Actions)
+Bump patch: auto-merge if CI passes
+Bump minor: require review
+Bump major: require review + manual testing
+
+# Security
+Fixes for security vulnerabilities
+Auto-merge if CI passes and severity is HIGH or CRITICAL
+
+# Feature
+New features and improvements
+Requires review by @libriopal
+CI must pass
+At least 1 approval required
+
+# Bug Fix
+Fixes for existing bugs
+Requires review
+CI must pass
+
+# Documentation
+Documentation-only changes
+Auto-merge if CI passes
+No approval required
+
+# Refactor
+Code refactoring without behavior change
+Requires review
+CI must pass

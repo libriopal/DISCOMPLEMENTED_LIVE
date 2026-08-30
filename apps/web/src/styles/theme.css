@@ -1,0 +1,270 @@
+/**
+ * Discomplement Design System — Magenta/Cyan (v2.0)
+ *
+ * Three-tier token model: Primitives → Semantic Aliases → Component Tokens
+ * Theme switching is a single root attribute swap (data-theme) — see
+ * `themes` in tokens/source.json for the set that exists.
+ *
+ * Semantic binding:
+ *   Magenta (semantic) → intent, natural language, prompts, reasoning, agent dialogue
+ *   Cyan (code)        → artefacts, generated code, file trees, diffs, build logs
+ *   Bridge             → corpus callosum gradient at prompt→artefact transitions
+ *   Neutral            → chrome, structure, containers (majority of page)
+ *
+ * Constraints:
+ *   - Dark-first: anchors at full saturation only on dark surfaces
+ *   - Cap saturated-accent coverage at ~10% viewport area
+ *   - Never place saturated magenta adjacent to saturated cyan (chromatic vibration)
+ *   - Pair hue with icon/label (never meaning by hue alone — deuteranopia safety)
+ *
+ * Primitives (Tier 1) and theme alias blocks (Tier 2) are both generated from
+ * tokens/source.json via tokens/build.cjs. This file defines Tier 3 (component
+ * tokens), which are theme-independent because they resolve through Tier 2.
+ */
+
+@import './generated-tokens.css';
+
+/* ========================================
+   TIER 2: SEMANTIC ALIASES (theme-switchable)
+   ======================================== */
+
+/* Generated, not written here. Every theme's alias block lives in
+ * tokens/source.json under `themes` and is emitted into generated-tokens.css
+ * by tokens/build.cjs, which also checks that all themes define the same alias
+ * set. Adding or changing a theme is a data change there plus a rebuild —
+ * editing Tier 2 in this file would be silently overridden by the @import
+ * above and would drift from the picker, which enumerates the same source. */
+
+/* ========================================
+   TIER 3: COMPONENT TOKENS
+   ======================================== */
+
+:root {
+  /* IDE layout */
+  --ide-header-bg: var(--surface-raised);
+  --ide-header-border: var(--border-default);
+  --ide-panel-bg: var(--surface-base);
+  --ide-divider-color: var(--border-subtle);
+  --ide-placeholder-text: var(--text-muted);
+
+  /* Monaco editor */
+  --monaco-bg: var(--surface-base);
+  --monaco-gutter: var(--surface-muted);
+
+  /* File tree */
+  --tree-bg: var(--surface-raised);
+  --tree-item-hover: var(--surface-hover);
+  --tree-item-active: var(--surface-muted);
+  --tree-text: var(--text-secondary);
+
+  /* Preview */
+  --preview-bg: var(--neutral-0);
+  --preview-border: var(--border-default);
+
+  /* Glass Engine */
+  --glass-bg: var(--surface-base);
+  --glass-header-bg: var(--surface-raised);
+  --glass-tab-active: var(--color-accent);
+  --glass-tab-inactive: var(--text-muted);
+
+  /* Memory Lattice */
+  --lattice-bg: var(--surface-base);
+  --lattice-grid: var(--border-subtle);
+  --lattice-node-semantic: var(--hemisphere-left);
+  --lattice-node-implementation: var(--hemisphere-right);
+  --lattice-node-bridge: var(--bridge-align);
+
+  /* Chat */
+  --chat-bg: var(--surface-base);
+  --chat-bubble-user: var(--semantic-500);
+  --chat-bubble-user-text: var(--neutral-0);
+  --chat-bubble-assistant: var(--surface-raised);
+  --chat-bubble-assistant-border: var(--border-default);
+  --chat-bubble-assistant-text: var(--text-primary);
+
+  /* Corpus callosum — gradient seam for prompt→artefact transitions */
+  --corpus-callosum-gradient: linear-gradient(
+    90deg,
+    var(--semantic-400) 0%,
+    var(--bridge-400) 50%,
+    var(--code-400) 100%
+  );
+
+  /* Backward compatibility — old indigo/violet/pink names map to new system */
+  --indigo-50: var(--semantic-100);
+  --indigo-100: var(--semantic-100);
+  --indigo-200: var(--semantic-200);
+  --indigo-300: var(--semantic-300);
+  --indigo-400: var(--semantic-400);
+  --indigo-500: var(--semantic-500);
+  --indigo-600: var(--semantic-600);
+  --indigo-700: var(--semantic-700);
+  --indigo-800: var(--semantic-800);
+  --indigo-900: var(--semantic-900);
+  --violet-50: var(--code-100);
+  --violet-100: var(--code-100);
+  --violet-200: var(--code-200);
+  --violet-300: var(--code-300);
+  --violet-400: var(--code-400);
+  --violet-500: var(--code-500);
+  --violet-600: var(--code-600);
+  --violet-700: var(--code-700);
+  --violet-800: var(--code-800);
+  --violet-900: var(--code-900);
+  --pink-50: var(--bridge-100);
+  --pink-100: var(--bridge-100);
+  --pink-200: var(--bridge-200);
+  --pink-300: var(--bridge-300);
+  --pink-400: var(--bridge-400);
+  --pink-500: var(--bridge-500);
+  --pink-600: var(--bridge-600);
+  --pink-700: var(--bridge-700);
+}
+
+/* ========================================
+   GLOBAL STYLES
+   ======================================== */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  min-height: 100%;
+  width: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  line-height: 1.5;
+  color: var(--text-primary);
+  background: var(--surface-base);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition:
+    background var(--duration-normal) var(--ease-standard),
+    color var(--duration-normal) var(--ease-standard);
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Theme swap — applied to <html> by ThemeToggle for the duration of the change,
+ * then removed. Without this only <body> animated (its own transition below) and
+ * every panel, border and button snapped to the new palette instantly. Scoped to
+ * the swap rather than left on permanently so it cannot slow unrelated hovers. */
+.theme-transition,
+.theme-transition *,
+.theme-transition *::before,
+.theme-transition *::after {
+  transition:
+    background-color var(--duration-normal) var(--ease-standard),
+    border-color var(--duration-normal) var(--ease-standard),
+    color var(--duration-normal) var(--ease-standard),
+    fill var(--duration-normal) var(--ease-standard),
+    box-shadow var(--duration-normal) var(--ease-standard) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-transition,
+  .theme-transition *,
+  .theme-transition *::before,
+  .theme-transition *::after {
+    transition: none !important;
+  }
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: var(--radius-full);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent);
+}
+
+/* Selection */
+::selection {
+  background: var(--color-accent);
+  color: var(--neutral-0);
+  opacity: 0.3;
+}
+
+/* Focus ring */
+*:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Skip-to-content link for keyboard accessibility */
+.skip-to-content {
+  position: absolute;
+  top: -9999px;
+  left: 0;
+  padding: var(--space-2) var(--space-4);
+  background: var(--surface-raised);
+  color: var(--text-primary);
+  border-radius: var(--radius-sm);
+  z-index: 9999;
+  text-decoration: none;
+}
+.skip-to-content:focus {
+  top: 0;
+  z-index: 10000;
+}
+
+/* ========================================
+   RESPONSIVE BREAKPOINTS
+   ======================================== */
+
+:root {
+  --content-density: 0.316;
+  --spacing-scale: calc(1rem * var(--content-density));
+}
+
+.mobile-only {
+  display: block;
+}
+.tablet-only {
+  display: none;
+}
+.desktop-only {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .mobile-only {
+    display: none;
+  }
+  .tablet-only {
+    display: block;
+  }
+  .desktop-only {
+    display: none;
+  }
+}
+
+@media (min-width: 1024px) {
+  .mobile-only {
+    display: none;
+  }
+  .tablet-only {
+    display: none;
+  }
+  .desktop-only {
+    display: block;
+  }
+}

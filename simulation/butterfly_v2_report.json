@@ -1,0 +1,708 @@
+{
+  "timestamp": "2026-08-19T15:33:08.806578+00:00",
+  "run_type": "butterfly_v2_architectural_dna",
+  "genome_size": 51,
+  "genome_categories": {
+    "tripwires": 9,
+    "vdr_knobs": 6,
+    "credit_params": 4,
+    "agent_params": 3,
+    "ui_params": 2,
+    "pipeline_topology": 6,
+    "agent_models": 5,
+    "uiux_interaction": 8,
+    "context_discovery": 4,
+    "safety_constraints": 4
+  },
+  "population_size": 25,
+  "num_generations": 20,
+  "interactions_per_genome": 900,
+  "total_simulated_interactions": 450000,
+  "total_rejected_genomes": 192,
+  "target_vdr": 91.3,
+  "baseline": {
+    "fitness": 49.81,
+    "vdr": 30.96,
+    "ui_usability": 0.603,
+    "accessibility": 0.75,
+    "response_time_ms": 1780
+  },
+  "evolved": {
+    "fitness": 79.06,
+    "vdr": 77.38,
+    "ui_usability": 0.914,
+    "accessibility": 0.9,
+    "response_time_ms": 1649,
+    "genome": {
+      "tw_01_empty_generation": 2,
+      "tw_02_infinite_loop": 4,
+      "tw_03_credit_burn": 22,
+      "tw_04_approval_bypass": 1,
+      "tw_05_silent_failure": 5,
+      "tw_06_token_overflow": 104394,
+      "tw_07_duplicate_gen": 2,
+      "tw_08_timeout": 81,
+      "tw_09_unauthorized": 1,
+      "early_exit_threshold": 18,
+      "tripwire_sensitivity": 3,
+      "deployment_gate_score": 0.354,
+      "approval_timeout_hours": 122,
+      "research_depth": 5,
+      "retry_limit": 4,
+      "per_user_budget": 493,
+      "per_bot_budget": 65,
+      "conversation_turn_limit": 53,
+      "burn_rate_per_min": 6,
+      "agent_timeout_seconds": 203,
+      "agent_parallel": 1,
+      "agent_research_sources": 4,
+      "responsive_breakpoint_px": 696,
+      "content_density": 0.658,
+      "pipeline_mode": 1,
+      "discovery_impl_overlap": 0.741,
+      "agent_count": 6,
+      "agent_specialization": 2,
+      "feedback_loop_depth": 5,
+      "governance_gate_count": 1,
+      "primary_model": 3,
+      "research_model": 1,
+      "coding_model": 2,
+      "audit_model": 2,
+      "model_temperature": 0.08,
+      "ui_interaction_mode": 0,
+      "input_bandwidth": 1,
+      "response_format": 1,
+      "approval_flow": 1,
+      "feedback_mechanism": 2,
+      "error_recovery": 2,
+      "onboarding_depth": 3,
+      "accessibility_level": 2,
+      "context_window_utilization": 0.655,
+      "rerank_depth": 52,
+      "embedding_dimensions": 1,
+      "lattice_search_radius": 5,
+      "max_credit_burn_per_session": 100,
+      "min_usability_score": 0.5,
+      "max_response_time_ms": 2000,
+      "min_accessibility_score": 0.7
+    },
+    "result": {
+      "fitness": 79.06,
+      "vdr": 77.38,
+      "vdr_house_edge": 22.62,
+      "ui_usability": 0.914,
+      "ui_desktop": 0.949,
+      "ui_mobile": 0.8,
+      "ui_voice": 0.6,
+      "accessibility": 0.9,
+      "response_time_ms": 1649,
+      "base_success_rate": 62.43,
+      "safety_passed": true,
+      "rejected": false,
+      "details": {
+        "vdr": {
+          "vdr": 77.38,
+          "house_edge": 22.62,
+          "total_credits": 1982,
+          "win_runs": 571,
+          "loss_runs": 7,
+          "partial_runs": 322,
+          "bots_killed": 6,
+          "total_tripwire_hits": 333,
+          "base_success_rate": 62.43,
+          "tripwire_breakdown": {
+            "TW-06-token-overflow": 71,
+            "TW-09-unauthorized-access": 27,
+            "moderation-gate": 40,
+            "TW-03-credit-burn-no-value": 50,
+            "TW-04-approval-bypass": 56,
+            "TW-07-duplicate-generation": 25
+          }
+        },
+        "ui": {
+          "usability_score": 0.914,
+          "desktop_score": 0.949,
+          "mobile_score": 0.8,
+          "voice_score": 0.6,
+          "onboarding_score": 1.0,
+          "interaction_mode": "desktop",
+          "input_bandwidth": "text+voice"
+        },
+        "a11y": {
+          "accessibility_score": 0.9,
+          "wcag_level": "WCAG-AAA"
+        },
+        "rt": {
+          "response_time_ms": 1649,
+          "within_limit": true
+        }
+      }
+    }
+  },
+  "improvement": {
+    "fitness": 29.25,
+    "vdr": 46.42
+  },
+  "target_reached": false,
+  "evolution_history": [
+    {
+      "generation": 1,
+      "best_fitness": 52.11,
+      "avg_fitness": 49.37,
+      "best_vdr": 30.53,
+      "best_ui": 0.702,
+      "best_a11y": 0.75,
+      "rejected_this_gen": 4,
+      "overall_best_fitness": 52.11,
+      "overall_best_vdr": 30.53
+    },
+    {
+      "generation": 2,
+      "best_fitness": 66.97,
+      "avg_fitness": 52.42,
+      "best_vdr": 49.17,
+      "best_ui": 0.881,
+      "best_a11y": 0.98,
+      "rejected_this_gen": 4,
+      "overall_best_fitness": 66.97,
+      "overall_best_vdr": 49.17
+    },
+    {
+      "generation": 3,
+      "best_fitness": 66.27,
+      "avg_fitness": 56.85,
+      "best_vdr": 47.43,
+      "best_ui": 0.881,
+      "best_a11y": 0.98,
+      "rejected_this_gen": 9,
+      "overall_best_fitness": 66.97,
+      "overall_best_vdr": 49.17
+    },
+    {
+      "generation": 4,
+      "best_fitness": 69.34,
+      "avg_fitness": 60.3,
+      "best_vdr": 59.94,
+      "best_ui": 0.81,
+      "best_a11y": 0.98,
+      "rejected_this_gen": 12,
+      "overall_best_fitness": 69.34,
+      "overall_best_vdr": 59.94
+    },
+    {
+      "generation": 5,
+      "best_fitness": 70.42,
+      "avg_fitness": 61.45,
+      "best_vdr": 62.63,
+      "best_ui": 0.81,
+      "best_a11y": 0.98,
+      "rejected_this_gen": 12,
+      "overall_best_fitness": 70.42,
+      "overall_best_vdr": 62.63
+    },
+    {
+      "generation": 6,
+      "best_fitness": 70.28,
+      "avg_fitness": 61.18,
+      "best_vdr": 64.42,
+      "best_ui": 0.765,
+      "best_a11y": 0.9,
+      "rejected_this_gen": 11,
+      "overall_best_fitness": 70.42,
+      "overall_best_vdr": 62.63
+    },
+    {
+      "generation": 7,
+      "best_fitness": 69.49,
+      "avg_fitness": 62.93,
+      "best_vdr": 52.97,
+      "best_ui": 0.881,
+      "best_a11y": 0.98,
+      "rejected_this_gen": 13,
+      "overall_best_fitness": 70.42,
+      "overall_best_vdr": 62.63
+    },
+    {
+      "generation": 8,
+      "best_fitness": 70.79,
+      "avg_fitness": 62.62,
+      "best_vdr": 56.23,
+      "best_ui": 0.881,
+      "best_a11y": 0.98,
+      "rejected_this_gen": 13,
+      "overall_best_fitness": 70.79,
+      "overall_best_vdr": 56.23
+    },
+    {
+      "generation": 9,
+      "best_fitness": 75.49,
+      "avg_fitness": 62.25,
+      "best_vdr": 68.49,
+      "best_ui": 0.857,
+      "best_a11y": 0.9,
+      "rejected_this_gen": 8,
+      "overall_best_fitness": 75.49,
+      "overall_best_vdr": 68.49
+    },
+    {
+      "generation": 10,
+      "best_fitness": 77.1,
+      "avg_fitness": 66.03,
+      "best_vdr": 72.53,
+      "best_ui": 0.857,
+      "best_a11y": 0.9,
+      "rejected_this_gen": 9,
+      "overall_best_fitness": 77.1,
+      "overall_best_vdr": 72.53
+    },
+    {
+      "generation": 11,
+      "best_fitness": 77.35,
+      "avg_fitness": 68.03,
+      "best_vdr": 73.15,
+      "best_ui": 0.857,
+      "best_a11y": 0.9,
+      "rejected_this_gen": 10,
+      "overall_best_fitness": 77.35,
+      "overall_best_vdr": 73.15
+    },
+    {
+      "generation": 12,
+      "best_fitness": 77.77,
+      "avg_fitness": 65.33,
+      "best_vdr": 74.2,
+      "best_ui": 0.857,
+      "best_a11y": 0.9,
+      "rejected_this_gen": 8,
+      "overall_best_fitness": 77.77,
+      "overall_best_vdr": 74.2
+    },
+    {
+      "generation": 13,
+      "best_fitness": 77.95,
+      "avg_fitness": 71.52,
+      "best_vdr": 74.66,
+      "best_ui": 0.857,
+      "best_a11y": 0.9,
+      "rejected_this_gen": 10,
+      "overall_best_fitness": 77.95,
+      "overall_best_vdr": 74.66
+    },
+    {
+      "generation": 14,
+      "best_fitness": 77.5,
+      "avg_fitness": 71.38,
+      "best_vdr": 73.52,
+      "best_ui": 0.857,
+      "best_a11y": 0.9,
+      "rejected_this_gen": 13,
+      "overall_best_fitness": 77.95,
+      "overall_best_vdr": 74.66
+    },
+    {
+      "generation": 15,
+      "best_fitness": 76.89,
+      "avg_fitness": 68.56,
+      "best_vdr": 71.92,
+      "best_ui": 0.867,
+      "best_a11y": 0.9,
+      "rejected_this_gen": 12,
+      "overall_best_fitness": 77.95,
+      "overall_best_vdr": 74.66
+    },
+    {
+      "generation": 16,
+      "best_fitness": 76.87,
+      "avg_fitness": 69.15,
+      "best_vdr": 72.03,
+      "best_ui": 0.9,
+      "best_a11y": 0.98,
+      "rejected_this_gen": 11,
+      "overall_best_fitness": 77.95,
+      "overall_best_vdr": 74.66
+    },
+    {
+      "generation": 17,
+      "best_fitness": 77.23,
+      "avg_fitness": 67.36,
+      "best_vdr": 72.86,
+      "best_ui": 0.857,
+      "best_a11y": 0.9,
+      "rejected_this_gen": 11,
+      "overall_best_fitness": 77.95,
+      "overall_best_vdr": 74.66
+    },
+    {
+      "generation": 18,
+      "best_fitness": 77.35,
+      "avg_fitness": 65.15,
+      "best_vdr": 73.07,
+      "best_ui": 0.867,
+      "best_a11y": 0.9,
+      "rejected_this_gen": 5,
+      "overall_best_fitness": 77.95,
+      "overall_best_vdr": 74.66
+    },
+    {
+      "generation": 19,
+      "best_fitness": 79.06,
+      "avg_fitness": 73.18,
+      "best_vdr": 77.38,
+      "best_ui": 0.914,
+      "best_a11y": 0.9,
+      "rejected_this_gen": 7,
+      "overall_best_fitness": 79.06,
+      "overall_best_vdr": 77.38
+    },
+    {
+      "generation": 20,
+      "best_fitness": 78.7,
+      "avg_fitness": 73.8,
+      "best_vdr": 76.48,
+      "best_ui": 0.914,
+      "best_a11y": 0.9,
+      "rejected_this_gen": 10,
+      "overall_best_fitness": 79.06,
+      "overall_best_vdr": 77.38
+    }
+  ],
+  "genome_changes": {
+    "tw_02_infinite_loop": {
+      "baseline": 3,
+      "evolved": 4,
+      "changed": true,
+      "category": "tripwire",
+      "baseline_label": 3,
+      "evolved_label": 4
+    },
+    "tw_03_credit_burn": {
+      "baseline": 20,
+      "evolved": 22,
+      "changed": true,
+      "category": "tripwire",
+      "baseline_label": 20,
+      "evolved_label": 22
+    },
+    "tw_05_silent_failure": {
+      "baseline": 2,
+      "evolved": 5,
+      "changed": true,
+      "category": "tripwire",
+      "baseline_label": 2,
+      "evolved_label": 5
+    },
+    "tw_06_token_overflow": {
+      "baseline": 100000,
+      "evolved": 104394,
+      "changed": true,
+      "category": "tripwire",
+      "baseline_label": 100000,
+      "evolved_label": 104394
+    },
+    "tw_07_duplicate_gen": {
+      "baseline": 3,
+      "evolved": 2,
+      "changed": true,
+      "category": "tripwire",
+      "baseline_label": 3,
+      "evolved_label": 2
+    },
+    "tw_08_timeout": {
+      "baseline": 60,
+      "evolved": 81,
+      "changed": true,
+      "category": "tripwire",
+      "baseline_label": 60,
+      "evolved_label": 81
+    },
+    "early_exit_threshold": {
+      "baseline": 20,
+      "evolved": 18,
+      "changed": true,
+      "category": "vdr",
+      "baseline_label": 20,
+      "evolved_label": 18
+    },
+    "tripwire_sensitivity": {
+      "baseline": 2,
+      "evolved": 3,
+      "changed": true,
+      "category": "vdr",
+      "baseline_label": 2,
+      "evolved_label": 3
+    },
+    "deployment_gate_score": {
+      "baseline": 0.6,
+      "evolved": 0.354,
+      "changed": true,
+      "category": "vdr",
+      "baseline_label": 0.6,
+      "evolved_label": 0.354
+    },
+    "approval_timeout_hours": {
+      "baseline": 72,
+      "evolved": 122,
+      "changed": true,
+      "category": "vdr",
+      "baseline_label": 72,
+      "evolved_label": 122
+    },
+    "research_depth": {
+      "baseline": 3,
+      "evolved": 5,
+      "changed": true,
+      "category": "vdr",
+      "baseline_label": 3,
+      "evolved_label": 5
+    },
+    "retry_limit": {
+      "baseline": 3,
+      "evolved": 4,
+      "changed": true,
+      "category": "vdr",
+      "baseline_label": 3,
+      "evolved_label": 4
+    },
+    "per_user_budget": {
+      "baseline": 100,
+      "evolved": 493,
+      "changed": true,
+      "category": "credit",
+      "baseline_label": 100,
+      "evolved_label": 493
+    },
+    "per_bot_budget": {
+      "baseline": 50,
+      "evolved": 65,
+      "changed": true,
+      "category": "credit",
+      "baseline_label": 50,
+      "evolved_label": 65
+    },
+    "conversation_turn_limit": {
+      "baseline": 30,
+      "evolved": 53,
+      "changed": true,
+      "category": "credit",
+      "baseline_label": 30,
+      "evolved_label": 53
+    },
+    "burn_rate_per_min": {
+      "baseline": 10,
+      "evolved": 6,
+      "changed": true,
+      "category": "credit",
+      "baseline_label": 10,
+      "evolved_label": 6
+    },
+    "agent_timeout_seconds": {
+      "baseline": 60,
+      "evolved": 203,
+      "changed": true,
+      "category": "agent",
+      "baseline_label": 60,
+      "evolved_label": 203
+    },
+    "agent_parallel": {
+      "baseline": 0,
+      "evolved": 1,
+      "changed": true,
+      "category": "agent",
+      "baseline_label": 0,
+      "evolved_label": 1
+    },
+    "agent_research_sources": {
+      "baseline": 3,
+      "evolved": 4,
+      "changed": true,
+      "category": "agent",
+      "baseline_label": 3,
+      "evolved_label": 4
+    },
+    "responsive_breakpoint_px": {
+      "baseline": 768,
+      "evolved": 696,
+      "changed": true,
+      "category": "ui",
+      "baseline_label": 768,
+      "evolved_label": 696
+    },
+    "content_density": {
+      "baseline": 0.7,
+      "evolved": 0.658,
+      "changed": true,
+      "category": "ui",
+      "baseline_label": 0.7,
+      "evolved_label": 0.658
+    },
+    "pipeline_mode": {
+      "baseline": 0,
+      "evolved": 1,
+      "changed": true,
+      "category": "topology",
+      "baseline_label": "sequential",
+      "evolved_label": "parallel"
+    },
+    "discovery_impl_overlap": {
+      "baseline": 0.0,
+      "evolved": 0.741,
+      "changed": true,
+      "category": "topology",
+      "baseline_label": 0.0,
+      "evolved_label": 0.741
+    },
+    "agent_count": {
+      "baseline": 4,
+      "evolved": 6,
+      "changed": true,
+      "category": "topology",
+      "baseline_label": 4,
+      "evolved_label": 6
+    },
+    "agent_specialization": {
+      "baseline": 1,
+      "evolved": 2,
+      "changed": true,
+      "category": "topology",
+      "baseline_label": "specialist",
+      "evolved_label": "mixed"
+    },
+    "feedback_loop_depth": {
+      "baseline": 1,
+      "evolved": 5,
+      "changed": true,
+      "category": "topology",
+      "baseline_label": 1,
+      "evolved_label": 5
+    },
+    "governance_gate_count": {
+      "baseline": 3,
+      "evolved": 1,
+      "changed": true,
+      "category": "topology",
+      "baseline_label": 3,
+      "evolved_label": 1
+    },
+    "primary_model": {
+      "baseline": 0,
+      "evolved": 3,
+      "changed": true,
+      "category": "model",
+      "baseline_label": "command-a",
+      "evolved_label": "mixed"
+    },
+    "research_model": {
+      "baseline": 0,
+      "evolved": 1,
+      "changed": true,
+      "category": "model",
+      "baseline_label": "command-a",
+      "evolved_label": "rerank-3"
+    },
+    "coding_model": {
+      "baseline": 1,
+      "evolved": 2,
+      "changed": true,
+      "category": "model",
+      "baseline_label": "command-a",
+      "evolved_label": "mixed"
+    },
+    "audit_model": {
+      "baseline": 0,
+      "evolved": 2,
+      "changed": true,
+      "category": "model",
+      "baseline_label": "command-a",
+      "evolved_label": "mixed"
+    },
+    "model_temperature": {
+      "baseline": 0.3,
+      "evolved": 0.08,
+      "changed": true,
+      "category": "model",
+      "baseline_label": 0.3,
+      "evolved_label": 0.08
+    },
+    "input_bandwidth": {
+      "baseline": 0,
+      "evolved": 1,
+      "changed": true,
+      "category": "uiux",
+      "baseline_label": "text-only",
+      "evolved_label": "text+voice"
+    },
+    "response_format": {
+      "baseline": 0,
+      "evolved": 1,
+      "changed": true,
+      "category": "uiux",
+      "baseline_label": "chat",
+      "evolved_label": "cards"
+    },
+    "approval_flow": {
+      "baseline": 0,
+      "evolved": 1,
+      "changed": true,
+      "category": "uiux",
+      "baseline_label": "single-click",
+      "evolved_label": "multi-step"
+    },
+    "feedback_mechanism": {
+      "baseline": 0,
+      "evolved": 2,
+      "changed": true,
+      "category": "uiux",
+      "baseline_label": "thumbs",
+      "evolved_label": "text"
+    },
+    "error_recovery": {
+      "baseline": 0,
+      "evolved": 2,
+      "changed": true,
+      "category": "uiux",
+      "baseline_label": "retry",
+      "evolved_label": "guided-fix"
+    },
+    "onboarding_depth": {
+      "baseline": 1,
+      "evolved": 3,
+      "changed": true,
+      "category": "uiux",
+      "baseline_label": "standard",
+      "evolved_label": "interactive-tutorial"
+    },
+    "accessibility_level": {
+      "baseline": 1,
+      "evolved": 2,
+      "changed": true,
+      "category": "uiux",
+      "baseline_label": "WCAG-AA",
+      "evolved_label": "WCAG-AAA"
+    },
+    "context_window_utilization": {
+      "baseline": 0.5,
+      "evolved": 0.655,
+      "changed": true,
+      "category": "discovery",
+      "baseline_label": 0.5,
+      "evolved_label": 0.655
+    },
+    "rerank_depth": {
+      "baseline": 20,
+      "evolved": 52,
+      "changed": true,
+      "category": "discovery",
+      "baseline_label": 20,
+      "evolved_label": 52
+    },
+    "lattice_search_radius": {
+      "baseline": 2,
+      "evolved": 5,
+      "changed": true,
+      "category": "discovery",
+      "baseline_label": 2,
+      "evolved_label": 5
+    }
+  },
+  "safety_note": "100% in-simulation. Zero production calls. Evolved genome NOT applied \u2014 requires explicit human approval."
+}

@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Discomplement — Research and design before code</title>
+    <!-- Positioning, not a claim: the research-and-design-before-code pipeline
+         and the human blueprint gate are live, dispatched code today. No
+         quality metric appears here for the same reason it doesn't appear on
+         the landing page — there is no derived number to stand behind. -->
+    <meta
+      name="description"
+      content="A researcher, designer, and coder agent build a blueprint you review — then, and only then, your app gets built."
+    />
+    <meta property="og:title" content="Discomplement — Research and design before code" />
+    <meta
+      property="og:description"
+      content="A researcher, designer, and coder agent build a blueprint you review — then, and only then, your app gets built."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://discomplemented.com/" />
+    <meta name="twitter:card" content="summary" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <!-- Weight ranges, not a list of two.
+         This asked for `wght@400;500` while the stylesheets use 400, 500, 600
+         and 700 — measured, and confirmed in the browser: the h1 computes to
+         `font-weight: 700` and every 600/700 rule was being faux-bolded by
+         Chrome from the 500 face. The design's display face was downloading
+         and then not rendering as designed, which is the same class of defect
+         as loading a font no token names.
+         A `400..700` range serves ONE variable file per family per subset
+         rather than four static faces, so covering the missing weights costs
+         less than the two it replaced. tests/e2e/fonts.spec.ts pins it. -->
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&family=Space+Grotesk:wght@400..700&family=Fira+Code:wght@400..600&display=swap"
+      rel="stylesheet"
+    />
+  <script src="/theme-init.js"></script>
+</head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

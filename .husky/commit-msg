@@ -1,0 +1,54 @@
+#!/usr/bin/env sh
+
+echo "🔍 Running lint-staged..."
+npx lint-staged
+
+echo "🔍 Running type check..."
+npx tsc --noEmit || {
+  echo "❌ Type check failed. Fix errors before committing."
+  exit 1
+}
+
+echo "🔍 Running commitlint..."
+npx commitlint --edit "$1" || exit 1
+
+# §4B — an independent model audits the diff before it becomes a commit.
+#
+# This runs in commit-msg rather than pre-commit for one reason: the auditor
+# needs to know what the change was *supposed* to do, and pre-commit runs before
+# a commit message exists. Judging a diff without its intent means checking for
+# generic smells, which is the weakest thing this gate could be doing. The
+# commit message is the statement of intent, and it is available here.
+#
+# A HIGH finding exits non-zero, which aborts the commit.
+echo "🔍 Running independent audit (§4B)..."
+
+if [ -n "$AUDIT_SKIP" ]; then
+  # Recorded, not silent. §4B req 5 allows disagreeing with the audit and
+  # forbids making it disappear; the same applies to skipping it. The skip goes
+  # in the ledger so `--stats` counts it, and the reason is required.
+  if [ -z "$AUDIT_SKIP_REASON" ]; then
+    echo "❌ AUDIT_SKIP requires AUDIT_SKIP_REASON — a skipped audit must say why."
+    exit 1
+  fi
+  node -e "
+    const {appendFileSync,mkdirSync}=require('node:fs');
+    mkdirSync('.audit',{recursive:true});
+    appendFileSync('.audit/ledger.jsonl', JSON.stringify({
+      kind:'audit', at:new Date().toISOString(), outcome:'refused',
+      error:'skipped by AUDIT_SKIP: '+process.env.AUDIT_SKIP_REASON, costUsd:0
+    })+'\n');
+  "
+  echo "⚠️  Audit SKIPPED — $AUDIT_SKIP_REASON (recorded in .audit/ledger.jsonl)"
+  exit 0
+fi
+
+node scripts/audit-diff.mjs --task "$(cat "$1")" || {
+  echo ""
+  echo "❌ Independent audit blocked this commit."
+  echo "   Fix the finding, or overrule it explicitly by stating which finding"
+  echo "   and why it is wrong in the commit message body."
+  echo "   To commit without an audit at all (recorded, not silent):"
+  echo "     AUDIT_SKIP=1 AUDIT_SKIP_REASON='...' git commit ..."
+  exit 1
+}

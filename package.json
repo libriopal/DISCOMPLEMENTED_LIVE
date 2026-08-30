@@ -1,0 +1,103 @@
+{
+  "name": "bicameral",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Bicameral — Cohere-native prompt-to-app platform on Cloudflare Workers",
+  "scripts": {
+    "dev": "pnpm --filter @bicameral/web dev",
+    "build": "pnpm --filter @bicameral/web build",
+    "deploy": "pnpm predeploy && pnpm --filter @bicameral/web build && pnpm --filter @bicameral/web exec wrangler deploy --env production",
+    "test:unit": "vitest run",
+    "test:unit:watch": "vitest",
+    "test:integration": "vitest run --config vitest.integration.config.ts",
+    "test:e2e": "playwright test",
+    "test:security": "vitest run tests/security/",
+    "test:all": "pnpm lint:migrations && pnpm typecheck && pnpm test:unit && pnpm test:integration && pnpm test:security && pnpm test:e2e",
+    "db:migrate": "node scripts/migrate.mjs",
+    "lint": "eslint apps/web/src/ packages/*/src/",
+    "lint:fix": "eslint apps/web/src/ packages/*/src/ --fix",
+    "format": "prettier --write \"apps/web/src/**/*.{ts,tsx,json,css}\" \"packages/*/src/**/*.{ts,tsx}\"",
+    "prepare": "husky",
+    "commitlint": "commitlint --edit",
+    "public-release": "echo 'See docs/PUBLIC_RELEASE.md for instructions'",
+    "predeploy": "bash scripts/predeploy.sh",
+    "deploy:force": "pnpm --filter @bicameral/web build && pnpm --filter @bicameral/web exec wrangler deploy --env production",
+    "deploy:local": "pnpm predeploy && pnpm --filter @bicameral/web build && pnpm --filter @bicameral/web exec wrangler deploy --env production --containers-rollout none",
+    "lint:migrations": "node scripts/lint-migrations.mjs",
+    "typecheck": "pnpm --filter @bicameral/web typecheck",
+    "gate": "node scripts/run-gate.mjs",
+    "gate:quick": "node scripts/run-gate.mjs --quick",
+    "audit:diff": "node scripts/audit-diff.mjs",
+    "audit:calibrate": "node scripts/audit-diff.mjs --calibrate",
+    "audit:stats": "node scripts/audit-diff.mjs --stats"
+  },
+  "dependencies": {
+    "@babel/standalone": "^7.26.0",
+    "@bicameral/admin": "link:packages/admin-stub",
+    "@bicameral/cohere": "workspace:*",
+    "@bicameral/shared": "workspace:*",
+    "@fluxy-chat/react": "^0.1.1",
+    "@fluxy-chat/sdk": "^0.6.0",
+    "@tanstack/react-query": "5.0.0",
+    "@tanstack/react-router": "1.0.0",
+    "better-auth": "1.6.26",
+    "esbuild-wasm": "^0.25.0",
+    "framer-motion": "11.0.0",
+    "hono": "4.13.1",
+    "lucide-react": "^0.460.0",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "three": "0.170.0",
+    "zod": "3.23.0",
+    "zustand": "5.0.0"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "0.20.3",
+    "@cloudflare/workers-types": "5.20260809.1",
+    "@commitlint/cli": "19.5.0",
+    "@commitlint/config-conventional": "19.5.0",
+    "@eslint/js": "9.15.0",
+    "@playwright/test": "^1.62.1",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.4",
+    "@types/three": "0.185.4",
+    "@vitejs/plugin-react": "6.0.5",
+    "concurrently": "10.0.4",
+    "eslint": "9.15.0",
+    "husky": "9.1.0",
+    "lint-staged": "15.2.0",
+    "msw": "2.15.0",
+    "playwright": "1.62.1",
+    "prettier": "3.4.0",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.16.0",
+    "unocss": "66.7.5",
+    "vite": "8.2.1",
+    "vitest": "4.1.10",
+    "wrangler": "4.120.0"
+  },
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,css,md}": [
+      "prettier --write"
+    ]
+  },
+  "pnpm": {
+    "overrides": {
+      "@bicameral/shared": "workspace:*",
+      "@bicameral/cohere": "workspace:*",
+      "yaml@<2.8.3": ">=2.8.3",
+      "micromatch@<4.0.8": ">=4.0.8",
+      "@eslint/plugin-kit@<0.3.4": ">=0.3.4",
+      "dompurify": "3.4.13"
+    }
+  }
+}

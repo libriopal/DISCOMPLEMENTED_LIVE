@@ -1,0 +1,255 @@
+<div data-name="user-flows-screen" style="min-width: 1440px; min-height: 2900px; background-color: #ffffff; padding: 56px 64px; box-sizing: border-box; font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; color: #000000;">
+<style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Space+Grotesk:wght@400;500&family=Fira+Code:wght@400;500&display=swap');</style>
+
+<!-- HEADER -->
+<div data-name="header" style="display: flex; flex-direction: column; gap: 16px; padding-bottom: 40px; border-bottom: 1px solid #d9d9dd;">
+<div data-name="eyebrow" style="display: flex; align-items: center; gap: 12px;">
+<div style="display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; background-color: #17171c; border-radius: 8px;">
+<img src="https://api.iconify.design/mdi/vector-polyline.svg?color=%23ffffff" style="width: 16px; height: 16px;" />
+</div>
+<span style="font-family: 'Fira Code', monospace; font-size: 11px; letter-spacing: 0.28px; text-transform: uppercase; color: #93939f;">Bicameral · View 02 / 06 · UX Specification</span>
+</div>
+<div style="font-family: 'Space Grotesk', sans-serif; font-size: 60px; font-weight: 400; letter-spacing: -1.2px; line-height: 1.0; color: #000000;">Primary User Flows<br/>& Journey Maps</div>
+<div style="font-size: 18px; line-height: 1.4; color: #93939f; max-width: 860px;">Three canonical journeys — Onboarding, Project Lifecycle, and the full Prompt → Export pipeline — each mapped with step screens, decision points, required data, success/failure states, and the micro-interactions that make the bicameral loop feel alive.</div>
+</div>
+
+<!-- LEGEND -->
+<div data-name="legend" style="display: flex; gap: 28px; padding: 32px 0 24px 0; flex-wrap: wrap; align-items: center;">
+<span style="font-family: 'Fira Code', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28px; color: #93939f;">Legend</span>
+<div style="display: flex; align-items: center; gap: 8px;"><div style="width: 20px; height: 20px; border-radius: 9999px; background-color: #17171c;"></div><span style="font-size: 13px; color: #17171c;">Screen / Step</span></div>
+<div style="display: flex; align-items: center; gap: 8px;"><div style="width: 20px; height: 20px; background-color: #eef1fd; border: 1px solid #1863dc; transform: rotate(45deg);"></div><span style="font-size: 13px; color: #17171c;">Decision point</span></div>
+<div style="display: flex; align-items: center; gap: 8px;"><div style="width: 20px; height: 20px; border-radius: 9999px; background-color: #232f2b;"></div><span style="font-size: 13px; color: #17171c;">Success state</span></div>
+<div style="display: flex; align-items: center; gap: 8px;"><div style="width: 20px; height: 20px; border-radius: 9999px; background-color: #fdf3e3; border: 1px solid #b36a00;"></div><span style="font-size: 13px; color: #17171c;">Failure / recovery</span></div>
+</div>
+
+<!-- ============ FLOW 1: ONBOARDING ============ -->
+<div data-name="flow-onboarding" style="padding-top: 24px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; letter-spacing: 0.28px; text-transform: uppercase; color: #93939f; padding-bottom: 12px;">Flow 01 — Onboarding & Account Setup</div>
+<div style="font-family: 'Space Grotesk', sans-serif; font-size: 32px; letter-spacing: -0.32px; color: #000000; padding-bottom: 8px;">First-Run to First Value</div>
+<div style="font-size: 16px; color: #93939f; padding-bottom: 32px; max-width: 800px;">Goal: get a new user from sign-in to a seeded first project with a live lattice in under 3 minutes.</div>
+
+<!-- flow rail -->
+<div style="display: flex; align-items: stretch; gap: 0; padding-bottom: 28px; flex-wrap: nowrap;">
+<div style="flex: 1; display: flex; flex-direction: column; gap: 10px; border: 1px solid #f2f2f2; border-radius: 22px; padding: 20px;">
+<div style="display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 9999px; background-color: #17171c; color: #ffffff; font-family: 'Space Grotesk', sans-serif; font-size: 14px;">1</div>
+<div style="font-size: 15px; color: #000000;">Sign In / SSO</div>
+<div style="font-size: 13px; color: #93939f; line-height: 1.4;">Email, Google, or enterprise SSO. Data: identity token.</div>
+</div>
+<div style="display: flex; align-items: center; padding: 0 8px;"><img src="https://api.iconify.design/mdi/arrow-right.svg?color=%23d9d9dd" style="width: 22px; height: 22px;" /></div>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 10px; border: 1px solid #f2f2f2; border-radius: 22px; padding: 20px;">
+<div style="display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 9999px; background-color: #17171c; color: #ffffff; font-family: 'Space Grotesk', sans-serif; font-size: 14px;">2</div>
+<div style="font-size: 15px; color: #000000;">Workspace Setup</div>
+<div style="font-size: 13px; color: #93939f; line-height: 1.4;">Name, role, team invite. Data: org profile, seats.</div>
+</div>
+<div style="display: flex; align-items: center; padding: 0 8px;"><img src="https://api.iconify.design/mdi/arrow-right.svg?color=%23d9d9dd" style="width: 22px; height: 22px;" /></div>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 10px; background-color: #eef1fd; border: 1px solid #1863dc; border-radius: 22px; padding: 20px;">
+<img src="https://api.iconify.design/mdi/help-rhombus-outline.svg?color=%231863dc" style="width: 24px; height: 24px;" />
+<div style="font-size: 15px; color: #17171c;">Import or start fresh?</div>
+<div style="font-size: 13px; color: #1863dc; line-height: 1.4;">Decision: connect repo/docs OR blank template.</div>
+</div>
+<div style="display: flex; align-items: center; padding: 0 8px;"><img src="https://api.iconify.design/mdi/arrow-right.svg?color=%23d9d9dd" style="width: 22px; height: 22px;" /></div>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 10px; border: 1px solid #f2f2f2; border-radius: 22px; padding: 20px;">
+<div style="display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 9999px; background-color: #17171c; color: #ffffff; font-family: 'Space Grotesk', sans-serif; font-size: 14px;">3</div>
+<div style="font-size: 15px; color: #000000;">Guided First Prompt</div>
+<div style="font-size: 13px; color: #93939f; line-height: 1.4;">Contextual coach-mark seeds initial memory node.</div>
+</div>
+<div style="display: flex; align-items: center; padding: 0 8px;"><img src="https://api.iconify.design/mdi/arrow-right.svg?color=%23d9d9dd" style="width: 22px; height: 22px;" /></div>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 10px; background-color: #232f2b; border-radius: 22px; padding: 20px;">
+<img src="https://api.iconify.design/mdi/check-circle-outline.svg?color=%236ee7b7" style="width: 24px; height: 24px;" />
+<div style="font-size: 15px; color: #ffffff;">Live Dashboard</div>
+<div style="font-size: 13px; color: rgba(255,255,255,0.7); line-height: 1.4;">Success: first lattice node visible.</div>
+</div>
+</div>
+
+<!-- failure + micro -->
+<div style="display: flex; gap: 28px;">
+<div style="flex: 1; background-color: #fdf3e3; border: 1px solid #f0dcb8; border-radius: 22px; padding: 24px;">
+<div style="display: flex; align-items: center; gap: 8px; padding-bottom: 8px;"><img src="https://api.iconify.design/mdi/alert-outline.svg?color=%23b36a00" style="width: 18px; height: 18px;" /><span style="font-size: 14px; color: #b36a00;">Failure & Recovery</span></div>
+<div style="font-size: 13px; color: #7a5200; line-height: 1.5;">SSO fails → fall back to email magic-link. Import timeout → skip & continue with blank template, retry banner persists. Invalid seat count → inline validation, block advance.</div>
+</div>
+<div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 22px; padding: 24px;">
+<div style="display: flex; align-items: center; gap: 8px; padding-bottom: 8px;"><img src="https://api.iconify.design/mdi/gesture-tap.svg?color=%233b4fd6" style="width: 18px; height: 18px;" /><span style="font-size: 14px; color: #000000;">Micro-interactions</span></div>
+<div style="font-size: 13px; color: #93939f; line-height: 1.5;">⌘K opens command palette from step 3 onward. Enter advances wizard. Coach-marks respect prefers-reduced-motion. Skip link jumps to main on every step.</div>
+</div>
+<div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 22px; padding: 24px;">
+<div style="display: flex; align-items: center; gap: 8px; padding-bottom: 8px;"><img src="https://api.iconify.design/mdi/chart-line.svg?color=%231863dc" style="width: 18px; height: 18px;" /><span style="font-size: 14px; color: #000000;">Validation Metrics</span></div>
+<div style="font-size: 13px; color: #93939f; line-height: 1.5;">Time-to-first-node &lt; 3min · Onboarding completion &gt; 80% · SSO success rate · First-prompt activation rate.</div>
+</div>
+</div>
+</div>
+
+<!-- ============ FLOW 2: PROJECT ============ -->
+<div data-name="flow-project" style="padding-top: 56px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; letter-spacing: 0.28px; text-transform: uppercase; color: #93939f; padding-bottom: 12px;">Flow 02 — Create & Manage Project</div>
+<div style="font-family: 'Space Grotesk', sans-serif; font-size: 32px; letter-spacing: -0.32px; color: #000000; padding-bottom: 8px;">Project Lifecycle</div>
+<div style="font-size: 16px; color: #93939f; padding-bottom: 32px; max-width: 800px;">Goal: create, configure, collaborate on, and archive a project without leaving the Workspace zone.</div>
+
+<div style="display: flex; align-items: stretch; gap: 0; padding-bottom: 28px; flex-wrap: nowrap;">
+<div style="flex: 1; display: flex; flex-direction: column; gap: 10px; border: 1px solid #f2f2f2; border-radius: 22px; padding: 20px;">
+<div style="display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 9999px; background-color: #3b4fd6; color: #ffffff; font-family: 'Space Grotesk', sans-serif; font-size: 14px;">1</div>
+<div style="font-size: 15px; color: #000000;">New Project</div>
+<div style="font-size: 13px; color: #93939f; line-height: 1.4;">⌘K → "New Project" or nav CTA. Data: name, template.</div>
+</div>
+<div style="display: flex; align-items: center; padding: 0 8px;"><img src="https://api.iconify.design/mdi/arrow-right.svg?color=%23d9d9dd" style="width: 22px; height: 22px;" /></div>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 10px; border: 1px solid #f2f2f2; border-radius: 22px; padding: 20px;">
+<div style="display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 9999px; background-color: #3b4fd6; color: #ffffff; font-family: 'Space Grotesk', sans-serif; font-size: 14px;">2</div>
+<div style="font-size: 15px; color: #000000;">Configure</div>
+<div style="font-size: 13px; color: #93939f; line-height: 1.4;">Members, permissions, integrations. Data: roles, tokens.</div>
+</div>
+<div style="display: flex; align-items: center; padding: 0 8px;"><img src="https://api.iconify.design/mdi/arrow-right.svg?color=%23d9d9dd" style="width: 22px; height: 22px;" /></div>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 10px; border: 1px solid #f2f2f2; border-radius: 22px; padding: 20px;">
+<div style="display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 9999px; background-color: #3b4fd6; color: #ffffff; font-family: 'Space Grotesk', sans-serif; font-size: 14px;">3</div>
+<div style="font-size: 15px; color: #000000;">Work · Pipeline</div>
+<div style="font-size: 13px; color: #93939f; line-height: 1.4;">Enter the Prompt→Export loop (Flow 03).</div>
+</div>
+<div style="display: flex; align-items: center; padding: 0 8px;"><img src="https://api.iconify.design/mdi/arrow-right.svg?color=%23d9d9dd" style="width: 22px; height: 22px;" /></div>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 10px; background-color: #eef1fd; border: 1px solid #1863dc; border-radius: 22px; padding: 20px;">
+<img src="https://api.iconify.design/mdi/help-rhombus-outline.svg?color=%231863dc" style="width: 24px; height: 24px;" />
+<div style="font-size: 15px; color: #17171c;">Active or archive?</div>
+<div style="font-size: 13px; color: #1863dc; line-height: 1.4;">Decision: continue, duplicate, or archive.</div>
+</div>
+<div style="display: flex; align-items: center; padding: 0 8px;"><img src="https://api.iconify.design/mdi/arrow-right.svg?color=%23d9d9dd" style="width: 22px; height: 22px;" /></div>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 10px; background-color: #232f2b; border-radius: 22px; padding: 20px;">
+<img src="https://api.iconify.design/mdi/check-circle-outline.svg?color=%236ee7b7" style="width: 24px; height: 24px;" />
+<div style="font-size: 15px; color: #ffffff;">Managed State</div>
+<div style="font-size: 13px; color: rgba(255,255,255,0.7); line-height: 1.4;">Success: project tracked in dashboard.</div>
+</div>
+</div>
+
+<div style="display: flex; gap: 28px;">
+<div style="flex: 1; background-color: #fdf3e3; border: 1px solid #f0dcb8; border-radius: 22px; padding: 24px;">
+<div style="display: flex; align-items: center; gap: 8px; padding-bottom: 8px;"><img src="https://api.iconify.design/mdi/alert-outline.svg?color=%23b36a00" style="width: 18px; height: 18px;" /><span style="font-size: 14px; color: #b36a00;">Failure & Recovery</span></div>
+<div style="font-size: 13px; color: #7a5200; line-height: 1.5;">Duplicate name → inline warning + auto-suffix suggestion. Integration auth revoked → non-blocking banner, degraded mode. Accidental archive → undo toast (10s) then restore from History.</div>
+</div>
+<div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 22px; padding: 24px;">
+<div style="display: flex; align-items: center; gap: 8px; padding-bottom: 8px;"><img src="https://api.iconify.design/mdi/gesture-tap.svg?color=%233b4fd6" style="width: 18px; height: 18px;" /><span style="font-size: 14px; color: #000000;">Micro-interactions</span></div>
+<div style="font-size: 13px; color: #93939f; line-height: 1.5;">Drag project cards to reorder / group. Inline-rename on double-click. Bulk-select with Shift. Command palette deep-links to any project stage.</div>
+</div>
+<div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 22px; padding: 24px;">
+<div style="display: flex; align-items: center; gap: 8px; padding-bottom: 8px;"><img src="https://api.iconify.design/mdi/chart-line.svg?color=%231863dc" style="width: 18px; height: 18px;" /><span style="font-size: 14px; color: #000000;">Validation Metrics</span></div>
+<div style="font-size: 13px; color: #93939f; line-height: 1.5;">Projects created / active user · Config completion rate · Undo-archive usage · Collaborators per project.</div>
+</div>
+</div>
+</div>
+
+<!-- ============ FLOW 3: PROMPT -> EXPORT PIPELINE ============ -->
+<div data-name="flow-pipeline" style="padding-top: 56px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; letter-spacing: 0.28px; text-transform: uppercase; color: #93939f; padding-bottom: 12px;">Flow 03 — The Bicameral Pipeline</div>
+<div style="font-family: 'Space Grotesk', sans-serif; font-size: 32px; letter-spacing: -0.32px; color: #000000; padding-bottom: 8px;">Prompt → Export</div>
+<div style="font-size: 16px; color: #93939f; padding-bottom: 32px; max-width: 860px;">The core 10-stage journey crossing both hemispheres, gated by a human-in-the-loop approval. Left = semantic (blue), Right = implementation (violet), the approval is the bridge.</div>
+
+<!-- Pipeline dark band -->
+<div style="background-color: #0d0a14; border-radius: 22px; padding: 40px; overflow: hidden;">
+<div style="display: flex; align-items: center; gap: 12px; padding-bottom: 28px;">
+<span style="font-family: 'Fira Code', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28px; color: rgba(255,255,255,0.5); background-color: rgba(255,255,255,0.1); padding: 6px 12px; border-radius: 9999px;">Left Hemisphere</span>
+<div style="flex: 1; height: 1px; background: linear-gradient(90deg, #3b4fd6, #1863dc, #8b3fd6);"></div>
+<span style="font-family: 'Fira Code', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28px; color: rgba(255,255,255,0.5); background-color: rgba(255,255,255,0.1); padding: 6px 12px; border-radius: 9999px;">Right Hemisphere</span>
+</div>
+
+<!-- stage row 1 -->
+<div style="display: flex; gap: 16px; padding-bottom: 20px; flex-wrap: nowrap;">
+<div style="flex: 1; background-color: rgba(59,79,214,0.14); border: 1px solid rgba(59,79,214,0.4); border-radius: 16px; padding: 18px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 10px; color: #8ea0ff; text-transform: uppercase; padding-bottom: 8px;">01 · Prompt</div>
+<div style="font-size: 14px; color: #ffffff; padding-bottom: 6px;">Composer</div>
+<div style="font-size: 12px; color: rgba(255,255,255,0.55); line-height: 1.4;">Data: intent text, context refs. ⌘Enter to submit.</div>
+</div>
+<div style="flex: 1; background-color: rgba(59,79,214,0.14); border: 1px solid rgba(59,79,214,0.4); border-radius: 16px; padding: 18px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 10px; color: #8ea0ff; text-transform: uppercase; padding-bottom: 8px;">02 · Research</div>
+<div style="font-size: 14px; color: #ffffff; padding-bottom: 6px;">Threads + Sources</div>
+<div style="font-size: 12px; color: rgba(255,255,255,0.55); line-height: 1.4;">Data: sources, confidence scores.</div>
+</div>
+<div style="flex: 1; background-color: rgba(59,79,214,0.14); border: 1px solid rgba(59,79,214,0.4); border-radius: 16px; padding: 18px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 10px; color: #8ea0ff; text-transform: uppercase; padding-bottom: 8px;">03 · Requirements</div>
+<div style="font-size: 14px; color: #ffffff; padding-bottom: 6px;">Spec Editor</div>
+<div style="font-size: 12px; color: rgba(255,255,255,0.55); line-height: 1.4;">Data: structured reqs, acceptance criteria.</div>
+</div>
+<div style="flex: 1; background-color: rgba(59,79,214,0.14); border: 1px solid rgba(59,79,214,0.4); border-radius: 16px; padding: 18px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 10px; color: #8ea0ff; text-transform: uppercase; padding-bottom: 8px;">04 · Design Spec</div>
+<div style="font-size: 14px; color: #ffffff; padding-bottom: 6px;">Draft Artifact</div>
+<div style="font-size: 12px; color: rgba(255,255,255,0.55); line-height: 1.4;">Data: spec doc, lattice node cluster.</div>
+</div>
+<!-- APPROVAL GATE -->
+<div style="flex: 1.1; background-color: rgba(255,255,255,0.95); border-radius: 16px; padding: 18px; display: flex; flex-direction: column;">
+<div style="font-family: 'Fira Code', monospace; font-size: 10px; color: #b36a00; text-transform: uppercase; padding-bottom: 8px;">05 · Approval ◆</div>
+<div style="font-size: 14px; color: #000000; padding-bottom: 6px;">Human-in-Loop</div>
+<div style="font-size: 12px; color: #93939f; line-height: 1.4;">Decision: Approve / Request changes / Reject. The bridge gate.</div>
+</div>
+</div>
+
+<!-- connector arrow down -->
+<div style="display: flex; justify-content: center; padding: 4px 0 16px 0;"><img src="https://api.iconify.design/mdi/arrow-down.svg?color=%238b3fd6" style="width: 24px; height: 24px;" /></div>
+
+<!-- stage row 2 -->
+<div style="display: flex; gap: 16px; padding-bottom: 20px; flex-wrap: nowrap;">
+<div style="flex: 1; background-color: rgba(139,63,214,0.14); border: 1px solid rgba(139,63,214,0.4); border-radius: 16px; padding: 18px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 10px; color: #c79bf5; text-transform: uppercase; padding-bottom: 8px;">06 · Architecture</div>
+<div style="font-size: 14px; color: #ffffff; padding-bottom: 6px;">System Canvas</div>
+<div style="font-size: 12px; color: rgba(255,255,255,0.55); line-height: 1.4;">Data: components, dependency paths.</div>
+</div>
+<div style="flex: 1; background-color: rgba(139,63,214,0.14); border: 1px solid rgba(139,63,214,0.4); border-radius: 16px; padding: 18px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 10px; color: #c79bf5; text-transform: uppercase; padding-bottom: 8px;">07 · Impl. Plan</div>
+<div style="font-size: 14px; color: #ffffff; padding-bottom: 6px;">Task Breakdown</div>
+<div style="font-size: 12px; color: rgba(255,255,255,0.55); line-height: 1.4;">Data: tasks, sequencing, estimates.</div>
+</div>
+<div style="flex: 1; background-color: rgba(139,63,214,0.14); border: 1px solid rgba(139,63,214,0.4); border-radius: 16px; padding: 18px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 10px; color: #c79bf5; text-transform: uppercase; padding-bottom: 8px;">08 · Code Gen</div>
+<div style="font-size: 14px; color: #ffffff; padding-bottom: 6px;">Generation</div>
+<div style="font-size: 12px; color: rgba(255,255,255,0.55); line-height: 1.4;">Data: source files, diffs, tests.</div>
+</div>
+<div style="flex: 1; background-color: rgba(139,63,214,0.14); border: 1px solid rgba(139,63,214,0.4); border-radius: 16px; padding: 18px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 10px; color: #c79bf5; text-transform: uppercase; padding-bottom: 8px;">09 · Verification ◆</div>
+<div style="font-size: 14px; color: #ffffff; padding-bottom: 6px;">Validation Report</div>
+<div style="font-size: 12px; color: rgba(255,255,255,0.55); line-height: 1.4;">Decision: pass / fail → loop back to 06.</div>
+</div>
+<div style="flex: 1.1; background-color: #16261f; border: 1px solid #2f7a5a; border-radius: 16px; padding: 18px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 10px; color: #6ee7b7; text-transform: uppercase; padding-bottom: 8px;">10 · Export ✓</div>
+<div style="font-size: 14px; color: #ffffff; padding-bottom: 6px;">Artifacts Ready</div>
+<div style="font-size: 12px; color: rgba(255,255,255,0.6); line-height: 1.4;">Success: React/TS bundle + spec exported.</div>
+</div>
+</div>
+
+<!-- loop-back note -->
+<div style="display: flex; align-items: center; gap: 10px; padding-top: 12px;">
+<img src="https://api.iconify.design/mdi/backup-restore.svg?color=%23f0b968" style="width: 18px; height: 18px;" />
+<span style="font-size: 13px; color: rgba(255,255,255,0.6);">Failure loops: Approval rejection → return to 03. Verification fail → return to 06 with annotated diffs. Every regression is captured as a lattice replay frame.</span>
+</div>
+</div>
+
+<!-- pipeline micro + metrics -->
+<div style="display: flex; gap: 28px; padding-top: 28px;">
+<div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 22px; padding: 24px;">
+<div style="display: flex; align-items: center; gap: 8px; padding-bottom: 8px;"><img src="https://api.iconify.design/mdi/gesture-tap.svg?color=%233b4fd6" style="width: 18px; height: 18px;" /><span style="font-size: 14px; color: #000000;">Key Micro-interactions</span></div>
+<div style="font-size: 13px; color: #93939f; line-height: 1.6;">• ⌘Enter submits prompt, ⌘K jumps between stages<br/>• Drag nodes in the lattice to re-cluster memory<br/>• Inline approve/reject with keyboard (A / R)<br/>• Live confidence meters animate as research resolves<br/>• Diff hover reveals source-to-code provenance</div>
+</div>
+<div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 22px; padding: 24px;">
+<div style="display: flex; align-items: center; gap: 8px; padding-bottom: 8px;"><img src="https://api.iconify.design/mdi/chart-line.svg?color=%231863dc" style="width: 18px; height: 18px;" /><span style="font-size: 14px; color: #000000;">Validation Metrics</span></div>
+<div style="font-size: 13px; color: #93939f; line-height: 1.6;">• Prompt→Export completion rate<br/>• Approval turnaround time<br/>• Verification pass rate (first attempt)<br/>• Loop-back count per project<br/>• Hemisphere alignment % at export<br/>• Export → adopted-in-codebase rate</div>
+</div>
+</div>
+</div>
+
+<!-- ============ ACCESSIBILITY & RECOVERY BAND ============ -->
+<div data-name="a11y-band" style="padding-top: 56px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; letter-spacing: 0.28px; text-transform: uppercase; color: #93939f; padding-bottom: 12px;">Cross-Cutting — Accessibility & Recovery</div>
+<div style="font-family: 'Space Grotesk', sans-serif; font-size: 32px; letter-spacing: -0.32px; color: #000000; padding-bottom: 32px;">Resilient by Default</div>
+<div style="display: flex; gap: 28px; flex-wrap: wrap;">
+
+<div style="flex: 1; min-width: 300px; border-left: 2px solid #1863dc; border-radius: 0 8px 8px 0; padding: 4px 0 4px 24px;">
+<div style="font-size: 17px; color: #000000; padding-bottom: 8px;">Keyboard-first navigation</div>
+<div style="font-size: 14px; color: #93939f; line-height: 1.5;">Every flow completable without a mouse. Logical tab order, visible focus rings (Ring Blue #4c6ee6), skip links on each screen, and a global ⌘K command palette as the universal entry point.</div>
+</div>
+
+<div style="flex: 1; min-width: 300px; border-left: 2px solid #3b4fd6; border-radius: 0 8px 8px 0; padding: 4px 0 4px 24px;">
+<div style="font-size: 17px; color: #000000; padding-bottom: 8px;">Screen-reader & motion</div>
+<div style="font-size: 14px; color: #93939f; line-height: 1.5;">ARIA live regions announce stage transitions and approval outcomes. Lattice offers a semantic list fallback. prefers-reduced-motion disables node physics and swaps to instant state changes.</div>
+</div>
+
+<div style="flex: 1; min-width: 300px; border-left: 2px solid #8b3fd6; border-radius: 0 8px 8px 0; padding: 4px 0 4px 24px;">
+<div style="font-size: 17px; color: #000000; padding-bottom: 8px;">Universal recovery</div>
+<div style="font-size: 14px; color: #93939f; line-height: 1.5;">Every destructive action is undoable via a 10s toast, then restorable from History. Autosave on every stage. Failed generations retain the last good artifact so the user never loses progress.</div>
+</div>
+
+</div>
+</div>
+
+</div>

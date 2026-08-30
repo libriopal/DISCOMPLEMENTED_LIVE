@@ -1,0 +1,85 @@
+# .gitignore for COMPaNiON / Bicameral
+
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+dist/client/
+.wrangler/
+*.tsbuildinfo
+
+# Environment files (NEVER commit)
+.env
+.env.*
+!.env.example
+
+# Secrets (NEVER commit)
+*.pem
+*.key
+secrets.json
+
+# Cloudflare
+.wrangler/
+.dev.vars
+
+# qa-loop run artifacts (may contain a test virtual key; regenerated per run)
+qa-loop/reports/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test outputs
+test-results/
+coverage/
+.nyc_output/
+playwright-report/
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Temporary
+tmp/
+temp/
+
+# Conversation artifacts (not repo content)
+incoming_files/
+*.bootstrap.zip
+
+# Committed junk cleanup
+*.zip
+__pycache__/
+simulation/__pycache__/
+
+
+# === Admin/Evolution Code (must never be in public repo) ===
+compiler/
+staging-worker.ts
+PROPOSAL_*.md
+EXECUTION-PROMPT.md
+monte-carlo-engine.ts
+evolution-engine.ts
+dna-string.ts
+bot-runner.ts
+persona-loader.ts
+deterministic-prng.ts
+merkle-verify.ts
+
+# AI dev tools (never commit these)
+.aider*
+aider/
+.continue*
+continue/
+
+.audit/

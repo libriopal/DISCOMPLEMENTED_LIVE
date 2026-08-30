@@ -1,0 +1,33 @@
+name: Sanitize Check
+on: [pull_request]
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: No admin/evolution imports in public repo
+        run: |
+          # Check for import/require statements referencing admin modules
+          if grep -rn "from.*['\"].*monte-carlo\|from.*['\"].*evolution-engine\|from.*['\"].*dna-string\|from.*['\"].*bot-runner\|from.*['\"].*persona-loader\|from.*['\"].*staging-worker\|from.*['\"].*deterministic-prng\|from.*['\"].*merkle-verify\|require.*monte-carlo\|require.*evolution-engine\|require.*dna-string\|require.*bot-runner" . \
+            --include="*.ts" --include="*.tsx" --exclude-dir=node_modules --exclude-dir=.git 2>/dev/null; then
+            echo "FAIL: Admin/evolution imports detected in public repo"
+            exit 1
+          fi
+          echo "OK: No admin imports detected"
+      - name: No secrets in tracked files
+        run: |
+          if grep -rn "API_KEY=\|SECRET_KEY=\|STAGING_KEY=\|CLOUDFLARE_API_TOKEN=" . \
+            --include="*.ts" --include="*.yml" --include="*.json" --include="*.toml" \
+            --exclude-dir=node_modules --exclude-dir=.git --exclude="*.d.ts" \
+            --exclude=".github/workflows/sanitize.yml" 2>/dev/null; then
+            echo "FAIL: Potential secrets detected"
+            exit 1
+          fi
+          echo "OK: No secrets detected"
+      - name: No internal proposals in public repo
+        run: |
+          if find . -name "PROPOSAL_*.md" -not -path "./node_modules/*" -not -path "./.git/*" 2>/dev/null | grep -q .; then
+            echo "FAIL: Internal proposals found in public repo"
+            exit 1
+          fi
+          echo "OK: No internal proposals"

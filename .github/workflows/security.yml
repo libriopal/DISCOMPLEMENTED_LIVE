@@ -1,0 +1,95 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 6 * * 1'  # Weekly on Monday 6 AM UTC
+
+jobs:
+  semgrep:
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Semgrep (security-audit + owasp-top-ten)
+        run: semgrep ci --config p/security-audit --config p/owasp-top-ten
+
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run pnpm audit
+        run: pnpm audit --prod --audit-level=moderate
+        continue-on-error: true
+
+      - name: Scan for secrets in code
+        run: |
+          echo "Scanning for secrets in source code..."
+          if grep -rE "(api[_-]?key|apikey|secret|token|password)\s*[:=]\s*['\"][^'\"]{10,}['\"]" src/ packages/*/src/ agent_docs/ --include="*.ts" --include="*.tsx" --include="*.md" | grep -v "process.env" | grep -v "import" | grep -v "wrangler secret" | grep -v "your_" | grep -v "example"; then
+            echo "⚠️ Potential secrets found in source code!"
+            exit 1
+          fi
+          echo "✅ No secrets detected in source code"
+
+      - name: Check for .env files committed
+        run: |
+          if git ls-files | grep -E "\.env$|\.env\.|\.dev\.vars"; then
+            echo "⚠️ Environment file is tracked in git! Remove it immediately."
+            git ls-files | grep -E "\.env$|\.env\.|\.dev\.vars"
+            exit 1
+          fi
+          echo "✅ No .env files tracked"
+
+      # This repo is public. packages/admin (billing, governance, moderation)
+      # lives in DISCOMPLEMENTED_ADMIN and must never reappear here.
+      #
+      # The previous version of this step checked that .gitattributes carried an
+      # `export-ignore` for the path, and only *warned* when it did not —
+      # export-ignore affects `git archive` and nothing else, so it never kept
+      # the source out of a clone. This asserts the property that matters, and
+      # fails.
+      - name: Verify admin package is not tracked
+        run: |
+          if git ls-files | grep -q "^packages/admin/"; then
+            echo "::error::packages/admin is tracked in the public repo."
+            git ls-files | grep "^packages/admin/"
+            exit 1
+          fi
+          echo "✅ packages/admin absent — admin-stub is the public fallback"
+
+      - name: Check for hardcoded Cloudflare credentials
+        run: |
+          echo "Checking for hardcoded CF credentials..."
+          if grep -rE "(account_id|database_id)\s*=\s*['\"][0-9a-f]{32}['\"]" wrangler.toml; then
+            echo "⚠️ Hardcoded Cloudflare IDs in wrangler.toml — use placeholders"
+            exit 1
+          fi
+          echo "✅ No hardcoded Cloudflare credentials"
+
+      - name: Verify agent_docs don't contain real API keys
+        run: |
+          echo "Checking agent_docs for real API keys..."
+          if grep -rE "ghp_[A-Za-z0-9]{36}|gho_[A-Za-z0-9]{36}|sk-[A-Za-z0-9]{48}" agent_docs/ CLAUDE.md; then
+            echo "❌ Real API keys found in agent_docs or CLAUDE.md!"
+            exit 1
+          fi
+          echo "✅ No real API keys in documentation"

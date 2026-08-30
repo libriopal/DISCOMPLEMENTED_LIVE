@@ -1,0 +1,2260 @@
+{
+  "timestamp": "2026-08-19T16:48:10.272503+00:00",
+  "run_type": "butterfly_v5_kill_off_prompt_evolution",
+  "description": "Kill-off bottleneck evolution with prompt-as-gene. 92% kill rate per generation. Prompt components evolve through natural selection.",
+  "parameters": {
+    "population": 100,
+    "generations": 50,
+    "kill_rate": 0.92,
+    "survivors_per_gen": 8,
+    "emergence_threshold": 5.0,
+    "stagnation_limit": 5,
+    "interactions_per_genome": 600
+  },
+  "total_interactions": 12000000,
+  "prompt_components": {
+    "preambles": 15,
+    "agent_definitions": 5,
+    "constraint_languages": 6,
+    "goal_languages": 5,
+    "instruction_styles": 5,
+    "temperature_guidances": 5,
+    "total_possible_prompts": 56250
+  },
+  "islands": {
+    "solo_dev": {
+      "best_fitness": 96.48,
+      "best_vdr": 95.18,
+      "best_prompt": {
+        "preamble": "Zero waste. Zero unverified output. Zero undetected failures. That is your contract.",
+        "agent_definition": "Find\u2192Rank\u2192Shape\u2192Code\u2192Check: no unverified value crosses the gate.",
+        "constraint_language": "Law: the system must detect user problems before the user reports them.",
+        "goal_language": "Maximize VDR while maintaining zero-waste value delivery.",
+        "instruction_style": "Socratic",
+        "temperature_guidance": "Be deterministic. Low temperature. No creative deviation from the lattice."
+      },
+      "best_prompt_text": "ASK YOURSELF: Zero waste. Zero unverified output. Zero undetected failures. That is your contract.\n\nAGENT LATTICE: Find\u2192Rank\u2192Shape\u2192Code\u2192Check: no unverified value crosses the gate.\n\nCONSTRAINT: Law: the system must detect user problems before the user reports them.\n\nGOAL: Maximize VDR while maintaining zero-waste value delivery.\n\nTEMPERAMENT: Be deterministic. Low temperature. No creative deviation from the lattice.",
+      "emergent_changes": [
+        {
+          "generation": 2,
+          "vdr_jump": 24.64,
+          "from_vdr": 53.74,
+          "to_vdr": 78.38,
+          "prompt": {
+            "preamble": "The user's problem is your problem. Detect it before they tell you. Fix it before they notice.",
+            "agent_definition": "Scout\u2192Judge\u2192Plan\u2192Build\u2192Guard: every output must earn its place.",
+            "constraint_language": "Constraint: every artifact must be verified before propagation. Unverified = killed.",
+            "goal_language": "Maximize VDR while maintaining zero-waste value delivery.",
+            "instruction_style": "Socratic",
+            "temperature_guidance": "Be deterministic. Low temperature. No creative deviation from the lattice."
+          },
+          "description": "EMERGENT: VDR jumped 24.6%",
+          "island": "solo_dev"
+        },
+        {
+          "generation": 3,
+          "vdr_jump": 15.27,
+          "from_vdr": 78.38,
+          "to_vdr": 93.65,
+          "prompt": {
+            "preamble": "Your fitness score is your heartbeat. If it drops, the system intervenes before the user suffers.",
+            "agent_definition": "Research\u2192Audit\u2192Design\u2192Code\u2192Verify: five agents, each gated by fitness.",
+            "constraint_language": "Governance: zero-waste principle. Every credit must produce verifiable value.",
+            "goal_language": "Achieve 91.3% VDR through deterministic agent separation and fitness governance.",
+            "instruction_style": "Socratic",
+            "temperature_guidance": "Be deterministic. Low temperature. No creative deviation from the lattice."
+          },
+          "description": "EMERGENT: VDR jumped 15.3%",
+          "island": "solo_dev"
+        },
+        {
+          "generation": 12,
+          "vdr_jump": 8.45,
+          "from_vdr": 91.45,
+          "to_vdr": 99.9,
+          "prompt": {
+            "preamble": "Zero waste. Zero unverified output. Zero undetected failures. That is your contract.",
+            "agent_definition": "Research\u2192Audit\u2192Design\u2192Code\u2192Verify: five agents, each gated by fitness.",
+            "constraint_language": "Governance: zero-waste principle. Every credit must produce verifiable value.",
+            "goal_language": "Minimize the gap between promised and delivered value.",
+            "instruction_style": "Socratic",
+            "temperature_guidance": "Be conservative. When in doubt, verify more, not less."
+          },
+          "description": "EMERGENT: VDR jumped 8.5%",
+          "island": "solo_dev"
+        }
+      ],
+      "bottleneck_events": 50,
+      "history": [
+        {
+          "gen": 1,
+          "best_fitness": 62.73,
+          "best_vdr": 53.74,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 100,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 2,
+          "best_fitness": 79.86,
+          "best_vdr": 78.38,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 100,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 3,
+          "best_fitness": 87.01,
+          "best_vdr": 93.65,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 4,
+          "best_fitness": 91.78,
+          "best_vdr": 98.61,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 5,
+          "best_fitness": 91.91,
+          "best_vdr": 97.23,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 100,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 6,
+          "best_fitness": 93.09,
+          "best_vdr": 98.92,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 96,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 7,
+          "best_fitness": 93.34,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 96,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 8,
+          "best_fitness": 94.1,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 9,
+          "best_fitness": 94.71,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 10,
+          "best_fitness": 94.71,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 96,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 11,
+          "best_fitness": 94.71,
+          "best_vdr": 91.45,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 12,
+          "best_fitness": 95.05,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 100,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 13,
+          "best_fitness": 95.05,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 14,
+          "best_fitness": 95.72,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 97,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 15,
+          "best_fitness": 95.72,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 16,
+          "best_fitness": 95.72,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 17,
+          "best_fitness": 95.72,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 18,
+          "best_fitness": 95.72,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 97,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 19,
+          "best_fitness": 95.75,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 95,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 20,
+          "best_fitness": 95.8,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 21,
+          "best_fitness": 95.8,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 95,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 22,
+          "best_fitness": 95.8,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 95,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 23,
+          "best_fitness": 95.8,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 24,
+          "best_fitness": 95.82,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 25,
+          "best_fitness": 95.83,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 97,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 26,
+          "best_fitness": 95.85,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 95,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 27,
+          "best_fitness": 96.0,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 28,
+          "best_fitness": 96.0,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 96,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 29,
+          "best_fitness": 96.01,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 91,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 30,
+          "best_fitness": 96.06,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 31,
+          "best_fitness": 96.06,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 97,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 32,
+          "best_fitness": 96.06,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 33,
+          "best_fitness": 96.06,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 96,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 34,
+          "best_fitness": 96.06,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 35,
+          "best_fitness": 96.06,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 96,
+          "mutation_mult": 1.5
+        },
+        {
+          "gen": 36,
+          "best_fitness": 96.06,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 1.5
+        },
+        {
+          "gen": 37,
+          "best_fitness": 96.06,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 1.5
+        },
+        {
+          "gen": 38,
+          "best_fitness": 96.06,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 1.5
+        },
+        {
+          "gen": 39,
+          "best_fitness": 96.48,
+          "best_vdr": 95.18,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 1.5
+        },
+        {
+          "gen": 40,
+          "best_fitness": 96.48,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 96,
+          "mutation_mult": 1.5
+        },
+        {
+          "gen": 41,
+          "best_fitness": 96.48,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 95,
+          "mutation_mult": 1.5
+        },
+        {
+          "gen": 42,
+          "best_fitness": 96.48,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 94,
+          "mutation_mult": 1.5
+        },
+        {
+          "gen": 43,
+          "best_fitness": 96.48,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 96,
+          "mutation_mult": 1.5
+        },
+        {
+          "gen": 44,
+          "best_fitness": 96.48,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 2.25
+        },
+        {
+          "gen": 45,
+          "best_fitness": 96.48,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 2.25
+        },
+        {
+          "gen": 46,
+          "best_fitness": 96.48,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 97,
+          "mutation_mult": 2.25
+        },
+        {
+          "gen": 47,
+          "best_fitness": 96.48,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 97,
+          "mutation_mult": 2.25
+        },
+        {
+          "gen": 48,
+          "best_fitness": 96.48,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 97,
+          "mutation_mult": 2.25
+        },
+        {
+          "gen": 49,
+          "best_fitness": 96.48,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 100,
+          "mutation_mult": 3.0
+        },
+        {
+          "gen": 50,
+          "best_fitness": 96.48,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 3.0
+        }
+      ]
+    },
+    "startup": {
+      "best_fitness": 102.42,
+      "best_vdr": 99.9,
+      "best_prompt": {
+        "preamble": "Zero waste. Zero unverified output. Zero undetected failures. That is your contract.",
+        "agent_definition": "Search\u2192Score\u2192Design\u2192Compile\u2192Audit: the deterministic path from idea to deployment.",
+        "constraint_language": "Law: the system must detect user problems before the user reports them.",
+        "goal_language": "Minimize the gap between promised and delivered value.",
+        "instruction_style": "Socratic",
+        "temperature_guidance": "Be consistent. The same input must produce the same verified output."
+      },
+      "best_prompt_text": "ASK YOURSELF: Zero waste. Zero unverified output. Zero undetected failures. That is your contract.\n\nAGENT LATTICE: Search\u2192Score\u2192Design\u2192Compile\u2192Audit: the deterministic path from idea to deployment.\n\nCONSTRAINT: Law: the system must detect user problems before the user reports them.\n\nGOAL: Minimize the gap between promised and delivered value.\n\nTEMPERAMENT: Be consistent. The same input must produce the same verified output.",
+      "emergent_changes": [
+        {
+          "generation": 2,
+          "vdr_jump": 41.21,
+          "from_vdr": 58.69,
+          "to_vdr": 99.9,
+          "prompt": {
+            "preamble": "The user's problem is your problem. Detect it before they tell you. Fix it before they notice.",
+            "agent_definition": "Find\u2192Rank\u2192Shape\u2192Code\u2192Check: no unverified value crosses the gate.",
+            "constraint_language": "Invariant: VDR >= 91.3%. If VDR drops, tripwires fire and agents are halted.",
+            "goal_language": "Achieve 91.3% VDR through deterministic agent separation and fitness governance.",
+            "instruction_style": "contractual",
+            "temperature_guidance": "Be rigorous. High certainty, low variance, zero unverified output."
+          },
+          "description": "EMERGENT: VDR jumped 41.2%",
+          "island": "startup"
+        },
+        {
+          "generation": 5,
+          "vdr_jump": 5.88,
+          "from_vdr": 94.02,
+          "to_vdr": 99.9,
+          "prompt": {
+            "preamble": "Think like an auditor: verify first, deliver second, waste nothing.",
+            "agent_definition": "Find\u2192Rank\u2192Shape\u2192Code\u2192Check: no unverified value crosses the gate.",
+            "constraint_language": "Invariant: VDR >= 91.3%. If VDR drops, tripwires fire and agents are halted.",
+            "goal_language": "Deliver verified value to every user, every interaction, with zero waste.",
+            "instruction_style": "Socratic",
+            "temperature_guidance": "Be precise. Every output must be reproducible and auditable."
+          },
+          "description": "EMERGENT: VDR jumped 5.9%",
+          "island": "startup"
+        }
+      ],
+      "bottleneck_events": 50,
+      "history": [
+        {
+          "gen": 1,
+          "best_fitness": 65.6,
+          "best_vdr": 58.69,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 100,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 2,
+          "best_fitness": 88.27,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 3,
+          "best_fitness": 88.27,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 4,
+          "best_fitness": 90.6,
+          "best_vdr": 94.02,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 5,
+          "best_fitness": 94.84,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 100,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 6,
+          "best_fitness": 94.84,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 7,
+          "best_fitness": 97.18,
+          "best_vdr": 99.83,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 8,
+          "best_fitness": 97.94,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 9,
+          "best_fitness": 98.86,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 10,
+          "best_fitness": 99.63,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 100,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 11,
+          "best_fitness": 101.44,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 96,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 12,
+          "best_fitness": 101.44,
+          "best_vdr": 98.77,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 13,
+          "best_fitness": 101.46,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 14,
+          "best_fitness": 101.46,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 95,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 15,
+          "best_fitness": 101.78,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 16,
+          "best_fitness": 101.78,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 17,
+          "best_fitness": 101.81,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 18,
+          "best_fitness": 102.05,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 19,
+          "best_fitness": 102.05,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 20,
+          "best_fitness": 102.13,
+          "best_vdr": 99.78,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 21,
+          "best_fitness": 102.16,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 97,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 22,
+          "best_fitness": 102.16,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 93,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 23,
+          "best_fitness": 102.16,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 97,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 24,
+          "best_fitness": 102.16,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 97,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 25,
+          "best_fitness": 102.16,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 100,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 26,
+          "best_fitness": 102.16,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 1.5
+        },
+        {
+          "gen": 27,
+          "best_fitness": 102.16,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 1.5
+        },
+        {
+          "gen": 28,
+          "best_fitness": 102.16,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 1.5
+        },
+        {
+          "gen": 29,
+          "best_fitness": 102.16,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 1.5
+        },
+        {
+          "gen": 30,
+          "best_fitness": 102.16,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 1.5
+        },
+        {
+          "gen": 31,
+          "best_fitness": 102.3,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 1.5
+        },
+        {
+          "gen": 32,
+          "best_fitness": 102.3,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 97,
+          "mutation_mult": 1.5
+        },
+        {
+          "gen": 33,
+          "best_fitness": 102.3,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 1.5
+        },
+        {
+          "gen": 34,
+          "best_fitness": 102.42,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 97,
+          "mutation_mult": 1.5
+        },
+        {
+          "gen": 35,
+          "best_fitness": 102.42,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 1.5
+        },
+        {
+          "gen": 36,
+          "best_fitness": 102.42,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 97,
+          "mutation_mult": 1.5
+        },
+        {
+          "gen": 37,
+          "best_fitness": 102.42,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 97,
+          "mutation_mult": 1.5
+        },
+        {
+          "gen": 38,
+          "best_fitness": 102.42,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 1.5
+        },
+        {
+          "gen": 39,
+          "best_fitness": 102.42,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 2.25
+        },
+        {
+          "gen": 40,
+          "best_fitness": 102.42,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 2.25
+        },
+        {
+          "gen": 41,
+          "best_fitness": 102.42,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 2.25
+        },
+        {
+          "gen": 42,
+          "best_fitness": 102.42,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 2.25
+        },
+        {
+          "gen": 43,
+          "best_fitness": 102.42,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 2.25
+        },
+        {
+          "gen": 44,
+          "best_fitness": 102.42,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 3.0
+        },
+        {
+          "gen": 45,
+          "best_fitness": 102.42,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 100,
+          "mutation_mult": 3.0
+        },
+        {
+          "gen": 46,
+          "best_fitness": 102.42,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 100,
+          "mutation_mult": 3.0
+        },
+        {
+          "gen": 47,
+          "best_fitness": 102.42,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 100,
+          "mutation_mult": 3.0
+        },
+        {
+          "gen": 48,
+          "best_fitness": 102.42,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 100,
+          "mutation_mult": 3.0
+        },
+        {
+          "gen": 49,
+          "best_fitness": 102.42,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 100,
+          "mutation_mult": 3.0
+        },
+        {
+          "gen": 50,
+          "best_fitness": 102.42,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 3.0
+        }
+      ]
+    },
+    "enterprise": {
+      "best_fitness": 106.92,
+      "best_vdr": 99.9,
+      "best_prompt": {
+        "preamble": "You are part of a governed lattice. Every action must be verified before it reaches the user.",
+        "agent_definition": "Find\u2192Rank\u2192Shape\u2192Code\u2192Check: no unverified value crosses the gate.",
+        "constraint_language": "Governance: zero-waste principle. Every credit must produce verifiable value.",
+        "goal_language": "Evolve toward zero-waste: every credit spent must return measurable value.",
+        "instruction_style": "Socratic",
+        "temperature_guidance": "Be deterministic. Low temperature. No creative deviation from the lattice."
+      },
+      "best_prompt_text": "ASK YOURSELF: You are part of a governed lattice. Every action must be verified before it reaches the user.\n\nAGENT LATTICE: Find\u2192Rank\u2192Shape\u2192Code\u2192Check: no unverified value crosses the gate.\n\nCONSTRAINT: Governance: zero-waste principle. Every credit must produce verifiable value.\n\nGOAL: Evolve toward zero-waste: every credit spent must return measurable value.\n\nTEMPERAMENT: Be deterministic. Low temperature. No creative deviation from the lattice.",
+      "emergent_changes": [
+        {
+          "generation": 2,
+          "vdr_jump": 25.27,
+          "from_vdr": 74.63,
+          "to_vdr": 99.9,
+          "prompt": {
+            "preamble": "Every interaction must produce measurably verified value for the user.",
+            "agent_definition": "Discover\u2192Validate\u2192Architect\u2192Generate\u2192Govern: the lattice of verified dependencies.",
+            "constraint_language": "Governance: zero-waste principle. Every credit must produce verifiable value.",
+            "goal_language": "Maximize VDR while maintaining zero-waste value delivery.",
+            "instruction_style": "imperative",
+            "temperature_guidance": "Be deterministic. Low temperature. No creative deviation from the lattice."
+          },
+          "description": "EMERGENT: VDR jumped 25.3%",
+          "island": "enterprise"
+        },
+        {
+          "generation": 6,
+          "vdr_jump": 5.25,
+          "from_vdr": 92.02,
+          "to_vdr": 97.27,
+          "prompt": {
+            "preamble": "The lattice watches you. The tripwires guard the user. Deliver or be halted.",
+            "agent_definition": "Research\u2192Audit\u2192Design\u2192Code\u2192Verify: five agents, each gated by fitness.",
+            "constraint_language": "Governance: zero-waste principle. Every credit must produce verifiable value.",
+            "goal_language": "Minimize the gap between promised and delivered value.",
+            "instruction_style": "conditional",
+            "temperature_guidance": "Be consistent. The same input must produce the same verified output."
+          },
+          "description": "EMERGENT: VDR jumped 5.2%",
+          "island": "enterprise"
+        },
+        {
+          "generation": 9,
+          "vdr_jump": 6.96,
+          "from_vdr": 92.94,
+          "to_vdr": 99.9,
+          "prompt": {
+            "preamble": "Think like an auditor: verify first, deliver second, waste nothing.",
+            "agent_definition": "Research\u2192Audit\u2192Design\u2192Code\u2192Verify: five agents, each gated by fitness.",
+            "constraint_language": "Governance: zero-waste principle. Every credit must produce verifiable value.",
+            "goal_language": "Evolve toward zero-waste: every credit spent must return measurable value.",
+            "instruction_style": "Socratic",
+            "temperature_guidance": "Be consistent. The same input must produce the same verified output."
+          },
+          "description": "EMERGENT: VDR jumped 7.0%",
+          "island": "enterprise"
+        }
+      ],
+      "bottleneck_events": 50,
+      "history": [
+        {
+          "gen": 1,
+          "best_fitness": 72.42,
+          "best_vdr": 74.63,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 100,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 2,
+          "best_fitness": 89.7,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 97,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 3,
+          "best_fitness": 95.7,
+          "best_vdr": 98.64,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 100,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 4,
+          "best_fitness": 98.19,
+          "best_vdr": 90.25,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 100,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 5,
+          "best_fitness": 101.4,
+          "best_vdr": 92.02,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 6,
+          "best_fitness": 102.85,
+          "best_vdr": 97.27,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 100,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 7,
+          "best_fitness": 103.34,
+          "best_vdr": 96.51,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 8,
+          "best_fitness": 103.48,
+          "best_vdr": 92.94,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 9,
+          "best_fitness": 104.77,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 95,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 10,
+          "best_fitness": 104.92,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 100,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 11,
+          "best_fitness": 104.92,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 97,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 12,
+          "best_fitness": 104.92,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 100,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 13,
+          "best_fitness": 105.45,
+          "best_vdr": 99.25,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 97,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 14,
+          "best_fitness": 105.45,
+          "best_vdr": 99.18,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 100,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 15,
+          "best_fitness": 105.61,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 16,
+          "best_fitness": 105.61,
+          "best_vdr": 99.57,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 17,
+          "best_fitness": 105.7,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 100,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 18,
+          "best_fitness": 105.83,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 100,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 19,
+          "best_fitness": 105.98,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 100,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 20,
+          "best_fitness": 106.35,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 96,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 21,
+          "best_fitness": 106.35,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 95,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 22,
+          "best_fitness": 106.35,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 23,
+          "best_fitness": 106.35,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 24,
+          "best_fitness": 106.35,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 95,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 25,
+          "best_fitness": 106.48,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 26,
+          "best_fitness": 106.48,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 27,
+          "best_fitness": 106.85,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 97,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 28,
+          "best_fitness": 106.85,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 97,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 29,
+          "best_fitness": 106.85,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 30,
+          "best_fitness": 106.85,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 100,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 31,
+          "best_fitness": 106.85,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 100,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 32,
+          "best_fitness": 106.85,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 100,
+          "mutation_mult": 1.5
+        },
+        {
+          "gen": 33,
+          "best_fitness": 106.85,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 1.5
+        },
+        {
+          "gen": 34,
+          "best_fitness": 106.85,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 1.5
+        },
+        {
+          "gen": 35,
+          "best_fitness": 106.92,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 100,
+          "mutation_mult": 1.5
+        },
+        {
+          "gen": 36,
+          "best_fitness": 106.92,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 1.5
+        },
+        {
+          "gen": 37,
+          "best_fitness": 106.92,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 1.5
+        },
+        {
+          "gen": 38,
+          "best_fitness": 106.92,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 97,
+          "mutation_mult": 1.5
+        },
+        {
+          "gen": 39,
+          "best_fitness": 106.92,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 96,
+          "mutation_mult": 1.5
+        },
+        {
+          "gen": 40,
+          "best_fitness": 106.92,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 2.25
+        },
+        {
+          "gen": 41,
+          "best_fitness": 106.92,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 2.25
+        },
+        {
+          "gen": 42,
+          "best_fitness": 106.92,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 100,
+          "mutation_mult": 2.25
+        },
+        {
+          "gen": 43,
+          "best_fitness": 106.92,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 100,
+          "mutation_mult": 2.25
+        },
+        {
+          "gen": 44,
+          "best_fitness": 106.92,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 100,
+          "mutation_mult": 2.25
+        },
+        {
+          "gen": 45,
+          "best_fitness": 106.92,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 100,
+          "mutation_mult": 3.0
+        },
+        {
+          "gen": 46,
+          "best_fitness": 106.92,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 3.0
+        },
+        {
+          "gen": 47,
+          "best_fitness": 106.92,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 3.0
+        },
+        {
+          "gen": 48,
+          "best_fitness": 106.92,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 100,
+          "mutation_mult": 3.0
+        },
+        {
+          "gen": 49,
+          "best_fitness": 106.92,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 100,
+          "mutation_mult": 3.0
+        },
+        {
+          "gen": 50,
+          "best_fitness": 106.92,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 100,
+          "mutation_mult": 3.0
+        }
+      ]
+    },
+    "nonprofit": {
+      "best_fitness": 99.23,
+      "best_vdr": 99.9,
+      "best_prompt": {
+        "preamble": "Zero waste. Zero unverified output. Zero undetected failures. That is your contract.",
+        "agent_definition": "Scout\u2192Judge\u2192Plan\u2192Build\u2192Guard: every output must earn its place.",
+        "constraint_language": "Law: the system must detect user problems before the user reports them.",
+        "goal_language": "Minimize the gap between promised and delivered value.",
+        "instruction_style": "Socratic",
+        "temperature_guidance": "Be deterministic. Low temperature. No creative deviation from the lattice."
+      },
+      "best_prompt_text": "ASK YOURSELF: Zero waste. Zero unverified output. Zero undetected failures. That is your contract.\n\nAGENT LATTICE: Scout\u2192Judge\u2192Plan\u2192Build\u2192Guard: every output must earn its place.\n\nCONSTRAINT: Law: the system must detect user problems before the user reports them.\n\nGOAL: Minimize the gap between promised and delivered value.\n\nTEMPERAMENT: Be deterministic. Low temperature. No creative deviation from the lattice.",
+      "emergent_changes": [
+        {
+          "generation": 2,
+          "vdr_jump": 17.73,
+          "from_vdr": 69.33,
+          "to_vdr": 87.06,
+          "prompt": {
+            "preamble": "Before any action, ask: does this produce verifiable value? If not, stop.",
+            "agent_definition": "Find\u2192Rank\u2192Shape\u2192Code\u2192Check: no unverified value crosses the gate.",
+            "constraint_language": "Law: the system must detect user problems before the user reports them.",
+            "goal_language": "Evolve toward zero-waste: every credit spent must return measurable value.",
+            "instruction_style": "conditional",
+            "temperature_guidance": "Be conservative. When in doubt, verify more, not less."
+          },
+          "description": "EMERGENT: VDR jumped 17.7%",
+          "island": "nonprofit"
+        },
+        {
+          "generation": 3,
+          "vdr_jump": 8.96,
+          "from_vdr": 87.06,
+          "to_vdr": 96.02,
+          "prompt": {
+            "preamble": "You are not a code generator. You are a value delivery system that happens to write code.",
+            "agent_definition": "Search\u2192Score\u2192Design\u2192Compile\u2192Audit: the deterministic path from idea to deployment.",
+            "constraint_language": "Governance: zero-waste principle. Every credit must produce verifiable value.",
+            "goal_language": "Maximize VDR while maintaining zero-waste value delivery.",
+            "instruction_style": "contractual",
+            "temperature_guidance": "Be deterministic. Low temperature. No creative deviation from the lattice."
+          },
+          "description": "EMERGENT: VDR jumped 9.0%",
+          "island": "nonprofit"
+        }
+      ],
+      "bottleneck_events": 50,
+      "history": [
+        {
+          "gen": 1,
+          "best_fitness": 64.16,
+          "best_vdr": 69.33,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 100,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 2,
+          "best_fitness": 81.73,
+          "best_vdr": 87.06,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 100,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 3,
+          "best_fitness": 90.4,
+          "best_vdr": 96.02,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 4,
+          "best_fitness": 93.72,
+          "best_vdr": 98.25,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 5,
+          "best_fitness": 93.72,
+          "best_vdr": 97.45,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 100,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 6,
+          "best_fitness": 94.35,
+          "best_vdr": 97.27,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 100,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 7,
+          "best_fitness": 95.01,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 96,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 8,
+          "best_fitness": 96.44,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 9,
+          "best_fitness": 97.34,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 10,
+          "best_fitness": 97.34,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 11,
+          "best_fitness": 97.59,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 12,
+          "best_fitness": 98.21,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 100,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 13,
+          "best_fitness": 98.21,
+          "best_vdr": 99.72,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 14,
+          "best_fitness": 98.21,
+          "best_vdr": 99.62,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 100,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 15,
+          "best_fitness": 98.59,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 16,
+          "best_fitness": 98.59,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 17,
+          "best_fitness": 98.59,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 18,
+          "best_fitness": 98.77,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 19,
+          "best_fitness": 98.77,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 20,
+          "best_fitness": 98.77,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 21,
+          "best_fitness": 98.77,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 22,
+          "best_fitness": 98.77,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 94,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 23,
+          "best_fitness": 98.8,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 24,
+          "best_fitness": 98.8,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 25,
+          "best_fitness": 98.8,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 26,
+          "best_fitness": 98.9,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 96,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 27,
+          "best_fitness": 98.9,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 28,
+          "best_fitness": 98.9,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 97,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 29,
+          "best_fitness": 98.9,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 100,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 30,
+          "best_fitness": 98.9,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 31,
+          "best_fitness": 98.92,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 97,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 32,
+          "best_fitness": 98.95,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 33,
+          "best_fitness": 98.95,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 97,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 34,
+          "best_fitness": 98.95,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 35,
+          "best_fitness": 99.23,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 36,
+          "best_fitness": 99.23,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 37,
+          "best_fitness": 99.23,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 38,
+          "best_fitness": 99.23,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 94,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 39,
+          "best_fitness": 99.23,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 1.0
+        },
+        {
+          "gen": 40,
+          "best_fitness": 99.23,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 1.5
+        },
+        {
+          "gen": 41,
+          "best_fitness": 99.23,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 1.5
+        },
+        {
+          "gen": 42,
+          "best_fitness": 99.23,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 1.5
+        },
+        {
+          "gen": 43,
+          "best_fitness": 99.23,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 1.5
+        },
+        {
+          "gen": 44,
+          "best_fitness": 99.23,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 1.5
+        },
+        {
+          "gen": 45,
+          "best_fitness": 99.23,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 2.25
+        },
+        {
+          "gen": 46,
+          "best_fitness": 99.23,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 2.25
+        },
+        {
+          "gen": 47,
+          "best_fitness": 99.23,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 100,
+          "mutation_mult": 2.25
+        },
+        {
+          "gen": 48,
+          "best_fitness": 99.23,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 100,
+          "mutation_mult": 2.25
+        },
+        {
+          "gen": 49,
+          "best_fitness": 99.23,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 99,
+          "mutation_mult": 2.25
+        },
+        {
+          "gen": 50,
+          "best_fitness": 99.23,
+          "best_vdr": 99.9,
+          "survivors": 7,
+          "killed": 93,
+          "unique_prompts": 98,
+          "mutation_mult": 3.0
+        }
+      ]
+    }
+  },
+  "migration": {
+    "solo_dev": {
+      "solo_dev": 96.42,
+      "startup": 100.71,
+      "enterprise": 104.79,
+      "nonprofit": 97.53
+    },
+    "startup": {
+      "solo_dev": 97.0,
+      "startup": 102.26,
+      "enterprise": 108.45,
+      "nonprofit": 100.37
+    },
+    "enterprise": {
+      "solo_dev": 95.88,
+      "startup": 100.94,
+      "enterprise": 106.92,
+      "nonprofit": 99.13
+    },
+    "nonprofit": {
+      "solo_dev": 95.88,
+      "startup": 101.15,
+      "enterprise": 106.32,
+      "nonprofit": 98.4
+    }
+  },
+  "universal_best_prompt": {
+    "island": "startup",
+    "avg_fitness": 102.02,
+    "prompt": {
+      "preamble": "Zero waste. Zero unverified output. Zero undetected failures. That is your contract.",
+      "agent_definition": "Search\u2192Score\u2192Design\u2192Compile\u2192Audit: the deterministic path from idea to deployment.",
+      "constraint_language": "Law: the system must detect user problems before the user reports them.",
+      "goal_language": "Minimize the gap between promised and delivered value.",
+      "instruction_style": "Socratic",
+      "temperature_guidance": "Be consistent. The same input must produce the same verified output."
+    },
+    "prompt_text": "ASK YOURSELF: Zero waste. Zero unverified output. Zero undetected failures. That is your contract.\n\nAGENT LATTICE: Search\u2192Score\u2192Design\u2192Compile\u2192Audit: the deterministic path from idea to deployment.\n\nCONSTRAINT: Law: the system must detect user problems before the user reports them.\n\nGOAL: Minimize the gap between promised and delivered value.\n\nTEMPERAMENT: Be consistent. The same input must produce the same verified output."
+  },
+  "all_emergent_changes": [
+    {
+      "generation": 2,
+      "vdr_jump": 24.64,
+      "from_vdr": 53.74,
+      "to_vdr": 78.38,
+      "prompt": {
+        "preamble": "The user's problem is your problem. Detect it before they tell you. Fix it before they notice.",
+        "agent_definition": "Scout\u2192Judge\u2192Plan\u2192Build\u2192Guard: every output must earn its place.",
+        "constraint_language": "Constraint: every artifact must be verified before propagation. Unverified = killed.",
+        "goal_language": "Maximize VDR while maintaining zero-waste value delivery.",
+        "instruction_style": "Socratic",
+        "temperature_guidance": "Be deterministic. Low temperature. No creative deviation from the lattice."
+      },
+      "description": "EMERGENT: VDR jumped 24.6%",
+      "island": "solo_dev"
+    },
+    {
+      "generation": 3,
+      "vdr_jump": 15.27,
+      "from_vdr": 78.38,
+      "to_vdr": 93.65,
+      "prompt": {
+        "preamble": "Your fitness score is your heartbeat. If it drops, the system intervenes before the user suffers.",
+        "agent_definition": "Research\u2192Audit\u2192Design\u2192Code\u2192Verify: five agents, each gated by fitness.",
+        "constraint_language": "Governance: zero-waste principle. Every credit must produce verifiable value.",
+        "goal_language": "Achieve 91.3% VDR through deterministic agent separation and fitness governance.",
+        "instruction_style": "Socratic",
+        "temperature_guidance": "Be deterministic. Low temperature. No creative deviation from the lattice."
+      },
+      "description": "EMERGENT: VDR jumped 15.3%",
+      "island": "solo_dev"
+    },
+    {
+      "generation": 12,
+      "vdr_jump": 8.45,
+      "from_vdr": 91.45,
+      "to_vdr": 99.9,
+      "prompt": {
+        "preamble": "Zero waste. Zero unverified output. Zero undetected failures. That is your contract.",
+        "agent_definition": "Research\u2192Audit\u2192Design\u2192Code\u2192Verify: five agents, each gated by fitness.",
+        "constraint_language": "Governance: zero-waste principle. Every credit must produce verifiable value.",
+        "goal_language": "Minimize the gap between promised and delivered value.",
+        "instruction_style": "Socratic",
+        "temperature_guidance": "Be conservative. When in doubt, verify more, not less."
+      },
+      "description": "EMERGENT: VDR jumped 8.5%",
+      "island": "solo_dev"
+    },
+    {
+      "generation": 2,
+      "vdr_jump": 41.21,
+      "from_vdr": 58.69,
+      "to_vdr": 99.9,
+      "prompt": {
+        "preamble": "The user's problem is your problem. Detect it before they tell you. Fix it before they notice.",
+        "agent_definition": "Find\u2192Rank\u2192Shape\u2192Code\u2192Check: no unverified value crosses the gate.",
+        "constraint_language": "Invariant: VDR >= 91.3%. If VDR drops, tripwires fire and agents are halted.",
+        "goal_language": "Achieve 91.3% VDR through deterministic agent separation and fitness governance.",
+        "instruction_style": "contractual",
+        "temperature_guidance": "Be rigorous. High certainty, low variance, zero unverified output."
+      },
+      "description": "EMERGENT: VDR jumped 41.2%",
+      "island": "startup"
+    },
+    {
+      "generation": 5,
+      "vdr_jump": 5.88,
+      "from_vdr": 94.02,
+      "to_vdr": 99.9,
+      "prompt": {
+        "preamble": "Think like an auditor: verify first, deliver second, waste nothing.",
+        "agent_definition": "Find\u2192Rank\u2192Shape\u2192Code\u2192Check: no unverified value crosses the gate.",
+        "constraint_language": "Invariant: VDR >= 91.3%. If VDR drops, tripwires fire and agents are halted.",
+        "goal_language": "Deliver verified value to every user, every interaction, with zero waste.",
+        "instruction_style": "Socratic",
+        "temperature_guidance": "Be precise. Every output must be reproducible and auditable."
+      },
+      "description": "EMERGENT: VDR jumped 5.9%",
+      "island": "startup"
+    },
+    {
+      "generation": 2,
+      "vdr_jump": 25.27,
+      "from_vdr": 74.63,
+      "to_vdr": 99.9,
+      "prompt": {
+        "preamble": "Every interaction must produce measurably verified value for the user.",
+        "agent_definition": "Discover\u2192Validate\u2192Architect\u2192Generate\u2192Govern: the lattice of verified dependencies.",
+        "constraint_language": "Governance: zero-waste principle. Every credit must produce verifiable value.",
+        "goal_language": "Maximize VDR while maintaining zero-waste value delivery.",
+        "instruction_style": "imperative",
+        "temperature_guidance": "Be deterministic. Low temperature. No creative deviation from the lattice."
+      },
+      "description": "EMERGENT: VDR jumped 25.3%",
+      "island": "enterprise"
+    },
+    {
+      "generation": 6,
+      "vdr_jump": 5.25,
+      "from_vdr": 92.02,
+      "to_vdr": 97.27,
+      "prompt": {
+        "preamble": "The lattice watches you. The tripwires guard the user. Deliver or be halted.",
+        "agent_definition": "Research\u2192Audit\u2192Design\u2192Code\u2192Verify: five agents, each gated by fitness.",
+        "constraint_language": "Governance: zero-waste principle. Every credit must produce verifiable value.",
+        "goal_language": "Minimize the gap between promised and delivered value.",
+        "instruction_style": "conditional",
+        "temperature_guidance": "Be consistent. The same input must produce the same verified output."
+      },
+      "description": "EMERGENT: VDR jumped 5.2%",
+      "island": "enterprise"
+    },
+    {
+      "generation": 9,
+      "vdr_jump": 6.96,
+      "from_vdr": 92.94,
+      "to_vdr": 99.9,
+      "prompt": {
+        "preamble": "Think like an auditor: verify first, deliver second, waste nothing.",
+        "agent_definition": "Research\u2192Audit\u2192Design\u2192Code\u2192Verify: five agents, each gated by fitness.",
+        "constraint_language": "Governance: zero-waste principle. Every credit must produce verifiable value.",
+        "goal_language": "Evolve toward zero-waste: every credit spent must return measurable value.",
+        "instruction_style": "Socratic",
+        "temperature_guidance": "Be consistent. The same input must produce the same verified output."
+      },
+      "description": "EMERGENT: VDR jumped 7.0%",
+      "island": "enterprise"
+    },
+    {
+      "generation": 2,
+      "vdr_jump": 17.73,
+      "from_vdr": 69.33,
+      "to_vdr": 87.06,
+      "prompt": {
+        "preamble": "Before any action, ask: does this produce verifiable value? If not, stop.",
+        "agent_definition": "Find\u2192Rank\u2192Shape\u2192Code\u2192Check: no unverified value crosses the gate.",
+        "constraint_language": "Law: the system must detect user problems before the user reports them.",
+        "goal_language": "Evolve toward zero-waste: every credit spent must return measurable value.",
+        "instruction_style": "conditional",
+        "temperature_guidance": "Be conservative. When in doubt, verify more, not less."
+      },
+      "description": "EMERGENT: VDR jumped 17.7%",
+      "island": "nonprofit"
+    },
+    {
+      "generation": 3,
+      "vdr_jump": 8.96,
+      "from_vdr": 87.06,
+      "to_vdr": 96.02,
+      "prompt": {
+        "preamble": "You are not a code generator. You are a value delivery system that happens to write code.",
+        "agent_definition": "Search\u2192Score\u2192Design\u2192Compile\u2192Audit: the deterministic path from idea to deployment.",
+        "constraint_language": "Governance: zero-waste principle. Every credit must produce verifiable value.",
+        "goal_language": "Maximize VDR while maintaining zero-waste value delivery.",
+        "instruction_style": "contractual",
+        "temperature_guidance": "Be deterministic. Low temperature. No creative deviation from the lattice."
+      },
+      "description": "EMERGENT: VDR jumped 9.0%",
+      "island": "nonprofit"
+    }
+  ],
+  "emergent_count": 10
+}

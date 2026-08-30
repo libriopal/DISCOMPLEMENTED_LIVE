@@ -1,0 +1,207 @@
+import { describe, it, expect } from 'vitest';
+import { readFileSync, readdirSync } from 'node:fs';
+import { resolve, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import {
+  HERO,
+  HOW_IT_WORKS,
+  BOUNDARIES,
+  PRICING,
+  TRUST,
+  FOOTER,
+  NAV_LINKS,
+} from './copy.js';
+
+/**
+ * The four constraints DESIGN_SPEC marks as fixed regardless of visual
+ * redesign: section order, verbatim copy, the provisional-pricing badge, and
+ * the absence of any quality percentage.
+ *
+ * These assert the constraints rather than the styling, so the look can be
+ * reworked freely without anyone silently reopening a claim the audit closed.
+ */
+
+const HERE = dirname(fileURLToPath(import.meta.url));
+const MARKETING_SOURCE = readFileSync(
+  resolve(HERE, 'MarketingSite.tsx'),
+  'utf8'
+);
+
+/**
+ * Comments are stripped before the content assertions run. The constraint is
+ * that no percentage reaches a visitor, and a comment recording *why* a figure
+ * was retired is exactly the note that should survive — the first run of this
+ * suite failed on its own explanatory comment.
+ */
+const MARKETING_TSX = MARKETING_SOURCE.replace(
+  /\/\*[\s\S]*?\*\/|\/\/[^\n]*/g,
+  ''
+);
+
+describe('verbatim copy', () => {
+  it('hero matches the spec word-for-word', () => {
+    expect(HERO.eyebrow).toBe('Research + design, before a line of code');
+    expect(HERO.headline).toBe(
+      'Your dev team researches and designs before it writes any code.'
+    );
+    expect(HERO.subhead).toBe(
+      'A researcher, designer, and coder agent build a blueprint you review — then, and only then, the app gets built.'
+    );
+    expect(HERO.primaryCta).toBe('Start building');
+    expect(HERO.secondaryCta).toBe('See how it works');
+  });
+
+  it('how-it-works steps match the spec word-for-word', () => {
+    expect(HOW_IT_WORKS.subtitle).toBe(
+      'Four steps. You approve the blueprint before anything ships.'
+    );
+    expect(HOW_IT_WORKS.steps.map((s) => s.label)).toEqual([
+      '01 — Describe',
+      '02 — Research & design',
+      '03 — You review',
+      '04 — Code & deploy',
+    ]);
+    expect(HOW_IT_WORKS.steps[2]?.body).toBe(
+      'A human gate. Nothing gets built until you approve the plan.'
+    );
+  });
+
+  it('keeps the trust disclaimer that replaced the retired ceiling', () => {
+    expect(TRUST.disclaimer).toBe(
+      "We're building toward measured, real-world quality metrics — we'd rather show nothing than a number we can't stand behind."
+    );
+  });
+});
+
+describe('no quality percentage anywhere', () => {
+  // The 91.3% VDR ceiling had no derivation behind it. Nothing on the public
+  // site may state a quality figure until real staging data exists.
+  const surfaces = [
+    JSON.stringify({ HERO, HOW_IT_WORKS, BOUNDARIES, PRICING, TRUST, FOOTER }),
+    MARKETING_TSX,
+  ];
+
+  it.each(surfaces.map((s, i) => [i === 0 ? 'copy' : 'markup', s]))(
+    'the %s contains no percentage figure',
+    (_label, source) => {
+      // Percentages only; prices such as $29/mo are unaffected.
+      expect(source).not.toMatch(/\d+(\.\d+)?\s?%/);
+    }
+  );
+
+  it('never mentions VDR or a quality score on the public surface', () => {
+    for (const source of surfaces) {
+      expect(source).not.toMatch(/\bVDR\b/i);
+      expect(source).not.toMatch(/quality (score|ceiling|rating)/i);
+    }
+  });
+
+  it('91.3 appears nowhere', () => {
+    for (const source of surfaces) expect(source).not.toContain('91.3');
+  });
+});
+
+describe('Architect is never named as an agent', () => {
+  // The role is dead in model-router.ts ("legacy — now handled by researcher"),
+  // so naming it would describe a pipeline that no longer runs.
+  it('does not appear in any marketing copy or markup', () => {
+    const combined =
+      JSON.stringify({ HERO, HOW_IT_WORKS, BOUNDARIES, PRICING, TRUST }) +
+      MARKETING_TSX;
+    expect(combined).not.toMatch(/\barchitect\b/i);
+  });
+
+  it('names exactly the three live roles in the hero subhead', () => {
+    expect(HERO.subhead).toContain('researcher');
+    expect(HERO.subhead).toContain('designer');
+    expect(HERO.subhead).toContain('coder');
+  });
+});
+
+describe('pricing is presented as provisional', () => {
+  it('carries the mandatory badge', () => {
+    expect(PRICING.badge).toBe('Early access — subject to change');
+  });
+
+  it('renders the badge in the markup', () => {
+    expect(MARKETING_TSX).toContain('PRICING.badge');
+    expect(MARKETING_TSX).toContain('mkt-badge');
+  });
+
+  it('lists the three tiers at the specified prices', () => {
+    expect(PRICING.tiers.map((t) => [t.name, t.price])).toEqual([
+      ['Free', '$0'],
+      ['Pro', '$29/mo'],
+      ['Team', '$99/mo'],
+    ]);
+  });
+
+  it('highlights Pro as the featured tier', () => {
+    expect(
+      PRICING.tiers.filter((t) => t.highlighted).map((t) => t.name)
+    ).toEqual(['Pro']);
+  });
+});
+
+describe('section order', () => {
+  it('renders nav, hero, how-it-works, boundaries, pricing, trust, footer in order', () => {
+    const markers = [
+      'mkt-nav',
+      'mkt-hero',
+      'id="how-it-works"',
+      'id="boundaries"',
+      'id="pricing"',
+      'id="trust"',
+      'mkt-footer',
+    ];
+    const positions = markers.map((m) => MARKETING_TSX.indexOf(m));
+    expect(positions.every((p) => p !== -1)).toBe(true);
+    expect(positions).toEqual([...positions].sort((a, b) => a - b));
+  });
+
+  it('marks the human review gate as the highlighted step', () => {
+    expect(
+      HOW_IT_WORKS.steps.filter((s) => s.highlighted).map((s) => s.label)
+    ).toEqual(['03 — You review']);
+  });
+});
+
+describe('links', () => {
+  it('points the footer at legal pages that exist in the repo', () => {
+    const slugs = Object.keys(
+      // Read the real doc registry rather than trusting the hrefs.
+      JSON.parse(
+        JSON.stringify(
+          readFileSync(resolve(HERE, '../../content/legal-docs.ts'), 'utf8')
+            .match(/slug: '([a-z-]+)'/g)
+            ?.reduce<Record<string, true>>((acc, m) => {
+              const slug = /slug: '([a-z-]+)'/.exec(m)?.[1];
+              if (slug !== undefined) acc[slug] = true;
+              return acc;
+            }, {}) ?? {}
+        )
+      )
+    );
+    for (const link of FOOTER.links) {
+      expect(slugs, `${link.href} has no legal doc`).toContain(
+        link.href.replace('/legal/', '')
+      );
+    }
+  });
+
+  it('anchors every nav link to a section that exists', () => {
+    for (const link of NAV_LINKS) {
+      expect(MARKETING_TSX).toContain(`id="${link.href.slice(1)}"`);
+    }
+  });
+});
+
+describe('marketing module hygiene', () => {
+  it('keeps copy out of the component file', () => {
+    // Every user-visible string must come from copy.ts, so the constraint
+    // tests above cover all of it.
+    const files = readdirSync(HERE);
+    expect(files).toContain('copy.ts');
+    expect(MARKETING_TSX).toContain("from './copy.js'");
+  });
+});

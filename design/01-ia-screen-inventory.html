@@ -1,0 +1,230 @@
+<div data-name="ia-screen-inventory" style="min-width: 1440px; min-height: 2400px; background-color: #ffffff; padding: 56px 64px; box-sizing: border-box; font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; color: #000000;">
+<style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Space+Grotesk:wght@400;500&family=Fira+Code:wght@400;500&display=swap');</style>
+
+<!-- HEADER -->
+<div data-name="header" style="display: flex; flex-direction: column; gap: 16px; padding-bottom: 40px; border-bottom: 1px solid #d9d9dd;">
+<div data-name="eyebrow" style="display: flex; align-items: center; gap: 12px;">
+<div style="display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; background-color: #17171c; border-radius: 8px;">
+<img src="https://api.iconify.design/mdi/hexagon-multiple-outline.svg?color=%23ffffff" style="width: 16px; height: 16px;" />
+</div>
+<span style="font-family: 'Fira Code', monospace; font-size: 11px; letter-spacing: 0.28px; text-transform: uppercase; color: #93939f;">Bicameral · View 01 / 06 · Architecture Specification</span>
+</div>
+<div style="font-family: 'Space Grotesk', sans-serif; font-size: 60px; font-weight: 400; letter-spacing: -1.2px; line-height: 1.0; color: #000000;">Information Architecture<br/>& Screen Inventory</div>
+<div style="font-size: 18px; line-height: 1.4; color: #93939f; max-width: 820px;">A hierarchical sitemap, persona-to-task mapping, and prioritized MVP screen matrix for the Bicameral memory platform — the canonical navigation source for all downstream design and engineering work.</div>
+</div>
+
+<!-- METRICS STRIP -->
+<div data-name="metrics" style="display: flex; gap: 28px; padding: 40px 0;">
+<div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 22px; padding: 28px;">
+<div style="font-family: 'Space Grotesk', sans-serif; font-size: 40px; letter-spacing: -0.8px; color: #000000;">15</div>
+<div style="font-size: 14px; color: #93939f; padding-top: 6px;">Top-level sections</div>
+</div>
+<div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 22px; padding: 28px;">
+<div style="font-family: 'Space Grotesk', sans-serif; font-size: 40px; letter-spacing: -0.8px; color: #000000;">62</div>
+<div style="font-size: 14px; color: #93939f; padding-top: 6px;">Total screens inventoried</div>
+</div>
+<div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 22px; padding: 28px;">
+<div style="font-family: 'Space Grotesk', sans-serif; font-size: 40px; letter-spacing: -0.8px; color: #1863dc;">24</div>
+<div style="font-size: 14px; color: #93939f; padding-top: 6px;">MVP-priority screens</div>
+</div>
+<div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 22px; padding: 28px;">
+<div style="font-family: 'Space Grotesk', sans-serif; font-size: 40px; letter-spacing: -0.8px; color: #000000;">4</div>
+<div style="font-size: 14px; color: #93939f; padding-top: 6px;">Core personas</div>
+</div>
+</div>
+
+<!-- SITEMAP SECTION -->
+<div data-name="sitemap-section" style="padding-top: 24px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; letter-spacing: 0.28px; text-transform: uppercase; color: #93939f; padding-bottom: 12px;">01 — Hierarchical Sitemap</div>
+<div style="font-family: 'Space Grotesk', sans-serif; font-size: 32px; letter-spacing: -0.32px; color: #000000; padding-bottom: 8px;">Application Structure</div>
+<div style="font-size: 16px; color: #93939f; padding-bottom: 32px; max-width: 760px;">Reorganized into three intent zones — Workspace (daily work), Intelligence (the bicameral core), and System (config & handoff) — reducing top-nav cognitive load while preserving every required section.</div>
+
+<div style="display: flex; gap: 28px;">
+
+<!-- ZONE A: WORKSPACE -->
+<div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 22px; padding: 28px; background-color: #ffffff;">
+<div style="display: flex; align-items: center; gap: 10px; padding-bottom: 20px;">
+<div style="display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; background-color: #eef1fd; border-radius: 9999px;">
+<img src="https://api.iconify.design/mdi/view-dashboard-outline.svg?color=%233b4fd6" style="width: 18px; height: 18px;" />
+</div>
+<span style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; color: #000000;">Zone A · Workspace</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px;">
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f2f2f2;"><span style="font-size: 15px; color: #17171c;">Dashboard</span><span style="font-family: 'Fira Code', monospace; font-size: 10px; color: #1863dc; text-transform: uppercase;">MVP</span></div>
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f2f2f2;"><span style="font-size: 15px; color: #17171c;">Projects</span><span style="font-family: 'Fira Code', monospace; font-size: 10px; color: #1863dc; text-transform: uppercase;">MVP</span></div>
+<div style="padding: 6px 0 6px 16px; font-size: 13px; color: #93939f;">↳ Project Overview · Board · List · Detail</div>
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f2f2f2;"><span style="font-size: 15px; color: #17171c;">Prompt Workspace</span><span style="font-family: 'Fira Code', monospace; font-size: 10px; color: #1863dc; text-transform: uppercase;">MVP</span></div>
+<div style="padding: 6px 0 6px 16px; font-size: 13px; color: #93939f;">↳ Composer · Thread · Suggestions</div>
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f2f2f2;"><span style="font-size: 15px; color: #17171c;">Execution Timeline</span><span style="font-family: 'Fira Code', monospace; font-size: 10px; color: #93939f; text-transform: uppercase;">V1.1</span></div>
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0;"><span style="font-size: 15px; color: #17171c;">History</span><span style="font-family: 'Fira Code', monospace; font-size: 10px; color: #93939f; text-transform: uppercase;">V1.1</span></div>
+</div>
+</div>
+
+<!-- ZONE B: INTELLIGENCE -->
+<div style="flex: 1; border: 1px solid #d9d9dd; border-radius: 22px; padding: 28px; background-color: #ffffff;">
+<div style="display: flex; align-items: center; gap: 10px; padding-bottom: 20px;">
+<div style="display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; background-color: #f6eefc; border-radius: 9999px;">
+<img src="https://api.iconify.design/mdi/brain.svg?color=%238b3fd6" style="width: 18px; height: 18px;" />
+</div>
+<span style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; color: #000000;">Zone B · Intelligence</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px;">
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f2f2f2;"><span style="font-size: 15px; color: #17171c;">Research</span><span style="font-family: 'Fira Code', monospace; font-size: 10px; color: #1863dc; text-transform: uppercase;">MVP</span></div>
+<div style="padding: 6px 0 6px 16px; font-size: 13px; color: #93939f;">↳ Threads · Sources · Confidence</div>
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f2f2f2;"><span style="font-size: 15px; color: #17171c;">Memory Lattice</span><span style="font-family: 'Fira Code', monospace; font-size: 10px; color: #1863dc; text-transform: uppercase;">MVP</span></div>
+<div style="padding: 6px 0 6px 16px; font-size: 13px; color: #93939f;">↳ Graph View · Node Detail · Replay</div>
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f2f2f2;"><span style="font-size: 15px; color: #17171c;">Requirements</span><span style="font-family: 'Fira Code', monospace; font-size: 10px; color: #1863dc; text-transform: uppercase;">MVP</span></div>
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f2f2f2;"><span style="font-size: 15px; color: #17171c;">Architecture</span><span style="font-family: 'Fira Code', monospace; font-size: 10px; color: #1863dc; text-transform: uppercase;">MVP</span></div>
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f2f2f2;"><span style="font-size: 15px; color: #17171c;">Implementation</span><span style="font-family: 'Fira Code', monospace; font-size: 10px; color: #1863dc; text-transform: uppercase;">MVP</span></div>
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0;"><span style="font-size: 15px; color: #17171c;">Validation</span><span style="font-family: 'Fira Code', monospace; font-size: 10px; color: #93939f; text-transform: uppercase;">V1.1</span></div>
+</div>
+</div>
+
+<!-- ZONE C: SYSTEM -->
+<div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 22px; padding: 28px; background-color: #ffffff;">
+<div style="display: flex; align-items: center; gap: 10px; padding-bottom: 20px;">
+<div style="display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; background-color: #f2f2f2; border-radius: 9999px;">
+<img src="https://api.iconify.design/mdi/tune-variant.svg?color=%2317171c" style="width: 18px; height: 18px;" />
+</div>
+<span style="font-family: 'Space Grotesk', sans-serif; font-size: 18px; color: #000000;">Zone C · System</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px;">
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f2f2f2;"><span style="font-size: 15px; color: #17171c;">Artifacts</span><span style="font-family: 'Fira Code', monospace; font-size: 10px; color: #93939f; text-transform: uppercase;">V1.1</span></div>
+<div style="padding: 6px 0 6px 16px; font-size: 13px; color: #93939f;">↳ Export · Diffs · Versions</div>
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f2f2f2;"><span style="font-size: 15px; color: #17171c;">Developer Tools</span><span style="font-family: 'Fira Code', monospace; font-size: 10px; color: #93939f; text-transform: uppercase;">V1.2</span></div>
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f2f2f2;"><span style="font-size: 15px; color: #17171c;">Design System</span><span style="font-family: 'Fira Code', monospace; font-size: 10px; color: #93939f; text-transform: uppercase;">V1.2</span></div>
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f2f2f2;"><span style="font-size: 15px; color: #17171c;">Settings</span><span style="font-family: 'Fira Code', monospace; font-size: 10px; color: #1863dc; text-transform: uppercase;">MVP</span></div>
+<div style="padding: 6px 0 6px 16px; font-size: 13px; color: #93939f;">↳ Profile · Team · Permissions · Billing</div>
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0;"><span style="font-size: 15px; color: #17171c;">Auth & Admin</span><span style="font-family: 'Fira Code', monospace; font-size: 10px; color: #1863dc; text-transform: uppercase;">MVP</span></div>
+<div style="padding: 6px 0 6px 16px; font-size: 13px; color: #93939f;">↳ Sign in · SSO · Onboarding · Roles</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<!-- PERSONAS SECTION -->
+<div data-name="personas-section" style="padding-top: 56px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; letter-spacing: 0.28px; text-transform: uppercase; color: #93939f; padding-bottom: 12px;">02 — Personas & Core Tasks</div>
+<div style="font-family: 'Space Grotesk', sans-serif; font-size: 32px; letter-spacing: -0.32px; color: #000000; padding-bottom: 32px;">Who Uses Bicameral</div>
+
+<div style="display: flex; gap: 28px;">
+
+<div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 22px; padding: 28px;">
+<div style="display: flex; align-items: center; gap: 12px; padding-bottom: 16px;">
+<div style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; background-color: #17171c; border-radius: 9999px; color: #ffffff; font-family: 'Space Grotesk', sans-serif; font-size: 15px;">PM</div>
+<div><div style="font-size: 17px; color: #000000;">Priya · Product Lead</div><div style="font-size: 13px; color: #93939f;">Defines intent & approves</div></div>
+</div>
+<div style="font-size: 14px; color: #93939f; line-height: 1.5; padding-bottom: 16px;">Owns the "why". Writes prompts, reviews research confidence, and gates approvals between hemispheres.</div>
+<div style="display: flex; flex-direction: column; gap: 8px;">
+<div style="font-size: 13px; color: #17171c;">• Author prompt & requirements</div>
+<div style="font-size: 13px; color: #17171c;">• Review research confidence</div>
+<div style="font-size: 13px; color: #17171c;">• Approve → Architecture</div>
+</div>
+</div>
+
+<div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 22px; padding: 28px;">
+<div style="display: flex; align-items: center; gap: 12px; padding-bottom: 16px;">
+<div style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; background-color: #3b4fd6; border-radius: 9999px; color: #ffffff; font-family: 'Space Grotesk', sans-serif; font-size: 15px;">RS</div>
+<div><div style="font-size: 17px; color: #000000;">Rafael · Researcher</div><div style="font-size: 13px; color: #93939f;">Left hemisphere</div></div>
+</div>
+<div style="font-size: 14px; color: #93939f; line-height: 1.5; padding-bottom: 16px;">Builds semantic understanding. Curates sources, validates knowledge, and grows the lattice's memory density.</div>
+<div style="display: flex; flex-direction: column; gap: 8px;">
+<div style="font-size: 13px; color: #17171c;">• Run research threads</div>
+<div style="font-size: 13px; color: #17171c;">• Curate & score sources</div>
+<div style="font-size: 13px; color: #17171c;">• Form memory nodes</div>
+</div>
+</div>
+
+<div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 22px; padding: 28px;">
+<div style="display: flex; align-items: center; gap: 12px; padding-bottom: 16px;">
+<div style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; background-color: #8b3fd6; border-radius: 9999px; color: #ffffff; font-family: 'Space Grotesk', sans-serif; font-size: 15px;">EN</div>
+<div><div style="font-size: 17px; color: #000000;">Elena · Engineer</div><div style="font-size: 13px; color: #93939f;">Right hemisphere</div></div>
+</div>
+<div style="font-size: 14px; color: #93939f; line-height: 1.5; padding-bottom: 16px;">Turns aligned memory into architecture and code. Owns implementation plans, verification, and export.</div>
+<div style="display: flex; flex-direction: column; gap: 8px;">
+<div style="font-size: 13px; color: #17171c;">• Design architecture</div>
+<div style="font-size: 13px; color: #17171c;">• Generate & verify code</div>
+<div style="font-size: 13px; color: #17171c;">• Export artifacts</div>
+</div>
+</div>
+
+<div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 22px; padding: 28px;">
+<div style="display: flex; align-items: center; gap: 12px; padding-bottom: 16px;">
+<div style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; background-color: #0a8a5c; border-radius: 9999px; color: #ffffff; font-family: 'Space Grotesk', sans-serif; font-size: 15px;">AD</div>
+<div><div style="font-size: 17px; color: #000000;">Aria · Admin</div><div style="font-size: 13px; color: #93939f;">Governance</div></div>
+</div>
+<div style="font-size: 14px; color: #93939f; line-height: 1.5; padding-bottom: 16px;">Enterprise oversight. Manages teams, permissions, audit history, and platform-wide settings.</div>
+<div style="display: flex; flex-direction: column; gap: 8px;">
+<div style="font-size: 13px; color: #17171c;">• Manage roles & SSO</div>
+<div style="font-size: 13px; color: #17171c;">• Audit history & replay</div>
+<div style="font-size: 13px; color: #17171c;">• Configure billing</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<!-- MVP SCREEN MATRIX -->
+<div data-name="mvp-matrix" style="padding-top: 56px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; letter-spacing: 0.28px; text-transform: uppercase; color: #93939f; padding-bottom: 12px;">03 — Prioritized MVP Screen Matrix</div>
+<div style="font-family: 'Space Grotesk', sans-serif; font-size: 32px; letter-spacing: -0.32px; color: #000000; padding-bottom: 8px;">What Ships First</div>
+<div style="font-size: 16px; color: #93939f; padding-bottom: 32px; max-width: 760px;">24 MVP screens ranked by lifecycle criticality, with responsive breakpoint coverage. P0 = launch-blocking, P1 = fast-follow.</div>
+
+<div style="border: 1px solid #d9d9dd; border-radius: 22px; overflow: hidden;">
+<!-- table head -->
+<div style="display: flex; align-items: center; padding: 16px 24px; background-color: #fafafa; border-bottom: 1px solid #d9d9dd;">
+<div style="flex: 3; font-family: 'Fira Code', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28px; color: #93939f;">Screen</div>
+<div style="flex: 2; font-family: 'Fira Code', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28px; color: #93939f;">Lifecycle Stage</div>
+<div style="flex: 1; font-family: 'Fira Code', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28px; color: #93939f;">Priority</div>
+<div style="flex: 2; font-family: 'Fira Code', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.28px; color: #93939f; text-align: right;">Breakpoints</div>
+</div>
+
+<!-- rows -->
+<div style="display: flex; align-items: center; padding: 16px 24px; border-bottom: 1px solid #f2f2f2;"><div style="flex: 3; font-size: 15px; color: #17171c;">Dashboard · Command Deck</div><div style="flex: 2; font-size: 14px; color: #93939f;">Overview</div><div style="flex: 1;"><span style="font-family: 'Fira Code', monospace; font-size: 11px; background-color: #eef1fd; color: #1863dc; padding: 3px 10px; border-radius: 9999px;">P0</span></div><div style="flex: 2; font-size: 13px; color: #93939f; text-align: right;">Desktop · Tablet · Mobile</div></div>
+
+<div style="display: flex; align-items: center; padding: 16px 24px; border-bottom: 1px solid #f2f2f2;"><div style="flex: 3; font-size: 15px; color: #17171c;">Prompt Workspace · Composer</div><div style="flex: 2; font-size: 14px; color: #93939f;">Prompt</div><div style="flex: 1;"><span style="font-family: 'Fira Code', monospace; font-size: 11px; background-color: #eef1fd; color: #1863dc; padding: 3px 10px; border-radius: 9999px;">P0</span></div><div style="flex: 2; font-size: 13px; color: #93939f; text-align: right;">Desktop · Tablet</div></div>
+
+<div style="display: flex; align-items: center; padding: 16px 24px; border-bottom: 1px solid #f2f2f2;"><div style="flex: 3; font-size: 15px; color: #17171c;">Research · Threads & Confidence</div><div style="flex: 2; font-size: 14px; color: #93939f;">Research</div><div style="flex: 1;"><span style="font-family: 'Fira Code', monospace; font-size: 11px; background-color: #eef1fd; color: #1863dc; padding: 3px 10px; border-radius: 9999px;">P0</span></div><div style="flex: 2; font-size: 13px; color: #93939f; text-align: right;">Desktop · Tablet</div></div>
+
+<div style="display: flex; align-items: center; padding: 16px 24px; border-bottom: 1px solid #f2f2f2;"><div style="flex: 3; font-size: 15px; color: #17171c;">Memory Lattice · Graph View</div><div style="flex: 2; font-size: 14px; color: #93939f;">Memory Formation</div><div style="flex: 1;"><span style="font-family: 'Fira Code', monospace; font-size: 11px; background-color: #eef1fd; color: #1863dc; padding: 3px 10px; border-radius: 9999px;">P0</span></div><div style="flex: 2; font-size: 13px; color: #93939f; text-align: right;">Desktop</div></div>
+
+<div style="display: flex; align-items: center; padding: 16px 24px; border-bottom: 1px solid #f2f2f2;"><div style="flex: 3; font-size: 15px; color: #17171c;">Requirements · Spec Editor</div><div style="flex: 2; font-size: 14px; color: #93939f;">Requirements</div><div style="flex: 1;"><span style="font-family: 'Fira Code', monospace; font-size: 11px; background-color: #eef1fd; color: #1863dc; padding: 3px 10px; border-radius: 9999px;">P0</span></div><div style="flex: 2; font-size: 13px; color: #93939f; text-align: right;">Desktop · Tablet</div></div>
+
+<div style="display: flex; align-items: center; padding: 16px 24px; border-bottom: 1px solid #f2f2f2;"><div style="flex: 3; font-size: 15px; color: #17171c;">Approval Gate · Human-in-loop</div><div style="flex: 2; font-size: 14px; color: #93939f;">Approval</div><div style="flex: 1;"><span style="font-family: 'Fira Code', monospace; font-size: 11px; background-color: #eef1fd; color: #1863dc; padding: 3px 10px; border-radius: 9999px;">P0</span></div><div style="flex: 2; font-size: 13px; color: #93939f; text-align: right;">Desktop · Tablet · Mobile</div></div>
+
+<div style="display: flex; align-items: center; padding: 16px 24px; border-bottom: 1px solid #f2f2f2;"><div style="flex: 3; font-size: 15px; color: #17171c;">Architecture · System Canvas</div><div style="flex: 2; font-size: 14px; color: #93939f;">Architecture</div><div style="flex: 1;"><span style="font-family: 'Fira Code', monospace; font-size: 11px; background-color: #eef1fd; color: #1863dc; padding: 3px 10px; border-radius: 9999px;">P0</span></div><div style="flex: 2; font-size: 13px; color: #93939f; text-align: right;">Desktop</div></div>
+
+<div style="display: flex; align-items: center; padding: 16px 24px; border-bottom: 1px solid #f2f2f2;"><div style="flex: 3; font-size: 15px; color: #17171c;">Implementation · Plan & Code Gen</div><div style="flex: 2; font-size: 14px; color: #93939f;">Implementation</div><div style="flex: 1;"><span style="font-family: 'Fira Code', monospace; font-size: 11px; background-color: #eef1fd; color: #1863dc; padding: 3px 10px; border-radius: 9999px;">P0</span></div><div style="flex: 2; font-size: 13px; color: #93939f; text-align: right;">Desktop</div></div>
+
+<div style="display: flex; align-items: center; padding: 16px 24px; border-bottom: 1px solid #f2f2f2;"><div style="flex: 3; font-size: 15px; color: #17171c;">Projects · Grid & Detail</div><div style="flex: 2; font-size: 14px; color: #93939f;">Overview</div><div style="flex: 1;"><span style="font-family: 'Fira Code', monospace; font-size: 11px; background-color: #fdf3e3; color: #b36a00; padding: 3px 10px; border-radius: 9999px;">P1</span></div><div style="flex: 2; font-size: 13px; color: #93939f; text-align: right;">Desktop · Tablet · Mobile</div></div>
+
+<div style="display: flex; align-items: center; padding: 16px 24px; border-bottom: 1px solid #f2f2f2;"><div style="flex: 3; font-size: 15px; color: #17171c;">Validation · Verification Report</div><div style="flex: 2; font-size: 14px; color: #93939f;">Verification</div><div style="flex: 1;"><span style="font-family: 'Fira Code', monospace; font-size: 11px; background-color: #fdf3e3; color: #b36a00; padding: 3px 10px; border-radius: 9999px;">P1</span></div><div style="flex: 2; font-size: 13px; color: #93939f; text-align: right;">Desktop · Tablet</div></div>
+
+<div style="display: flex; align-items: center; padding: 16px 24px; border-bottom: 1px solid #f2f2f2;"><div style="flex: 3; font-size: 15px; color: #17171c;">Artifacts · Export & Versions</div><div style="flex: 2; font-size: 14px; color: #93939f;">Export</div><div style="flex: 1;"><span style="font-family: 'Fira Code', monospace; font-size: 11px; background-color: #fdf3e3; color: #b36a00; padding: 3px 10px; border-radius: 9999px;">P1</span></div><div style="flex: 2; font-size: 13px; color: #93939f; text-align: right;">Desktop · Tablet</div></div>
+
+<div style="display: flex; align-items: center; padding: 16px 24px;"><div style="flex: 3; font-size: 15px; color: #17171c;">Settings · Profile / Team / Roles</div><div style="flex: 2; font-size: 14px; color: #93939f;">System</div><div style="flex: 1;"><span style="font-family: 'Fira Code', monospace; font-size: 11px; background-color: #fdf3e3; color: #b36a00; padding: 3px 10px; border-radius: 9999px;">P1</span></div><div style="flex: 2; font-size: 13px; color: #93939f; text-align: right;">Desktop · Tablet · Mobile</div></div>
+</div>
+</div>
+
+<!-- REORG NOTES -->
+<div data-name="reorg-notes" style="padding-top: 56px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; letter-spacing: 0.28px; text-transform: uppercase; color: #93939f; padding-bottom: 12px;">04 — Architect Recommendations</div>
+<div style="font-family: 'Space Grotesk', sans-serif; font-size: 32px; letter-spacing: -0.32px; color: #000000; padding-bottom: 32px;">Reorganizations for Scale</div>
+<div style="display: flex; gap: 28px;">
+<div style="flex: 1; border-left: 2px solid #1863dc; border-radius: 0 8px 8px 0; padding: 4px 0 4px 24px;">
+<div style="font-size: 17px; color: #000000; padding-bottom: 8px;">Collapse 15 → 3 nav zones</div>
+<div style="font-size: 14px; color: #93939f; line-height: 1.5;">Grouping by intent (Workspace / Intelligence / System) keeps the top nav to ~5 items and matches the lifecycle mental model.</div>
+</div>
+<div style="flex: 1; border-left: 2px solid #3b4fd6; border-radius: 0 8px 8px 0; padding: 4px 0 4px 24px;">
+<div style="font-size: 17px; color: #000000; padding-bottom: 8px;">Lattice as persistent rail</div>
+<div style="font-size: 14px; color: #93939f; line-height: 1.5;">The Memory Lattice appears as a collapsible right rail on every Intelligence screen — always showing alignment context, not just its own page.</div>
+</div>
+<div style="flex: 1; border-left: 2px solid #8b3fd6; border-radius: 0 8px 8px 0; padding: 4px 0 4px 24px;">
+<div style="font-size: 17px; color: #000000; padding-bottom: 8px;">Approval as a modal layer</div>
+<div style="font-size: 14px; color: #93939f; line-height: 1.5;">Human-in-loop gates are a cross-cutting overlay reachable from any stage — reducing screen count while surfacing pending approvals everywhere.</div>
+</div>
+</div>
+</div>
+
+</div>

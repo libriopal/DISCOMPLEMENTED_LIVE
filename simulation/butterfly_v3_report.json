@@ -1,0 +1,1983 @@
+{
+  "timestamp": "2026-08-19T15:54:02.020995+00:00",
+  "run_type": "butterfly_v3_architectural_dna_island_model",
+  "genome_size": 85,
+  "genome_categories": {
+    "tripwires": 9,
+    "vdr_knobs": 6,
+    "credit": 4,
+    "agent": 3,
+    "ui": 2,
+    "topology": 6,
+    "models": 5,
+    "uiux": 8,
+    "discovery": 4,
+    "safety": 4,
+    "collab": 8,
+    "enterprise": 6,
+    "chat": 5,
+    "team": 5,
+    "proactive": 6,
+    "billing": 4
+  },
+  "research_basis": "You.com Answer API with citations \u2014 see RESEARCH_SOURCE_OF_TRUTH.md",
+  "parameters": {
+    "pop_per_island": 50,
+    "generations": 30,
+    "crossover": 0.85,
+    "base_mutation": 0.02,
+    "adaptive_mutation_max": 0.1,
+    "stagnation_limit": 10,
+    "elite_pct": 10,
+    "diversity_pct": 20
+  },
+  "islands": {
+    "solo_dev": {
+      "best_fitness": 44.67,
+      "best_vdr": 82.33,
+      "best_collab": 0.191,
+      "best_enterprise": 0.05,
+      "best_team": 0.139,
+      "best_proactive": 0.787,
+      "total_rejected": 267,
+      "history": [
+        {
+          "gen": 1,
+          "best": 23.39,
+          "avg": 19.2,
+          "best_vdr": 42.37,
+          "rejected": 6,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 2,
+          "best": 37.25,
+          "avg": 22.2,
+          "best_vdr": 70.09,
+          "rejected": 3,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 3,
+          "best": 39.29,
+          "avg": 29.9,
+          "best_vdr": 74.01,
+          "rejected": 14,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 4,
+          "best": 40.93,
+          "avg": 38.3,
+          "best_vdr": 77.98,
+          "rejected": 13,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 5,
+          "best": 41.33,
+          "avg": 38.9,
+          "best_vdr": 78.22,
+          "rejected": 7,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 6,
+          "best": 42.33,
+          "avg": 39.1,
+          "best_vdr": 80.19,
+          "rejected": 7,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 7,
+          "best": 42.53,
+          "avg": 40.6,
+          "best_vdr": 79.62,
+          "rejected": 10,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 8,
+          "best": 42.69,
+          "avg": 40.3,
+          "best_vdr": 79.82,
+          "rejected": 9,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 9,
+          "best": 42.68,
+          "avg": 40.8,
+          "best_vdr": 78.0,
+          "rejected": 9,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 10,
+          "best": 43.84,
+          "avg": 41.7,
+          "best_vdr": 80.48,
+          "rejected": 10,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 11,
+          "best": 43.84,
+          "avg": 41.4,
+          "best_vdr": 80.47,
+          "rejected": 9,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 12,
+          "best": 43.46,
+          "avg": 41.8,
+          "best_vdr": 79.65,
+          "rejected": 10,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 13,
+          "best": 43.89,
+          "avg": 41.0,
+          "best_vdr": 80.61,
+          "rejected": 9,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 14,
+          "best": 43.87,
+          "avg": 41.6,
+          "best_vdr": 80.55,
+          "rejected": 7,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 15,
+          "best": 43.8,
+          "avg": 41.9,
+          "best_vdr": 80.41,
+          "rejected": 8,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 16,
+          "best": 43.65,
+          "avg": 41.8,
+          "best_vdr": 80.07,
+          "rejected": 9,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 17,
+          "best": 43.42,
+          "avg": 41.5,
+          "best_vdr": 79.57,
+          "rejected": 11,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 18,
+          "best": 43.78,
+          "avg": 41.0,
+          "best_vdr": 80.35,
+          "rejected": 10,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 19,
+          "best": 43.78,
+          "avg": 42.5,
+          "best_vdr": 80.36,
+          "rejected": 10,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 20,
+          "best": 43.7,
+          "avg": 42.0,
+          "best_vdr": 80.18,
+          "rejected": 9,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 21,
+          "best": 43.75,
+          "avg": 41.5,
+          "best_vdr": 80.29,
+          "rejected": 8,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 22,
+          "best": 43.5,
+          "avg": 41.2,
+          "best_vdr": 79.74,
+          "rejected": 10,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 23,
+          "best": 43.84,
+          "avg": 40.7,
+          "best_vdr": 80.49,
+          "rejected": 7,
+          "mutation_rate": 0.04
+        },
+        {
+          "gen": 24,
+          "best": 43.59,
+          "avg": 40.8,
+          "best_vdr": 79.93,
+          "rejected": 8,
+          "mutation_rate": 0.04
+        },
+        {
+          "gen": 25,
+          "best": 44.67,
+          "avg": 41.8,
+          "best_vdr": 82.33,
+          "rejected": 7,
+          "mutation_rate": 0.04
+        },
+        {
+          "gen": 26,
+          "best": 44.24,
+          "avg": 42.1,
+          "best_vdr": 81.39,
+          "rejected": 10,
+          "mutation_rate": 0.04
+        },
+        {
+          "gen": 27,
+          "best": 43.9,
+          "avg": 42.6,
+          "best_vdr": 80.63,
+          "rejected": 11,
+          "mutation_rate": 0.04
+        },
+        {
+          "gen": 28,
+          "best": 44.06,
+          "avg": 41.6,
+          "best_vdr": 80.99,
+          "rejected": 9,
+          "mutation_rate": 0.04
+        },
+        {
+          "gen": 29,
+          "best": 43.91,
+          "avg": 41.2,
+          "best_vdr": 80.64,
+          "rejected": 9,
+          "mutation_rate": 0.04
+        },
+        {
+          "gen": 30,
+          "best": 44.0,
+          "avg": 41.6,
+          "best_vdr": 80.81,
+          "rejected": 8,
+          "mutation_rate": 0.04
+        }
+      ]
+    },
+    "startup": {
+      "best_fitness": 39.26,
+      "best_vdr": 86.9,
+      "best_collab": 0.698,
+      "best_enterprise": 0.165,
+      "best_team": 0.68,
+      "best_proactive": 0.562,
+      "total_rejected": 263,
+      "history": [
+        {
+          "gen": 1,
+          "best": 18.09,
+          "avg": 14.8,
+          "best_vdr": 38.85,
+          "rejected": 4,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 2,
+          "best": 18.91,
+          "avg": 16.6,
+          "best_vdr": 42.65,
+          "rejected": 10,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 3,
+          "best": 23.91,
+          "avg": 18.1,
+          "best_vdr": 48.24,
+          "rejected": 8,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 4,
+          "best": 24.25,
+          "avg": 20.1,
+          "best_vdr": 49.21,
+          "rejected": 10,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 5,
+          "best": 27.24,
+          "avg": 23.9,
+          "best_vdr": 58.29,
+          "rejected": 7,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 6,
+          "best": 28.63,
+          "avg": 25.9,
+          "best_vdr": 59.94,
+          "rejected": 7,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 7,
+          "best": 29.75,
+          "avg": 27.2,
+          "best_vdr": 62.67,
+          "rejected": 12,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 8,
+          "best": 30.18,
+          "avg": 27.9,
+          "best_vdr": 64.93,
+          "rejected": 8,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 9,
+          "best": 29.22,
+          "avg": 28.0,
+          "best_vdr": 62.03,
+          "rejected": 9,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 10,
+          "best": 29.32,
+          "avg": 27.8,
+          "best_vdr": 62.26,
+          "rejected": 8,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 11,
+          "best": 29.59,
+          "avg": 28.3,
+          "best_vdr": 63.03,
+          "rejected": 9,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 12,
+          "best": 30.46,
+          "avg": 27.8,
+          "best_vdr": 64.51,
+          "rejected": 5,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 13,
+          "best": 31.01,
+          "avg": 28.7,
+          "best_vdr": 66.09,
+          "rejected": 11,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 14,
+          "best": 30.44,
+          "avg": 28.7,
+          "best_vdr": 64.29,
+          "rejected": 9,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 15,
+          "best": 30.85,
+          "avg": 28.6,
+          "best_vdr": 63.9,
+          "rejected": 7,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 16,
+          "best": 32.98,
+          "avg": 29.5,
+          "best_vdr": 70.64,
+          "rejected": 11,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 17,
+          "best": 33.35,
+          "avg": 30.6,
+          "best_vdr": 71.68,
+          "rejected": 7,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 18,
+          "best": 34.36,
+          "avg": 31.5,
+          "best_vdr": 78.95,
+          "rejected": 6,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 19,
+          "best": 36.03,
+          "avg": 31.7,
+          "best_vdr": 82.4,
+          "rejected": 9,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 20,
+          "best": 37.55,
+          "avg": 34.1,
+          "best_vdr": 82.93,
+          "rejected": 18,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 21,
+          "best": 37.77,
+          "avg": 35.3,
+          "best_vdr": 83.44,
+          "rejected": 11,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 22,
+          "best": 38.85,
+          "avg": 36.7,
+          "best_vdr": 86.2,
+          "rejected": 9,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 23,
+          "best": 38.83,
+          "avg": 36.7,
+          "best_vdr": 85.47,
+          "rejected": 7,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 24,
+          "best": 39.06,
+          "avg": 37.6,
+          "best_vdr": 86.95,
+          "rejected": 8,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 25,
+          "best": 39.03,
+          "avg": 37.6,
+          "best_vdr": 86.38,
+          "rejected": 9,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 26,
+          "best": 38.86,
+          "avg": 37.3,
+          "best_vdr": 85.92,
+          "rejected": 9,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 27,
+          "best": 39.21,
+          "avg": 37.7,
+          "best_vdr": 86.73,
+          "rejected": 9,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 28,
+          "best": 38.96,
+          "avg": 37.9,
+          "best_vdr": 85.55,
+          "rejected": 10,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 29,
+          "best": 38.97,
+          "avg": 36.7,
+          "best_vdr": 86.05,
+          "rejected": 7,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 30,
+          "best": 39.26,
+          "avg": 37.5,
+          "best_vdr": 86.9,
+          "rejected": 9,
+          "mutation_rate": 0.02
+        }
+      ]
+    },
+    "enterprise": {
+      "best_fitness": 33.83,
+      "best_vdr": 84.38,
+      "best_collab": 0.574,
+      "best_enterprise": 1.0,
+      "best_team": 0.9,
+      "best_proactive": 0.9,
+      "total_rejected": 289,
+      "history": [
+        {
+          "gen": 1,
+          "best": 14.01,
+          "avg": 11.8,
+          "best_vdr": 38.27,
+          "rejected": 2,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 2,
+          "best": 15.03,
+          "avg": 12.9,
+          "best_vdr": 39.2,
+          "rejected": 12,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 3,
+          "best": 18.96,
+          "avg": 14.4,
+          "best_vdr": 41.41,
+          "rejected": 9,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 4,
+          "best": 21.65,
+          "avg": 16.2,
+          "best_vdr": 47.02,
+          "rejected": 13,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 5,
+          "best": 27.44,
+          "avg": 18.7,
+          "best_vdr": 67.95,
+          "rejected": 7,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 6,
+          "best": 29.53,
+          "avg": 23.6,
+          "best_vdr": 74.76,
+          "rejected": 17,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 7,
+          "best": 29.84,
+          "avg": 27.6,
+          "best_vdr": 76.02,
+          "rejected": 15,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 8,
+          "best": 30.72,
+          "avg": 28.1,
+          "best_vdr": 77.98,
+          "rejected": 20,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 9,
+          "best": 30.93,
+          "avg": 29.1,
+          "best_vdr": 78.78,
+          "rejected": 13,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 10,
+          "best": 31.11,
+          "avg": 29.4,
+          "best_vdr": 78.05,
+          "rejected": 10,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 11,
+          "best": 31.12,
+          "avg": 30.1,
+          "best_vdr": 76.86,
+          "rejected": 9,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 12,
+          "best": 31.65,
+          "avg": 30.4,
+          "best_vdr": 79.08,
+          "rejected": 9,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 13,
+          "best": 31.5,
+          "avg": 30.2,
+          "best_vdr": 78.53,
+          "rejected": 8,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 14,
+          "best": 31.42,
+          "avg": 30.5,
+          "best_vdr": 78.21,
+          "rejected": 9,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 15,
+          "best": 32.03,
+          "avg": 30.9,
+          "best_vdr": 80.63,
+          "rejected": 9,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 16,
+          "best": 32.17,
+          "avg": 30.1,
+          "best_vdr": 80.06,
+          "rejected": 8,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 17,
+          "best": 32.2,
+          "avg": 30.8,
+          "best_vdr": 80.68,
+          "rejected": 8,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 18,
+          "best": 32.48,
+          "avg": 31.0,
+          "best_vdr": 81.8,
+          "rejected": 9,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 19,
+          "best": 33.0,
+          "avg": 31.5,
+          "best_vdr": 83.58,
+          "rejected": 10,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 20,
+          "best": 33.24,
+          "avg": 31.1,
+          "best_vdr": 84.81,
+          "rejected": 7,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 21,
+          "best": 32.93,
+          "avg": 32.1,
+          "best_vdr": 83.07,
+          "rejected": 11,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 22,
+          "best": 33.14,
+          "avg": 31.4,
+          "best_vdr": 83.93,
+          "rejected": 7,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 23,
+          "best": 33.26,
+          "avg": 31.4,
+          "best_vdr": 82.89,
+          "rejected": 8,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 24,
+          "best": 33.3,
+          "avg": 31.6,
+          "best_vdr": 83.08,
+          "rejected": 9,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 25,
+          "best": 33.19,
+          "avg": 31.0,
+          "best_vdr": 82.63,
+          "rejected": 6,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 26,
+          "best": 33.33,
+          "avg": 31.5,
+          "best_vdr": 83.7,
+          "rejected": 8,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 27,
+          "best": 33.38,
+          "avg": 32.5,
+          "best_vdr": 83.6,
+          "rejected": 10,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 28,
+          "best": 33.49,
+          "avg": 32.0,
+          "best_vdr": 83.02,
+          "rejected": 8,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 29,
+          "best": 33.64,
+          "avg": 32.1,
+          "best_vdr": 83.62,
+          "rejected": 9,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 30,
+          "best": 33.83,
+          "avg": 32.6,
+          "best_vdr": 84.38,
+          "rejected": 9,
+          "mutation_rate": 0.02
+        }
+      ]
+    },
+    "nonprofit": {
+      "best_fitness": 38.9,
+      "best_vdr": 86.47,
+      "best_collab": 0.555,
+      "best_enterprise": 0.11,
+      "best_team": 0.833,
+      "best_proactive": 0.511,
+      "total_rejected": 260,
+      "history": [
+        {
+          "gen": 1,
+          "best": 17.22,
+          "avg": 15.4,
+          "best_vdr": 35.19,
+          "rejected": 2,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 2,
+          "best": 17.76,
+          "avg": 15.6,
+          "best_vdr": 35.91,
+          "rejected": 11,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 3,
+          "best": 21.53,
+          "avg": 16.3,
+          "best_vdr": 39.2,
+          "rejected": 8,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 4,
+          "best": 27.02,
+          "avg": 18.8,
+          "best_vdr": 55.68,
+          "rejected": 10,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 5,
+          "best": 32.96,
+          "avg": 24.0,
+          "best_vdr": 72.43,
+          "rejected": 16,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 6,
+          "best": 35.59,
+          "avg": 29.4,
+          "best_vdr": 80.71,
+          "rejected": 14,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 7,
+          "best": 35.92,
+          "avg": 32.7,
+          "best_vdr": 80.24,
+          "rejected": 8,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 8,
+          "best": 36.71,
+          "avg": 35.0,
+          "best_vdr": 82.62,
+          "rejected": 9,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 9,
+          "best": 37.42,
+          "avg": 35.7,
+          "best_vdr": 84.07,
+          "rejected": 9,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 10,
+          "best": 36.85,
+          "avg": 35.4,
+          "best_vdr": 82.42,
+          "rejected": 9,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 11,
+          "best": 37.07,
+          "avg": 34.7,
+          "best_vdr": 83.62,
+          "rejected": 8,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 12,
+          "best": 37.12,
+          "avg": 35.1,
+          "best_vdr": 83.2,
+          "rejected": 8,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 13,
+          "best": 36.9,
+          "avg": 34.5,
+          "best_vdr": 81.9,
+          "rejected": 6,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 14,
+          "best": 37.0,
+          "avg": 35.9,
+          "best_vdr": 81.69,
+          "rejected": 9,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 15,
+          "best": 37.68,
+          "avg": 35.9,
+          "best_vdr": 84.19,
+          "rejected": 9,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 16,
+          "best": 37.92,
+          "avg": 35.4,
+          "best_vdr": 86.13,
+          "rejected": 8,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 17,
+          "best": 37.54,
+          "avg": 35.2,
+          "best_vdr": 84.64,
+          "rejected": 7,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 18,
+          "best": 37.93,
+          "avg": 36.4,
+          "best_vdr": 83.6,
+          "rejected": 8,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 19,
+          "best": 38.3,
+          "avg": 36.6,
+          "best_vdr": 84.75,
+          "rejected": 10,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 20,
+          "best": 38.9,
+          "avg": 35.5,
+          "best_vdr": 86.47,
+          "rejected": 7,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 21,
+          "best": 38.57,
+          "avg": 37.6,
+          "best_vdr": 85.52,
+          "rejected": 10,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 22,
+          "best": 38.26,
+          "avg": 36.5,
+          "best_vdr": 84.64,
+          "rejected": 7,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 23,
+          "best": 38.61,
+          "avg": 37.1,
+          "best_vdr": 85.64,
+          "rejected": 10,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 24,
+          "best": 38.64,
+          "avg": 37.5,
+          "best_vdr": 85.61,
+          "rejected": 11,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 25,
+          "best": 38.5,
+          "avg": 36.9,
+          "best_vdr": 85.22,
+          "rejected": 8,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 26,
+          "best": 38.58,
+          "avg": 37.3,
+          "best_vdr": 85.62,
+          "rejected": 9,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 27,
+          "best": 38.64,
+          "avg": 37.0,
+          "best_vdr": 85.89,
+          "rejected": 9,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 28,
+          "best": 38.5,
+          "avg": 36.3,
+          "best_vdr": 85.32,
+          "rejected": 7,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 29,
+          "best": 38.41,
+          "avg": 36.4,
+          "best_vdr": 84.79,
+          "rejected": 6,
+          "mutation_rate": 0.02
+        },
+        {
+          "gen": 30,
+          "best": 38.73,
+          "avg": 36.7,
+          "best_vdr": 85.91,
+          "rejected": 7,
+          "mutation_rate": 0.04
+        }
+      ]
+    }
+  },
+  "migration": {
+    "solo_dev": {
+      "genome": {
+        "tw_01_empty_generation": 1,
+        "tw_02_infinite_loop": 2,
+        "tw_03_credit_burn": 20,
+        "tw_04_approval_bypass": 1,
+        "tw_05_silent_failure": 5,
+        "tw_06_token_overflow": 66888,
+        "tw_07_duplicate_gen": 6,
+        "tw_08_timeout": 154,
+        "tw_09_unauthorized": 1,
+        "early_exit_threshold": 12,
+        "tripwire_sensitivity": 4,
+        "deployment_gate_score": 0.382,
+        "approval_timeout_hours": 81,
+        "research_depth": 3,
+        "retry_limit": 5,
+        "per_user_budget": 157,
+        "per_bot_budget": 58,
+        "conversation_turn_limit": 27,
+        "burn_rate_per_min": 14,
+        "agent_timeout_seconds": 48,
+        "agent_parallel": 1,
+        "agent_research_sources": 1,
+        "responsive_breakpoint_px": 876,
+        "content_density": 0.488,
+        "pipeline_mode": 1,
+        "discovery_impl_overlap": 0.994,
+        "agent_count": 6,
+        "agent_specialization": 1,
+        "feedback_loop_depth": 5,
+        "governance_gate_count": 3,
+        "primary_model": 1,
+        "research_model": 0,
+        "coding_model": 1,
+        "audit_model": 2,
+        "model_temperature": 0.461,
+        "ui_interaction_mode": 2,
+        "input_bandwidth": 3,
+        "response_format": 3,
+        "approval_flow": 1,
+        "feedback_mechanism": 3,
+        "error_recovery": 2,
+        "onboarding_depth": 3,
+        "accessibility_level": 3,
+        "context_window_utilization": 0.482,
+        "rerank_depth": 72,
+        "embedding_dimensions": 2,
+        "lattice_search_radius": 4,
+        "max_credit_burn_per_session": 100,
+        "min_usability_score": 0.5,
+        "max_response_time_ms": 2000,
+        "min_accessibility_score": 0.7,
+        "coworking_enabled": 1,
+        "crdt_type": 2,
+        "presence_indicators": 1,
+        "file_sync_mode": 2,
+        "voice_video_enabled": 1,
+        "shared_cursor": 1,
+        "team_session_max": 33,
+        "collab_persistence": 0,
+        "sso_provider": 3,
+        "rbac_enabled": 0,
+        "audit_log_retention_days": 231,
+        "rate_limit_strategy": 1,
+        "api_versioning": 3,
+        "multi_tenant_isolation": 0,
+        "chat_enabled": 0,
+        "chat_transport": 0,
+        "message_persistence": 3,
+        "typing_indicators": 0,
+        "push_notifications": 1,
+        "team_hierarchy": 0,
+        "role_set": 1,
+        "project_templates": 3,
+        "team_billing_model": 1,
+        "team_permissions": 3,
+        "health_score_enabled": 1,
+        "churn_prediction_model": 3,
+        "usage_anomaly_detection": 3,
+        "sentiment_analysis_source": 2,
+        "early_warning_threshold": 0.856,
+        "auto_intervention": 2,
+        "billing_model": 3,
+        "nonprofit_discount": 18,
+        "credit_refund_policy": 0,
+        "value_guarantee": 1
+      },
+      "cross_island_scores": {
+        "solo_dev": 43.4,
+        "startup": 35.4,
+        "enterprise": 29.28,
+        "nonprofit": 35.34
+      }
+    },
+    "startup": {
+      "genome": {
+        "tw_01_empty_generation": 2,
+        "tw_02_infinite_loop": 3,
+        "tw_03_credit_burn": 25,
+        "tw_04_approval_bypass": 1,
+        "tw_05_silent_failure": 4,
+        "tw_06_token_overflow": 72137,
+        "tw_07_duplicate_gen": 4,
+        "tw_08_timeout": 180,
+        "tw_09_unauthorized": 3,
+        "early_exit_threshold": 10,
+        "tripwire_sensitivity": 4,
+        "deployment_gate_score": 0.303,
+        "approval_timeout_hours": 68,
+        "research_depth": 2,
+        "retry_limit": 3,
+        "per_user_budget": 180,
+        "per_bot_budget": 99,
+        "conversation_turn_limit": 48,
+        "burn_rate_per_min": 24,
+        "agent_timeout_seconds": 41,
+        "agent_parallel": 0,
+        "agent_research_sources": 1,
+        "responsive_breakpoint_px": 768,
+        "content_density": 0.7,
+        "pipeline_mode": 1,
+        "discovery_impl_overlap": 0.381,
+        "agent_count": 6,
+        "agent_specialization": 1,
+        "feedback_loop_depth": 3,
+        "governance_gate_count": 3,
+        "primary_model": 3,
+        "research_model": 1,
+        "coding_model": 2,
+        "audit_model": 1,
+        "model_temperature": 0.237,
+        "ui_interaction_mode": 1,
+        "input_bandwidth": 2,
+        "response_format": 0,
+        "approval_flow": 0,
+        "feedback_mechanism": 3,
+        "error_recovery": 1,
+        "onboarding_depth": 2,
+        "accessibility_level": 2,
+        "context_window_utilization": 0.484,
+        "rerank_depth": 90,
+        "embedding_dimensions": 1,
+        "lattice_search_radius": 4,
+        "max_credit_burn_per_session": 100,
+        "min_usability_score": 0.5,
+        "max_response_time_ms": 2000,
+        "min_accessibility_score": 0.7,
+        "coworking_enabled": 1,
+        "crdt_type": 1,
+        "presence_indicators": 0,
+        "file_sync_mode": 1,
+        "voice_video_enabled": 0,
+        "shared_cursor": 0,
+        "team_session_max": 48,
+        "collab_persistence": 2,
+        "sso_provider": 1,
+        "rbac_enabled": 1,
+        "audit_log_retention_days": 43,
+        "rate_limit_strategy": 1,
+        "api_versioning": 1,
+        "multi_tenant_isolation": 0,
+        "chat_enabled": 1,
+        "chat_transport": 2,
+        "message_persistence": 1,
+        "typing_indicators": 1,
+        "push_notifications": 1,
+        "team_hierarchy": 1,
+        "role_set": 2,
+        "project_templates": 0,
+        "team_billing_model": 4,
+        "team_permissions": 2,
+        "health_score_enabled": 1,
+        "churn_prediction_model": 1,
+        "usage_anomaly_detection": 3,
+        "sentiment_analysis_source": 3,
+        "early_warning_threshold": 0.466,
+        "auto_intervention": 0,
+        "billing_model": 3,
+        "nonprofit_discount": 70,
+        "credit_refund_policy": 1,
+        "value_guarantee": 0
+      },
+      "cross_island_scores": {
+        "solo_dev": 44.23,
+        "startup": 38.57,
+        "enterprise": 31.27,
+        "nonprofit": 37.24
+      }
+    },
+    "enterprise": {
+      "genome": {
+        "tw_01_empty_generation": 3,
+        "tw_02_infinite_loop": 3,
+        "tw_03_credit_burn": 32,
+        "tw_04_approval_bypass": 1,
+        "tw_05_silent_failure": 4,
+        "tw_06_token_overflow": 106931,
+        "tw_07_duplicate_gen": 3,
+        "tw_08_timeout": 62,
+        "tw_09_unauthorized": 2,
+        "early_exit_threshold": 11,
+        "tripwire_sensitivity": 4,
+        "deployment_gate_score": 0.337,
+        "approval_timeout_hours": 121,
+        "research_depth": 2,
+        "retry_limit": 5,
+        "per_user_budget": 294,
+        "per_bot_budget": 86,
+        "conversation_turn_limit": 59,
+        "burn_rate_per_min": 19,
+        "agent_timeout_seconds": 109,
+        "agent_parallel": 1,
+        "agent_research_sources": 1,
+        "responsive_breakpoint_px": 768,
+        "content_density": 0.537,
+        "pipeline_mode": 1,
+        "discovery_impl_overlap": 0.482,
+        "agent_count": 3,
+        "agent_specialization": 2,
+        "feedback_loop_depth": 3,
+        "governance_gate_count": 7,
+        "primary_model": 1,
+        "research_model": 0,
+        "coding_model": 2,
+        "audit_model": 1,
+        "model_temperature": 0.017,
+        "ui_interaction_mode": 3,
+        "input_bandwidth": 1,
+        "response_format": 0,
+        "approval_flow": 1,
+        "feedback_mechanism": 1,
+        "error_recovery": 0,
+        "onboarding_depth": 2,
+        "accessibility_level": 3,
+        "context_window_utilization": 0.592,
+        "rerank_depth": 68,
+        "embedding_dimensions": 3,
+        "lattice_search_radius": 2,
+        "max_credit_burn_per_session": 100,
+        "min_usability_score": 0.5,
+        "max_response_time_ms": 2000,
+        "min_accessibility_score": 0.7,
+        "coworking_enabled": 1,
+        "crdt_type": 2,
+        "presence_indicators": 1,
+        "file_sync_mode": 1,
+        "voice_video_enabled": 0,
+        "shared_cursor": 1,
+        "team_session_max": 35,
+        "collab_persistence": 1,
+        "sso_provider": 1,
+        "rbac_enabled": 1,
+        "audit_log_retention_days": 155,
+        "rate_limit_strategy": 3,
+        "api_versioning": 1,
+        "multi_tenant_isolation": 2,
+        "chat_enabled": 1,
+        "chat_transport": 0,
+        "message_persistence": 0,
+        "typing_indicators": 0,
+        "push_notifications": 0,
+        "team_hierarchy": 1,
+        "role_set": 1,
+        "project_templates": 10,
+        "team_billing_model": 1,
+        "team_permissions": 2,
+        "health_score_enabled": 1,
+        "churn_prediction_model": 3,
+        "usage_anomaly_detection": 2,
+        "sentiment_analysis_source": 3,
+        "early_warning_threshold": 0.56,
+        "auto_intervention": 3,
+        "billing_model": 0,
+        "nonprofit_discount": 1,
+        "credit_refund_policy": 1,
+        "value_guarantee": 0
+      },
+      "cross_island_scores": {
+        "solo_dev": 45.11,
+        "startup": 37.74,
+        "enterprise": 32.97,
+        "nonprofit": 37.76
+      }
+    },
+    "nonprofit": {
+      "genome": {
+        "tw_01_empty_generation": 2,
+        "tw_02_infinite_loop": 3,
+        "tw_03_credit_burn": 20,
+        "tw_04_approval_bypass": 1,
+        "tw_05_silent_failure": 3,
+        "tw_06_token_overflow": 109361,
+        "tw_07_duplicate_gen": 6,
+        "tw_08_timeout": 60,
+        "tw_09_unauthorized": 1,
+        "early_exit_threshold": 15,
+        "tripwire_sensitivity": 3,
+        "deployment_gate_score": 0.313,
+        "approval_timeout_hours": 72,
+        "research_depth": 5,
+        "retry_limit": 5,
+        "per_user_budget": 387,
+        "per_bot_budget": 40,
+        "conversation_turn_limit": 54,
+        "burn_rate_per_min": 10,
+        "agent_timeout_seconds": 189,
+        "agent_parallel": 1,
+        "agent_research_sources": 3,
+        "responsive_breakpoint_px": 768,
+        "content_density": 0.304,
+        "pipeline_mode": 1,
+        "discovery_impl_overlap": 0.66,
+        "agent_count": 4,
+        "agent_specialization": 2,
+        "feedback_loop_depth": 5,
+        "governance_gate_count": 7,
+        "primary_model": 0,
+        "research_model": 2,
+        "coding_model": 1,
+        "audit_model": 0,
+        "model_temperature": 0.164,
+        "ui_interaction_mode": 1,
+        "input_bandwidth": 3,
+        "response_format": 1,
+        "approval_flow": 2,
+        "feedback_mechanism": 1,
+        "error_recovery": 1,
+        "onboarding_depth": 3,
+        "accessibility_level": 3,
+        "context_window_utilization": 0.556,
+        "rerank_depth": 40,
+        "embedding_dimensions": 0,
+        "lattice_search_radius": 5,
+        "max_credit_burn_per_session": 100,
+        "min_usability_score": 0.5,
+        "max_response_time_ms": 2000,
+        "min_accessibility_score": 0.7,
+        "coworking_enabled": 1,
+        "crdt_type": 0,
+        "presence_indicators": 1,
+        "file_sync_mode": 2,
+        "voice_video_enabled": 1,
+        "shared_cursor": 0,
+        "team_session_max": 47,
+        "collab_persistence": 3,
+        "sso_provider": 3,
+        "rbac_enabled": 0,
+        "audit_log_retention_days": 30,
+        "rate_limit_strategy": 0,
+        "api_versioning": 1,
+        "multi_tenant_isolation": 1,
+        "chat_enabled": 1,
+        "chat_transport": 2,
+        "message_persistence": 3,
+        "typing_indicators": 1,
+        "push_notifications": 0,
+        "team_hierarchy": 1,
+        "role_set": 1,
+        "project_templates": 5,
+        "team_billing_model": 4,
+        "team_permissions": 1,
+        "health_score_enabled": 1,
+        "churn_prediction_model": 3,
+        "usage_anomaly_detection": 2,
+        "sentiment_analysis_source": 0,
+        "early_warning_threshold": 0.494,
+        "auto_intervention": 2,
+        "billing_model": 0,
+        "nonprofit_discount": 0,
+        "credit_refund_policy": 0,
+        "value_guarantee": 0
+      },
+      "cross_island_scores": {
+        "solo_dev": 44.03,
+        "startup": 37.19,
+        "enterprise": 31.22,
+        "nonprofit": 37.52
+      }
+    }
+  },
+  "overall_best_island": "solo_dev",
+  "overall_best": {
+    "fitness": 44.67,
+    "vdr": 82.33,
+    "collab": 0.191,
+    "enterprise": 0.05,
+    "team": 0.139,
+    "proactive": 0.787,
+    "genome": {
+      "tw_01_empty_generation": 1,
+      "tw_02_infinite_loop": 2,
+      "tw_03_credit_burn": 20,
+      "tw_04_approval_bypass": 1,
+      "tw_05_silent_failure": 5,
+      "tw_06_token_overflow": 66888,
+      "tw_07_duplicate_gen": 6,
+      "tw_08_timeout": 154,
+      "tw_09_unauthorized": 1,
+      "early_exit_threshold": 12,
+      "tripwire_sensitivity": 4,
+      "deployment_gate_score": 0.382,
+      "approval_timeout_hours": 81,
+      "research_depth": 3,
+      "retry_limit": 5,
+      "per_user_budget": 157,
+      "per_bot_budget": 58,
+      "conversation_turn_limit": 27,
+      "burn_rate_per_min": 14,
+      "agent_timeout_seconds": 48,
+      "agent_parallel": 1,
+      "agent_research_sources": 1,
+      "responsive_breakpoint_px": 876,
+      "content_density": 0.488,
+      "pipeline_mode": 1,
+      "discovery_impl_overlap": 0.994,
+      "agent_count": 6,
+      "agent_specialization": 1,
+      "feedback_loop_depth": 5,
+      "governance_gate_count": 3,
+      "primary_model": 1,
+      "research_model": 0,
+      "coding_model": 1,
+      "audit_model": 2,
+      "model_temperature": 0.461,
+      "ui_interaction_mode": 2,
+      "input_bandwidth": 3,
+      "response_format": 3,
+      "approval_flow": 1,
+      "feedback_mechanism": 3,
+      "error_recovery": 2,
+      "onboarding_depth": 3,
+      "accessibility_level": 3,
+      "context_window_utilization": 0.482,
+      "rerank_depth": 72,
+      "embedding_dimensions": 2,
+      "lattice_search_radius": 4,
+      "max_credit_burn_per_session": 100,
+      "min_usability_score": 0.5,
+      "max_response_time_ms": 2000,
+      "min_accessibility_score": 0.7,
+      "coworking_enabled": 1,
+      "crdt_type": 2,
+      "presence_indicators": 1,
+      "file_sync_mode": 2,
+      "voice_video_enabled": 1,
+      "shared_cursor": 1,
+      "team_session_max": 33,
+      "collab_persistence": 0,
+      "sso_provider": 3,
+      "rbac_enabled": 0,
+      "audit_log_retention_days": 231,
+      "rate_limit_strategy": 1,
+      "api_versioning": 3,
+      "multi_tenant_isolation": 0,
+      "chat_enabled": 0,
+      "chat_transport": 0,
+      "message_persistence": 3,
+      "typing_indicators": 0,
+      "push_notifications": 1,
+      "team_hierarchy": 0,
+      "role_set": 1,
+      "project_templates": 3,
+      "team_billing_model": 1,
+      "team_permissions": 3,
+      "health_score_enabled": 1,
+      "churn_prediction_model": 3,
+      "usage_anomaly_detection": 3,
+      "sentiment_analysis_source": 2,
+      "early_warning_threshold": 0.856,
+      "auto_intervention": 2,
+      "billing_model": 3,
+      "nonprofit_discount": 18,
+      "credit_refund_policy": 0,
+      "value_guarantee": 1
+    }
+  },
+  "baseline": {
+    "fitness": 17.73,
+    "vdr": 30.03
+  },
+  "improvement": 26.94,
+  "genome_changes": {
+    "tw_01_empty_generation": {
+      "baseline": 2,
+      "evolved": 1,
+      "category": "tripwire",
+      "baseline_label": 2,
+      "evolved_label": 1
+    },
+    "tw_02_infinite_loop": {
+      "baseline": 3,
+      "evolved": 2,
+      "category": "tripwire",
+      "baseline_label": 3,
+      "evolved_label": 2
+    },
+    "tw_05_silent_failure": {
+      "baseline": 2,
+      "evolved": 5,
+      "category": "tripwire",
+      "baseline_label": 2,
+      "evolved_label": 5
+    },
+    "tw_06_token_overflow": {
+      "baseline": 100000,
+      "evolved": 66888,
+      "category": "tripwire",
+      "baseline_label": 100000,
+      "evolved_label": 66888
+    },
+    "tw_07_duplicate_gen": {
+      "baseline": 3,
+      "evolved": 6,
+      "category": "tripwire",
+      "baseline_label": 3,
+      "evolved_label": 6
+    },
+    "tw_08_timeout": {
+      "baseline": 60,
+      "evolved": 154,
+      "category": "tripwire",
+      "baseline_label": 60,
+      "evolved_label": 154
+    },
+    "early_exit_threshold": {
+      "baseline": 20,
+      "evolved": 12,
+      "category": "vdr",
+      "baseline_label": 20,
+      "evolved_label": 12
+    },
+    "tripwire_sensitivity": {
+      "baseline": 2,
+      "evolved": 4,
+      "category": "vdr",
+      "baseline_label": 2,
+      "evolved_label": 4
+    },
+    "deployment_gate_score": {
+      "baseline": 0.6,
+      "evolved": 0.382,
+      "category": "vdr",
+      "baseline_label": 0.6,
+      "evolved_label": 0.382
+    },
+    "approval_timeout_hours": {
+      "baseline": 72,
+      "evolved": 81,
+      "category": "vdr",
+      "baseline_label": 72,
+      "evolved_label": 81
+    },
+    "retry_limit": {
+      "baseline": 3,
+      "evolved": 5,
+      "category": "vdr",
+      "baseline_label": 3,
+      "evolved_label": 5
+    },
+    "per_user_budget": {
+      "baseline": 100,
+      "evolved": 157,
+      "category": "credit",
+      "baseline_label": 100,
+      "evolved_label": 157
+    },
+    "per_bot_budget": {
+      "baseline": 50,
+      "evolved": 58,
+      "category": "credit",
+      "baseline_label": 50,
+      "evolved_label": 58
+    },
+    "conversation_turn_limit": {
+      "baseline": 30,
+      "evolved": 27,
+      "category": "credit",
+      "baseline_label": 30,
+      "evolved_label": 27
+    },
+    "burn_rate_per_min": {
+      "baseline": 10,
+      "evolved": 14,
+      "category": "credit",
+      "baseline_label": 10,
+      "evolved_label": 14
+    },
+    "agent_timeout_seconds": {
+      "baseline": 60,
+      "evolved": 48,
+      "category": "agent",
+      "baseline_label": 60,
+      "evolved_label": 48
+    },
+    "agent_parallel": {
+      "baseline": 0,
+      "evolved": 1,
+      "category": "agent",
+      "baseline_label": 0,
+      "evolved_label": 1
+    },
+    "agent_research_sources": {
+      "baseline": 3,
+      "evolved": 1,
+      "category": "agent",
+      "baseline_label": 3,
+      "evolved_label": 1
+    },
+    "responsive_breakpoint_px": {
+      "baseline": 768,
+      "evolved": 876,
+      "category": "ui",
+      "baseline_label": 768,
+      "evolved_label": 876
+    },
+    "content_density": {
+      "baseline": 0.7,
+      "evolved": 0.488,
+      "category": "ui",
+      "baseline_label": 0.7,
+      "evolved_label": 0.488
+    },
+    "pipeline_mode": {
+      "baseline": 0,
+      "evolved": 1,
+      "category": "topology",
+      "baseline_label": "sequential",
+      "evolved_label": "parallel"
+    },
+    "discovery_impl_overlap": {
+      "baseline": 0.0,
+      "evolved": 0.994,
+      "category": "topology",
+      "baseline_label": 0.0,
+      "evolved_label": 0.994
+    },
+    "agent_count": {
+      "baseline": 4,
+      "evolved": 6,
+      "category": "topology",
+      "baseline_label": 4,
+      "evolved_label": 6
+    },
+    "feedback_loop_depth": {
+      "baseline": 1,
+      "evolved": 5,
+      "category": "topology",
+      "baseline_label": 1,
+      "evolved_label": 5
+    },
+    "primary_model": {
+      "baseline": 0,
+      "evolved": 1,
+      "category": "model",
+      "baseline_label": "command-a",
+      "evolved_label": "north-mini-code"
+    },
+    "audit_model": {
+      "baseline": 0,
+      "evolved": 2,
+      "category": "model",
+      "baseline_label": "command-a",
+      "evolved_label": "mixed"
+    },
+    "model_temperature": {
+      "baseline": 0.3,
+      "evolved": 0.461,
+      "category": "model",
+      "baseline_label": 0.3,
+      "evolved_label": 0.461
+    },
+    "ui_interaction_mode": {
+      "baseline": 0,
+      "evolved": 2,
+      "category": "uiux",
+      "baseline_label": "desktop",
+      "evolved_label": "voice"
+    },
+    "input_bandwidth": {
+      "baseline": 0,
+      "evolved": 3,
+      "category": "uiux",
+      "baseline_label": "text-only",
+      "evolved_label": "full-multimodal"
+    },
+    "response_format": {
+      "baseline": 0,
+      "evolved": 3,
+      "category": "uiux",
+      "baseline_label": "chat",
+      "evolved_label": "hybrid"
+    },
+    "approval_flow": {
+      "baseline": 0,
+      "evolved": 1,
+      "category": "uiux",
+      "baseline_label": "single-click",
+      "evolved_label": "multi-step"
+    },
+    "feedback_mechanism": {
+      "baseline": 0,
+      "evolved": 3,
+      "category": "uiux",
+      "baseline_label": "thumbs",
+      "evolved_label": "behavioral"
+    },
+    "error_recovery": {
+      "baseline": 0,
+      "evolved": 2,
+      "category": "uiux",
+      "baseline_label": "retry",
+      "evolved_label": "guided-fix"
+    },
+    "onboarding_depth": {
+      "baseline": 1,
+      "evolved": 3,
+      "category": "uiux",
+      "baseline_label": "standard",
+      "evolved_label": "interactive-tutorial"
+    },
+    "accessibility_level": {
+      "baseline": 1,
+      "evolved": 3,
+      "category": "uiux",
+      "baseline_label": "WCAG-AA",
+      "evolved_label": "max"
+    },
+    "context_window_utilization": {
+      "baseline": 0.5,
+      "evolved": 0.482,
+      "category": "discovery",
+      "baseline_label": 0.5,
+      "evolved_label": 0.482
+    },
+    "rerank_depth": {
+      "baseline": 20,
+      "evolved": 72,
+      "category": "discovery",
+      "baseline_label": 20,
+      "evolved_label": 72
+    },
+    "embedding_dimensions": {
+      "baseline": 1,
+      "evolved": 2,
+      "category": "discovery",
+      "baseline_label": "768",
+      "evolved_label": "1024"
+    },
+    "lattice_search_radius": {
+      "baseline": 2,
+      "evolved": 4,
+      "category": "discovery",
+      "baseline_label": 2,
+      "evolved_label": 4
+    },
+    "coworking_enabled": {
+      "baseline": 0,
+      "evolved": 1,
+      "category": "collab",
+      "baseline_label": 0,
+      "evolved_label": 1
+    },
+    "crdt_type": {
+      "baseline": 0,
+      "evolved": 2,
+      "category": "collab",
+      "baseline_label": "none",
+      "evolved_label": "automerge"
+    },
+    "presence_indicators": {
+      "baseline": 0,
+      "evolved": 1,
+      "category": "collab",
+      "baseline_label": 0,
+      "evolved_label": 1
+    },
+    "file_sync_mode": {
+      "baseline": 0,
+      "evolved": 2,
+      "category": "collab",
+      "baseline_label": "none",
+      "evolved_label": "manual"
+    },
+    "voice_video_enabled": {
+      "baseline": 0,
+      "evolved": 1,
+      "category": "collab",
+      "baseline_label": 0,
+      "evolved_label": 1
+    },
+    "shared_cursor": {
+      "baseline": 0,
+      "evolved": 1,
+      "category": "collab",
+      "baseline_label": 0,
+      "evolved_label": 1
+    },
+    "team_session_max": {
+      "baseline": 5,
+      "evolved": 33,
+      "category": "collab",
+      "baseline_label": 5,
+      "evolved_label": 33
+    },
+    "sso_provider": {
+      "baseline": 0,
+      "evolved": 3,
+      "category": "enterprise",
+      "baseline_label": "none",
+      "evolved_label": "both"
+    },
+    "audit_log_retention_days": {
+      "baseline": 30,
+      "evolved": 231,
+      "category": "enterprise",
+      "baseline_label": 30,
+      "evolved_label": 231
+    },
+    "rate_limit_strategy": {
+      "baseline": 0,
+      "evolved": 1,
+      "category": "enterprise",
+      "baseline_label": "fixed",
+      "evolved_label": "sliding"
+    },
+    "api_versioning": {
+      "baseline": 0,
+      "evolved": 3,
+      "category": "enterprise",
+      "baseline_label": "none",
+      "evolved_label": "content-negotiation"
+    },
+    "message_persistence": {
+      "baseline": 0,
+      "evolved": 3,
+      "category": "chat",
+      "baseline_label": "none",
+      "evolved_label": "s3"
+    },
+    "push_notifications": {
+      "baseline": 0,
+      "evolved": 1,
+      "category": "chat",
+      "baseline_label": 0,
+      "evolved_label": 1
+    },
+    "role_set": {
+      "baseline": 0,
+      "evolved": 1,
+      "category": "team",
+      "baseline_label": "basic-3",
+      "evolved_label": "standard-5"
+    },
+    "project_templates": {
+      "baseline": 0,
+      "evolved": 3,
+      "category": "team",
+      "baseline_label": 0,
+      "evolved_label": 3
+    },
+    "team_billing_model": {
+      "baseline": 0,
+      "evolved": 1,
+      "category": "team",
+      "baseline_label": "per-credit",
+      "evolved_label": "subscription"
+    },
+    "team_permissions": {
+      "baseline": 0,
+      "evolved": 3,
+      "category": "team",
+      "baseline_label": "read-only",
+      "evolved_label": "admin"
+    },
+    "health_score_enabled": {
+      "baseline": 0,
+      "evolved": 1,
+      "category": "proactive",
+      "baseline_label": 0,
+      "evolved_label": 1
+    },
+    "churn_prediction_model": {
+      "baseline": 0,
+      "evolved": 3,
+      "category": "proactive",
+      "baseline_label": "none",
+      "evolved_label": "hybrid"
+    },
+    "usage_anomaly_detection": {
+      "baseline": 0,
+      "evolved": 3,
+      "category": "proactive",
+      "baseline_label": "none",
+      "evolved_label": "ml"
+    },
+    "sentiment_analysis_source": {
+      "baseline": 0,
+      "evolved": 2,
+      "category": "proactive",
+      "baseline_label": "none",
+      "evolved_label": "in-app"
+    },
+    "early_warning_threshold": {
+      "baseline": 0.5,
+      "evolved": 0.856,
+      "category": "proactive",
+      "baseline_label": 0.5,
+      "evolved_label": 0.856
+    },
+    "auto_intervention": {
+      "baseline": 0,
+      "evolved": 2,
+      "category": "proactive",
+      "baseline_label": "off",
+      "evolved_label": "draft-outreach"
+    },
+    "billing_model": {
+      "baseline": 0,
+      "evolved": 3,
+      "category": "billing",
+      "baseline_label": "per-credit",
+      "evolved_label": "outcome-linked"
+    },
+    "nonprofit_discount": {
+      "baseline": 0,
+      "evolved": 18,
+      "category": "billing",
+      "baseline_label": 0,
+      "evolved_label": 18
+    },
+    "value_guarantee": {
+      "baseline": 0,
+      "evolved": 1,
+      "category": "billing",
+      "baseline_label": "none",
+      "evolved_label": "credit-back"
+    }
+  },
+  "north_star_1": "Maximize value delivered to users \u2014 VDR, collaboration, team, enterprise",
+  "north_star_2": "Know when a user has a problem before they tell us, before it's too late \u2014 proactive detection",
+  "safety_note": "100% in-simulation. Zero production calls. Evolved genome NOT applied \u2014 requires explicit human approval."
+}

@@ -1,0 +1,54 @@
+version: 2
+updates:
+  # npm dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "automated"
+    commit-message:
+      prefix: "deps:"
+      include: "scope"
+    groups:
+      react:
+        patterns:
+          - "react"
+          - "react-dom"
+          - "@types/react"
+          - "@types/react-dom"
+      cloudflare:
+        patterns:
+          - "wrangler"
+          - "@cloudflare/*"
+      cohere:
+        patterns:
+          - "@bicameral/cohere"
+          - "@bicameral/shared"
+      fluxychat:
+        patterns:
+          - "@fluxy-chat/*"
+      testing:
+        patterns:
+          - "vitest"
+          - "playwright"
+          - "msw"
+          - "@vitest/*"
+    ignore:
+      # Don't auto-update Cohere models (manual verification required)
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "github-actions"
+      - "automated"

@@ -1,0 +1,255 @@
+{
+  "timestamp": "2026-08-19T15:18:10.292027+00:00",
+  "run_type": "butterfly_evolution",
+  "data_source": "allenai/WildChat + DeepMostInnovations/saas-sales-conversations (4000 sampled each)",
+  "population_size": 20,
+  "num_generations": 10,
+  "interactions_per_genome": 900,
+  "total_simulated_interactions": 180000,
+  "target_vdr": 91.3,
+  "target_house_edge": 8.7,
+  "baseline_vdr": 14.88,
+  "baseline_house_edge": 85.12,
+  "baseline_result": {
+    "vdr": 14.88,
+    "house_edge": 85.12,
+    "total_credits": 5546,
+    "value_credits": 825,
+    "loss_credits": 4721,
+    "win_runs": 123,
+    "loss_runs": 576,
+    "partial_runs": 201,
+    "total_tripwire_hits": 746,
+    "bots_killed": 282,
+    "tripwire_breakdown": {
+      "TW-06-token-overflow": 111,
+      "TW-04-approval-bypass": 137,
+      "TW-09-unauthorized-access": 71,
+      "moderation-gate": 100,
+      "TW-07-duplicate-generation": 60,
+      "TW-03-credit-burn-no-value": 110
+    }
+  },
+  "evolved_vdr": 40.95,
+  "evolved_house_edge": 59.05,
+  "evolved_genome": {
+    "tw_01_empty_generation": 5,
+    "tw_02_infinite_loop": 5,
+    "tw_03_credit_burn": 30,
+    "tw_04_approval_bypass": 1,
+    "tw_05_silent_failure": 1,
+    "tw_06_token_overflow": 119039,
+    "tw_07_duplicate_gen": 3,
+    "tw_08_timeout": 139,
+    "tw_09_unauthorized": 1,
+    "early_exit_threshold": 22,
+    "tripwire_sensitivity": 4,
+    "deployment_gate_score": 0.346,
+    "approval_timeout_hours": 80,
+    "research_depth": 3,
+    "retry_limit": 5,
+    "per_user_budget": 211,
+    "per_bot_budget": 87,
+    "conversation_turn_limit": 49,
+    "burn_rate_per_min": 5,
+    "agent_timeout_seconds": 60,
+    "agent_parallel": 1,
+    "agent_research_sources": 4,
+    "responsive_breakpoint_px": 759,
+    "content_density": 0.5
+  },
+  "evolved_result": {
+    "vdr": 36.24,
+    "house_edge": 63.76,
+    "total_credits": 5925,
+    "value_credits": 2148,
+    "loss_credits": 3778,
+    "win_runs": 361,
+    "loss_runs": 334,
+    "partial_runs": 205,
+    "total_tripwire_hits": 1029,
+    "bots_killed": 95,
+    "tripwire_breakdown": {
+      "TW-06-token-overflow": 168,
+      "TW-04-approval-bypass": 177,
+      "TW-09-unauthorized-access": 95,
+      "moderation-gate": 146,
+      "TW-07-duplicate-generation": 103,
+      "TW-03-credit-burn-no-value": 153
+    }
+  },
+  "target_reached": false,
+  "improvement": 26.07,
+  "improvement_percent": 175.2,
+  "evolution_history": [
+    {
+      "generation": 1,
+      "best_vdr": 20.76,
+      "avg_vdr": 16.03,
+      "worst_vdr": 13.21,
+      "overall_best_vdr": 20.76
+    },
+    {
+      "generation": 2,
+      "best_vdr": 34.6,
+      "avg_vdr": 17.67,
+      "worst_vdr": 11.04,
+      "overall_best_vdr": 34.6
+    },
+    {
+      "generation": 3,
+      "best_vdr": 31.06,
+      "avg_vdr": 21.73,
+      "worst_vdr": 11.69,
+      "overall_best_vdr": 34.6
+    },
+    {
+      "generation": 4,
+      "best_vdr": 32.13,
+      "avg_vdr": 23.31,
+      "worst_vdr": 9.67,
+      "overall_best_vdr": 34.6
+    },
+    {
+      "generation": 5,
+      "best_vdr": 35.43,
+      "avg_vdr": 26.31,
+      "worst_vdr": 16.2,
+      "overall_best_vdr": 35.43
+    },
+    {
+      "generation": 6,
+      "best_vdr": 34.79,
+      "avg_vdr": 28.14,
+      "worst_vdr": 9.85,
+      "overall_best_vdr": 35.43
+    },
+    {
+      "generation": 7,
+      "best_vdr": 34.65,
+      "avg_vdr": 30.11,
+      "worst_vdr": 10.46,
+      "overall_best_vdr": 35.43
+    },
+    {
+      "generation": 8,
+      "best_vdr": 40.68,
+      "avg_vdr": 29.38,
+      "worst_vdr": 14.28,
+      "overall_best_vdr": 40.68
+    },
+    {
+      "generation": 9,
+      "best_vdr": 40.17,
+      "avg_vdr": 29.25,
+      "worst_vdr": 11.4,
+      "overall_best_vdr": 40.68
+    },
+    {
+      "generation": 10,
+      "best_vdr": 40.95,
+      "avg_vdr": 31.56,
+      "worst_vdr": 11.8,
+      "overall_best_vdr": 40.95
+    }
+  ],
+  "genome_changes": {
+    "tw_01_empty_generation": {
+      "baseline": 2,
+      "evolved": 5,
+      "changed": true
+    },
+    "tw_02_infinite_loop": {
+      "baseline": 3,
+      "evolved": 5,
+      "changed": true
+    },
+    "tw_03_credit_burn": {
+      "baseline": 20,
+      "evolved": 30,
+      "changed": true
+    },
+    "tw_05_silent_failure": {
+      "baseline": 2,
+      "evolved": 1,
+      "changed": true
+    },
+    "tw_06_token_overflow": {
+      "baseline": 100000,
+      "evolved": 119039,
+      "changed": true
+    },
+    "tw_08_timeout": {
+      "baseline": 60,
+      "evolved": 139,
+      "changed": true
+    },
+    "early_exit_threshold": {
+      "baseline": 20,
+      "evolved": 22,
+      "changed": true
+    },
+    "tripwire_sensitivity": {
+      "baseline": 2,
+      "evolved": 4,
+      "changed": true
+    },
+    "deployment_gate_score": {
+      "baseline": 0.6,
+      "evolved": 0.346,
+      "changed": true
+    },
+    "approval_timeout_hours": {
+      "baseline": 72,
+      "evolved": 80,
+      "changed": true
+    },
+    "retry_limit": {
+      "baseline": 3,
+      "evolved": 5,
+      "changed": true
+    },
+    "per_user_budget": {
+      "baseline": 100,
+      "evolved": 211,
+      "changed": true
+    },
+    "per_bot_budget": {
+      "baseline": 50,
+      "evolved": 87,
+      "changed": true
+    },
+    "conversation_turn_limit": {
+      "baseline": 30,
+      "evolved": 49,
+      "changed": true
+    },
+    "burn_rate_per_min": {
+      "baseline": 10,
+      "evolved": 5,
+      "changed": true
+    },
+    "agent_parallel": {
+      "baseline": 0,
+      "evolved": 1,
+      "changed": true
+    },
+    "agent_research_sources": {
+      "baseline": 3,
+      "evolved": 4,
+      "changed": true
+    },
+    "responsive_breakpoint_px": {
+      "baseline": 768,
+      "evolved": 759,
+      "changed": true
+    },
+    "content_density": {
+      "baseline": 0.7,
+      "evolved": 0.5,
+      "changed": true
+    }
+  },
+  "safety_note": "This evolution ran 100% in simulation. Zero calls to production pipeline. The evolved genome is NOT applied to the architecture \u2014 it requires explicit human approval before any change is implemented.",
+  "recommendation": "The evolved architecture achieved VDR=40.95% (target: 91.3%). Target not reached. Current improvement: +26.07%. Recommend running more generations or adjusting the genome space."
+}

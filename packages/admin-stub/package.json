@@ -1,0 +1,19 @@
+{
+  "name": "@bicameral/admin-stub",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Public stub for @bicameral/admin — lets open-source contributors build without private admin access. All operations throw 'admin module required'.",
+  "exports": {
+    ".": "./src/index.ts",
+    "./billing": "./src/billing/index.ts",
+    "./governance": "./src/governance/index.ts",
+    "./admin-ops": "./src/admin-ops/index.ts"
+  },
+  "dependencies": {
+    "@bicameral/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3"
+  }
+}

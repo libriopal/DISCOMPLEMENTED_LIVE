@@ -1,0 +1,26 @@
+{
+  "name": "@bicameral/cohere",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Cohere API wrapper — public-safe fetch wrapper. No secrets in code, all keys via env vars.",
+  "exports": {
+    ".": "./src/index.ts",
+    "./chat": "./src/chat.ts",
+    "./embed": "./src/embed.ts",
+    "./rerank": "./src/rerank.ts",
+    "./streaming": "./src/streaming.ts",
+    "./openrouter": "./src/openrouter.ts",
+    "./model-router": "./src/model-router.ts"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@bicameral/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3",
+    "vitest": "4.1.10"
+  }
+}

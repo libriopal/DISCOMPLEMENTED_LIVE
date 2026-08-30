@@ -1,0 +1,278 @@
+<div data-name="hifi-layouts-responsive" style="min-width: 1440px; min-height: 5200px; background-color: #ffffff; padding: 56px 64px; box-sizing: border-box; font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; color: #000000;">
+<style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Space+Grotesk:wght@400;500&family=Fira+Code:wght@400;500&display=swap');</style>
+
+<!-- HEADER -->
+<div data-name="header" style="display: flex; flex-direction: column; gap: 16px; padding-bottom: 40px; border-bottom: 1px solid #d9d9dd;">
+<div style="display: flex; align-items: center; gap: 12px;">
+<div style="display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; background-color: #17171c; border-radius: 8px;">
+<img src="https://api.iconify.design/mdi/monitor-dashboard.svg?color=%23ffffff" style="width: 16px; height: 16px;" />
+</div>
+<span style="font-family: 'Fira Code', monospace; font-size: 11px; letter-spacing: 0.28px; text-transform: uppercase; color: #93939f;">Bicameral · View 06 / 06 · High-Fidelity Layouts</span>
+</div>
+<div style="font-family: 'Space Grotesk', sans-serif; font-size: 60px; font-weight: 400; letter-spacing: -1.2px; line-height: 1.0; color: #000000;">High-Fidelity Layouts<br/>& Responsive Patterns</div>
+<div style="font-size: 18px; line-height: 1.4; color: #93939f; max-width: 920px;">Annotated layout specs for all ten core screens — each with a desktop composition, tablet + mobile adaptation rules, 12-column grid mapping, spacing tokens, focus indicators, and empty/loading/error states. Preserves the rounded 22px-card visual brief while optimizing for readability, accessibility, and responsive integrity.</div>
+</div>
+
+<!-- GLOBAL GRID + BREAKPOINT KEY -->
+<div data-name="grid-key" style="display: flex; gap: 28px; padding: 40px 0;">
+<div style="flex: 1.4; border: 1px solid #f2f2f2; border-radius: 22px; padding: 28px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; color: #93939f; text-transform: uppercase; padding-bottom: 16px;">Global 12-Column Grid</div>
+<div style="display: flex; gap: 6px;">
+<div style="flex: 1; height: 48px; background-color: #eef1fd; border-radius: 4px;"></div><div style="flex: 1; height: 48px; background-color: #eef1fd; border-radius: 4px;"></div><div style="flex: 1; height: 48px; background-color: #eef1fd; border-radius: 4px;"></div><div style="flex: 1; height: 48px; background-color: #eef1fd; border-radius: 4px;"></div><div style="flex: 1; height: 48px; background-color: #eef1fd; border-radius: 4px;"></div><div style="flex: 1; height: 48px; background-color: #eef1fd; border-radius: 4px;"></div><div style="flex: 1; height: 48px; background-color: #eef1fd; border-radius: 4px;"></div><div style="flex: 1; height: 48px; background-color: #eef1fd; border-radius: 4px;"></div><div style="flex: 1; height: 48px; background-color: #eef1fd; border-radius: 4px;"></div><div style="flex: 1; height: 48px; background-color: #eef1fd; border-radius: 4px;"></div><div style="flex: 1; height: 48px; background-color: #eef1fd; border-radius: 4px;"></div><div style="flex: 1; height: 48px; background-color: #eef1fd; border-radius: 4px;"></div>
+</div>
+<div style="font-size: 13px; color: #93939f; line-height: 1.6; padding-top: 14px;">Desktop 12-col · 24px gutter · 64px margins · max 1440px. Tablet → 8-col · 24px margins. Mobile → 4-col · 16px margins.</div>
+</div>
+<div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 22px; padding: 28px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; color: #93939f; text-transform: uppercase; padding-bottom: 16px;">Breakpoints</div>
+<div style="display: flex; flex-direction: column; gap: 10px;">
+<div style="display: flex; justify-content: space-between;"><span style="font-family: 'Fira Code', monospace; font-size: 13px; color: #17171c;">mobile</span><span style="font-size: 13px; color: #93939f;">&lt; 768px</span></div>
+<div style="display: flex; justify-content: space-between;"><span style="font-family: 'Fira Code', monospace; font-size: 13px; color: #17171c;">tablet</span><span style="font-size: 13px; color: #93939f;">768–1023px</span></div>
+<div style="display: flex; justify-content: space-between;"><span style="font-family: 'Fira Code', monospace; font-size: 13px; color: #17171c;">desktop</span><span style="font-size: 13px; color: #93939f;">1024–1439px</span></div>
+<div style="display: flex; justify-content: space-between;"><span style="font-family: 'Fira Code', monospace; font-size: 13px; color: #17171c;">wide</span><span style="font-size: 13px; color: #93939f;">≥ 1440px</span></div>
+</div>
+</div>
+<div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 22px; padding: 28px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; color: #93939f; text-transform: uppercase; padding-bottom: 16px;">State Legend</div>
+<div style="display: flex; flex-direction: column; gap: 10px;">
+<div style="display: flex; align-items: center; gap: 8px;"><div style="width: 14px; height: 14px; border-radius: 4px; background-color: #eef1fd; border: 1px solid #1863dc;"></div><span style="font-size: 13px; color: #17171c;">Empty state</span></div>
+<div style="display: flex; align-items: center; gap: 8px;"><div style="width: 14px; height: 14px; border-radius: 4px; background: linear-gradient(90deg,#f2f2f2,#e8e8ec,#f2f2f2);"></div><span style="font-size: 13px; color: #17171c;">Loading / skeleton</span></div>
+<div style="display: flex; align-items: center; gap: 8px;"><div style="width: 14px; height: 14px; border-radius: 4px; background-color: #fceceb; border: 1px solid #c0362c;"></div><span style="font-size: 13px; color: #17171c;">Error state</span></div>
+<div style="display: flex; align-items: center; gap: 8px;"><div style="width: 14px; height: 14px; border-radius: 4px; border: 2px solid #4c6ee6;"></div><span style="font-size: 13px; color: #17171c;">Focus ring 2px</span></div>
+</div>
+</div>
+</div>
+
+<!-- ============ SCREEN 01 DASHBOARD ============ -->
+<div data-name="s-dashboard" style="padding-top: 24px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; letter-spacing: 0.28px; text-transform: uppercase; color: #93939f; padding-bottom: 12px;">Screen 01 — Command Deck</div>
+<div style="font-family: 'Space Grotesk', sans-serif; font-size: 32px; letter-spacing: -0.32px; color: #000000; padding-bottom: 24px;">Dashboard</div>
+
+<div style="display: flex; gap: 28px;">
+<!-- desktop mock -->
+<div style="flex: 2.2; border: 1px solid #d9d9dd; border-radius: 22px; overflow: hidden;">
+<div style="display: flex; align-items: center; gap: 16px; padding: 12px 20px; border-bottom: 1px solid #f2f2f2;"><span style="font-family:'Fira Code',monospace; font-size: 10px; color: #93939f; text-transform: uppercase;">Desktop · 1440</span><div style="flex:1;"></div><div style="display: flex; align-items: center; gap: 8px; padding: 6px 12px; border: 1px solid #d9d9dd; border-radius: 9999px; font-size: 11px; color: #93939f;"><img src="https://api.iconify.design/mdi/magnify.svg?color=%2393939f" style="width: 12px; height: 12px;" />⌘K</div></div>
+<div style="display: flex; gap: 16px; padding: 20px;">
+<div style="width: 60px; display: flex; flex-direction: column; gap: 8px;"><div style="height: 32px; background-color: #eef1fd; border-radius: 10px;"></div><div style="height: 32px; background-color: #f2f2f2; border-radius: 10px;"></div><div style="height: 32px; background-color: #f2f2f2; border-radius: 10px;"></div></div>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 16px;">
+<div style="background-color: #0d0a14; border-radius: 16px; height: 140px; display: flex; align-items: flex-end; padding: 16px;"><span style="font-family:'Space Grotesk',sans-serif; font-size: 16px; color: #fff;">Live Lattice</span></div>
+<div style="display: flex; gap: 16px;"><div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 16px; height: 80px;"></div><div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 16px; height: 80px;"></div></div>
+<div style="display: flex; gap: 16px;"><div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 16px; height: 72px;"></div><div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 16px; height: 72px;"></div><div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 16px; height: 72px;"></div></div>
+</div>
+<div style="width: 90px; display: flex; flex-direction: column; gap: 8px;"><div style="height: 60px; border: 1px solid #f2f2f2; border-radius: 12px;"></div><div style="height: 60px; border: 1px solid #f2f2f2; border-radius: 12px;"></div></div>
+</div>
+</div>
+<!-- responsive + notes -->
+<div style="flex: 1; display: flex; flex-direction: column; gap: 16px;">
+<div style="display: flex; gap: 16px;">
+<div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 16px; padding: 14px;"><div style="font-family:'Fira Code',monospace; font-size: 10px; color: #93939f; text-transform: uppercase; padding-bottom: 8px;">Tablet</div><div style="background-color: #0d0a14; border-radius: 8px; height: 44px; margin-bottom: 6px;"></div><div style="display: flex; gap: 6px;"><div style="flex:1; height: 30px; border: 1px solid #f2f2f2; border-radius: 6px;"></div><div style="flex:1; height: 30px; border: 1px solid #f2f2f2; border-radius: 6px;"></div></div></div>
+<div style="flex: 0.5; border: 1px solid #f2f2f2; border-radius: 16px; padding: 14px;"><div style="font-family:'Fira Code',monospace; font-size: 10px; color: #93939f; text-transform: uppercase; padding-bottom: 8px;">Mobile</div><div style="background-color: #0d0a14; border-radius: 6px; height: 40px; margin-bottom: 6px;"></div><div style="height: 24px; border: 1px solid #f2f2f2; border-radius: 6px; margin-bottom: 6px;"></div><div style="height: 24px; border: 1px solid #f2f2f2; border-radius: 6px;"></div></div>
+</div>
+<div style="border: 1px solid #f2f2f2; border-radius: 16px; padding: 18px; font-size: 13px; color: #93939f; line-height: 1.6;"><span style="color:#17171c;">Grid:</span> lattice spans 8 col, status rail 4 col. <span style="color:#17171c;">Tablet:</span> rail drops below hero, 2-col cards. <span style="color:#17171c;">Mobile:</span> single column, sidebar → bottom tab bar, lattice becomes tappable summary card. <span style="color:#17171c;">Empty:</span> "Create your first project" CTA replaces grid.</div>
+</div>
+</div>
+</div>
+
+<!-- ============ SCREEN 02 PROJECTS LIST ============ -->
+<div data-name="s-projects" style="padding-top: 48px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; letter-spacing: 0.28px; text-transform: uppercase; color: #93939f; padding-bottom: 12px;">Screen 02 — Projects List</div>
+<div style="font-family: 'Space Grotesk', sans-serif; font-size: 32px; letter-spacing: -0.32px; color: #000000; padding-bottom: 24px;">Projects</div>
+<div style="display: flex; gap: 28px;">
+<div style="flex: 2.2; border: 1px solid #d9d9dd; border-radius: 22px; padding: 20px;">
+<div style="display: flex; align-items: center; gap: 12px; padding-bottom: 16px;"><span style="font-family:'Space Grotesk',sans-serif; font-size: 18px; color: #000000;">Projects</span><span style="font-family:'Fira Code',monospace; font-size: 10px; color: #1863dc; background: #eef1fd; padding: 3px 10px; border-radius: 9999px;">12</span><div style="flex:1;"></div><div style="display: flex; gap: 8px;"><div style="width: 32px; height: 32px; border: 1px solid #d9d9dd; border-radius: 8px; display: flex; align-items: center; justify-content: center;"><img src="https://api.iconify.design/mdi/view-grid-outline.svg?color=%231863dc" style="width: 16px; height: 16px;" /></div><div style="width: 32px; height: 32px; border: 1px solid #f2f2f2; border-radius: 8px; display: flex; align-items: center; justify-content: center;"><img src="https://api.iconify.design/mdi/view-list-outline.svg?color=%2393939f" style="width: 16px; height: 16px;" /></div><div style="padding: 6px 14px; background: #17171c; color: #fff; border-radius: 9999px; font-size: 12px;">New</div></div></div>
+<div style="display: flex; gap: 16px; padding-bottom: 16px;"><div style="display: flex; align-items: center; gap: 8px; padding: 8px 14px; border: 1px solid #d9d9dd; border-radius: 9999px; font-size: 12px; color: #93939f;"><img src="https://api.iconify.design/mdi/magnify.svg?color=%2393939f" style="width: 14px; height: 14px;" />Search</div><span style="font-family:'Fira Code',monospace; font-size: 11px; color: #17171c; background: #f2f2f2; padding: 6px 12px; border-radius: 9999px;">All</span><span style="font-family:'Fira Code',monospace; font-size: 11px; color: #93939f; padding: 6px 12px;">In Progress</span><span style="font-family:'Fira Code',monospace; font-size: 11px; color: #93939f; padding: 6px 12px;">Verified</span></div>
+<div style="display: flex; gap: 16px;"><div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 16px; height: 130px; padding: 16px;"><span style="font-family:'Fira Code',monospace; font-size: 10px; color: #1863dc; background: #eef1fd; padding: 3px 8px; border-radius: 9999px;">IN PROGRESS</span><div style="font-size: 14px; color: #000; padding-top: 12px;">Insights Agent</div></div><div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 16px; height: 130px; padding: 16px;"><span style="font-family:'Fira Code',monospace; font-size: 10px; color: #0a8a5c; background: #e8f7f0; padding: 3px 8px; border-radius: 9999px;">VERIFIED</span><div style="font-size: 14px; color: #000; padding-top: 12px;">Ticket Router</div></div><div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 16px; height: 130px; padding: 16px;"><span style="font-family:'Fira Code',monospace; font-size: 10px; color: #b36a00; background: #fdf3e3; padding: 3px 8px; border-radius: 9999px;">REVIEW</span><div style="font-size: 14px; color: #000; padding-top: 12px;">Pricing Engine</div></div></div>
+</div>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 16px;">
+<div style="border: 1px solid #f2f2f2; border-radius: 16px; padding: 18px;"><div style="font-family:'Fira Code',monospace; font-size: 10px; color: #93939f; text-transform: uppercase; padding-bottom: 10px;">Empty State</div><div style="background-color: #eef1fd; border: 1px dashed #1863dc; border-radius: 12px; padding: 20px; text-align: center;"><img src="https://api.iconify.design/mdi/folder-plus-outline.svg?color=%231863dc" style="width: 24px; height: 24px;" /><div style="font-size: 13px; color: #17171c; padding-top: 8px;">No projects yet</div><div style="font-size: 11px; color: #93939f;">Create your first to begin</div></div></div>
+<div style="border: 1px solid #f2f2f2; border-radius: 16px; padding: 18px; font-size: 13px; color: #93939f; line-height: 1.6;"><span style="color:#17171c;">Grid:</span> 3-up cards desktop → 2-up tablet → 1-up mobile. <span style="color:#17171c;">Filter bar</span> becomes a scrollable chip row on mobile. Card is a role=link with focus ring.</div>
+</div>
+</div>
+</div>
+
+<!-- ============ SCREEN 03 PROJECT DETAIL ============ -->
+<div data-name="s-detail" style="padding-top: 48px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; letter-spacing: 0.28px; text-transform: uppercase; color: #93939f; padding-bottom: 12px;">Screen 03 — Project Detail</div>
+<div style="font-family: 'Space Grotesk', sans-serif; font-size: 32px; letter-spacing: -0.32px; color: #000000; padding-bottom: 24px;">Detail · Lattice + Status</div>
+<div style="display: flex; gap: 28px;">
+<div style="flex: 2.2; border: 1px solid #d9d9dd; border-radius: 22px; padding: 20px;">
+<div style="display: flex; align-items: center; gap: 12px; padding-bottom: 16px;"><div style="width: 36px; height: 36px; border-radius: 9999px; background: radial-gradient(circle,#5a6fe6,#3b4fd6);"></div><div><div style="font-size: 16px; color: #000;">Insights Agent</div><div style="font-family:'Fira Code',monospace; font-size: 11px; color: #93939f;">Architecture · 76%</div></div><div style="flex:1;"></div><div style="display: flex; gap: 16px;"><span style="font-size: 13px; color: #000; border-bottom: 2px solid #1863dc; padding-bottom: 4px;">Overview</span><span style="font-size: 13px; color: #93939f;">Lattice</span><span style="font-size: 13px; color: #93939f;">Timeline</span></div></div>
+<div style="display: flex; gap: 16px;"><div style="flex: 2; background-color: #0d0a14; border-radius: 16px; height: 200px; position: relative;"><div style="position: absolute; top: 40px; left: 40px; width: 40px; height: 40px; border-radius: 9999px; background: radial-gradient(circle,#5a6fe6,#3b4fd6); box-shadow: 0 0 16px rgba(59,79,214,0.6);"></div><div style="position: absolute; top: 120px; right: 60px; width: 36px; height: 36px; border-radius: 9999px; background: radial-gradient(circle,#a55ee0,#8b3fd6); box-shadow: 0 0 16px rgba(139,63,214,0.6);"></div><div style="position: absolute; top: 80px; left: 130px; width: 24px; height: 24px; border-radius: 9999px; background: radial-gradient(circle,#ef82ba,#db3f88);"></div></div><div style="flex: 1; display: flex; flex-direction: column; gap: 12px;"><div style="border: 1px solid #f2f2f2; border-radius: 12px; padding: 14px;"><div style="font-size: 12px; color: #93939f;">Left hemisphere</div><div style="height: 6px; background: #f2f2f2; border-radius: 9999px; margin-top: 8px;"><div style="width: 92%; height: 6px; background: #3b4fd6; border-radius: 9999px;"></div></div></div><div style="border: 1px solid #f2f2f2; border-radius: 12px; padding: 14px;"><div style="font-size: 12px; color: #93939f;">Right hemisphere</div><div style="height: 6px; background: #f2f2f2; border-radius: 9999px; margin-top: 8px;"><div style="width: 68%; height: 6px; background: #8b3fd6; border-radius: 9999px;"></div></div></div></div></div>
+</div>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 16px;">
+<div style="border: 1px solid #f2f2f2; border-radius: 16px; padding: 18px;"><div style="font-family:'Fira Code',monospace; font-size: 10px; color: #93939f; text-transform: uppercase; padding-bottom: 10px;">Mobile Stack</div><div style="display: flex; flex-direction: column; gap: 6px;"><div style="background: #0d0a14; border-radius: 8px; height: 60px;"></div><div style="border: 1px solid #f2f2f2; border-radius: 8px; height: 30px;"></div><div style="border: 1px solid #f2f2f2; border-radius: 8px; height: 30px;"></div></div></div>
+<div style="border: 1px solid #f2f2f2; border-radius: 16px; padding: 18px; font-size: 13px; color: #93939f; line-height: 1.6;"><span style="color:#17171c;">Grid:</span> lattice 8-col, status 4-col rail. <span style="color:#17171c;">Tablet:</span> tabs pin, rail collapses to summary chips. <span style="color:#17171c;">Mobile:</span> lattice preview card → full-screen on tap; status becomes accordion.</div>
+</div>
+</div>
+</div>
+
+<!-- ============ SCREEN 04 PROMPT WORKSPACE ============ -->
+<div data-name="s-prompt" style="padding-top: 48px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; letter-spacing: 0.28px; text-transform: uppercase; color: #93939f; padding-bottom: 12px;">Screen 04 — Prompt Workspace</div>
+<div style="font-family: 'Space Grotesk', sans-serif; font-size: 32px; letter-spacing: -0.32px; color: #000000; padding-bottom: 24px;">Composer</div>
+<div style="display: flex; gap: 28px;">
+<div style="flex: 2.2; border: 1px solid #d9d9dd; border-radius: 22px; padding: 20px;">
+<div style="display: flex; gap: 16px;">
+<div style="flex: 1.6; display: flex; flex-direction: column; gap: 14px;">
+<div style="border: 1px solid #d9d9dd; border-radius: 16px; padding: 18px; min-height: 90px;"><div style="font-size: 13px; color: #17171c;">Build a customer insights agent that…<span style="width:1px;height:14px;background:#4c6ee6;display:inline-block;margin-left:2px;"></span></div></div>
+<div style="display: flex; gap: 8px;"><span style="font-family:'Fira Code',monospace; font-size: 11px; color: #93939f; border: 1px solid #d9d9dd; padding: 6px 12px; border-radius: 9999px;">+ Context</span><span style="font-family:'Fira Code',monospace; font-size: 11px; color: #93939f; border: 1px solid #d9d9dd; padding: 6px 12px; border-radius: 9999px;">@ Reference</span><div style="flex:1;"></div><span style="padding: 8px 18px; background: #17171c; color: #fff; border-radius: 9999px; font-size: 12px;">Run ⌘↵</span></div>
+</div>
+<div style="flex: 1; background-color: #f6eefc; border-radius: 16px; padding: 16px;"><div style="font-family:'Fira Code',monospace; font-size: 10px; color: #8b3fd6; text-transform: uppercase; padding-bottom: 10px;">Suggestions</div><div style="font-size: 12px; color: #17171c; line-height: 1.8;">• Add success metrics<br/>• Define data sources<br/>• Specify guardrails</div></div>
+</div>
+</div>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 16px;">
+<div style="border: 1px solid #f2f2f2; border-radius: 16px; padding: 18px;"><div style="font-family:'Fira Code',monospace; font-size: 10px; color: #93939f; text-transform: uppercase; padding-bottom: 10px;">Loading</div><div style="display: flex; flex-direction: column; gap: 8px;"><div style="height: 10px; width: 80%; background: linear-gradient(90deg,#f2f2f2,#e8e8ec,#f2f2f2); border-radius: 5px;"></div><div style="height: 10px; width: 95%; background: linear-gradient(90deg,#f2f2f2,#e8e8ec,#f2f2f2); border-radius: 5px;"></div><div style="height: 10px; width: 65%; background: linear-gradient(90deg,#f2f2f2,#e8e8ec,#f2f2f2); border-radius: 5px;"></div></div></div>
+<div style="border: 1px solid #f2f2f2; border-radius: 16px; padding: 18px; font-size: 13px; color: #93939f; line-height: 1.6;"><span style="color:#17171c;">Grid:</span> composer 8-col, suggestions 4-col. <span style="color:#17171c;">Mobile:</span> suggestions collapse to a bottom sheet; composer is full-width, sticky Run button. Textarea autosize with 44px min touch target.</div>
+</div>
+</div>
+</div>
+
+<!-- ============ SCREEN 05 RESEARCH VIEWER ============ -->
+<div data-name="s-research" style="padding-top: 48px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; letter-spacing: 0.28px; text-transform: uppercase; color: #93939f; padding-bottom: 12px;">Screen 05 — Research Viewer</div>
+<div style="font-family: 'Space Grotesk', sans-serif; font-size: 32px; letter-spacing: -0.32px; color: #000000; padding-bottom: 24px;">Threads · Sources · Confidence</div>
+<div style="display: flex; gap: 28px;">
+<div style="flex: 2.2; border: 1px solid #d9d9dd; border-radius: 22px; padding: 20px;">
+<div style="display: flex; gap: 16px;">
+<div style="width: 140px; display: flex; flex-direction: column; gap: 8px;"><div style="font-family:'Fira Code',monospace; font-size: 10px; color: #93939f; text-transform: uppercase; padding-bottom: 4px;">Threads</div><div style="padding: 10px; background: #eef1fd; border-radius: 10px; font-size: 12px; color: #1863dc;">Market scan</div><div style="padding: 10px; font-size: 12px; color: #17171c;">Competitors</div><div style="padding: 10px; font-size: 12px; color: #17171c;">Constraints</div></div>
+<div style="flex: 1; border-left: 1px solid #f2f2f2; padding-left: 16px;"><div style="font-size: 15px; color: #000; padding-bottom: 12px;">Market scan</div><div style="border: 1px solid #f2f2f2; border-radius: 12px; padding: 14px; margin-bottom: 10px;"><div style="display: flex; justify-content: space-between;"><span style="font-size: 13px; color: #17171c;">Source: Industry report 2024</span><span style="font-family:'Fira Code',monospace; font-size: 11px; color: #0a8a5c;">94%</span></div></div><div style="border: 1px solid #f2f2f2; border-radius: 12px; padding: 14px;"><div style="display: flex; justify-content: space-between;"><span style="font-size: 13px; color: #17171c;">Source: User interviews</span><span style="font-family:'Fira Code',monospace; font-size: 11px; color: #b36a00;">71%</span></div></div></div>
+</div>
+</div>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 16px;">
+<div style="border: 1px solid #f2f2f2; border-radius: 16px; padding: 18px;"><div style="font-family:'Fira Code',monospace; font-size: 10px; color: #93939f; text-transform: uppercase; padding-bottom: 10px;">Confidence</div><div style="display: flex; align-items: center; justify-content: center; padding: 8px;"><div style="width: 80px; height: 80px; border-radius: 9999px; border: 6px solid #f2f2f2; border-top-color: #0a8a5c; border-right-color: #0a8a5c; display: flex; align-items: center; justify-content: center;"><span style="font-family:'Space Grotesk',sans-serif; font-size: 20px; color: #000;">83%</span></div></div></div>
+<div style="border: 1px solid #f2f2f2; border-radius: 16px; padding: 18px; font-size: 13px; color: #93939f; line-height: 1.6;"><span style="color:#17171c;">Grid:</span> 3-pane (threads / reader / confidence) → 2-pane tablet (confidence into reader header) → mobile single pane with thread dropdown + collapsible source cards.</div>
+</div>
+</div>
+</div>
+
+<!-- ============ SCREEN 06 REQUIREMENTS EDITOR ============ -->
+<div data-name="s-requirements" style="padding-top: 48px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; letter-spacing: 0.28px; text-transform: uppercase; color: #93939f; padding-bottom: 12px;">Screen 06 — Requirements Editor</div>
+<div style="font-family: 'Space Grotesk', sans-serif; font-size: 32px; letter-spacing: -0.32px; color: #000000; padding-bottom: 24px;">Spec Editor</div>
+<div style="display: flex; gap: 28px;">
+<div style="flex: 2.2; border: 1px solid #d9d9dd; border-radius: 22px; padding: 20px;">
+<div style="display: flex; align-items: center; gap: 10px; padding-bottom: 14px;"><span style="font-size: 15px; color: #000;">Requirements</span><span style="font-family:'Fira Code',monospace; font-size: 10px; color: #1863dc; background: #eef1fd; padding: 3px 8px; border-radius: 9999px;">DRAFT</span></div>
+<div style="display: flex; flex-direction: column; gap: 10px;">
+<div style="display: flex; align-items: center; gap: 12px; border: 1px solid #f2f2f2; border-radius: 12px; padding: 14px;"><div style="width: 20px; height: 20px; border-radius: 9999px; background: #0a8a5c; display: flex; align-items: center; justify-content: center;"><img src="https://api.iconify.design/mdi/check.svg?color=%23ffffff" style="width: 12px; height: 12px;" /></div><span style="font-size: 14px; color: #17171c;">Agent must summarize sentiment per ticket</span><div style="flex:1;"></div><span style="font-family:'Fira Code',monospace; font-size: 10px; color: #93939f;">REQ-01</span></div>
+<div style="display: flex; align-items: center; gap: 12px; border: 1px solid #4c6ee6; border-radius: 12px; padding: 14px; box-shadow: 0 0 0 2px rgba(76,110,230,0.15);"><div style="width: 20px; height: 20px; border-radius: 9999px; border: 1px solid #d9d9dd;"></div><span style="font-size: 14px; color: #17171c;">Editing: response latency &lt; 2s<span style="width:1px;height:14px;background:#4c6ee6;display:inline-block;margin-left:2px;"></span></span><div style="flex:1;"></div><span style="font-family:'Fira Code',monospace; font-size: 10px; color: #93939f;">REQ-02</span></div>
+<div style="display: flex; align-items: center; gap: 12px; border: 1px solid #c0362c; border-radius: 12px; padding: 14px; background: #fceceb;"><img src="https://api.iconify.design/mdi/alert-circle-outline.svg?color=%23c0362c" style="width: 20px; height: 20px;" /><span style="font-size: 14px; color: #c0362c;">Conflicts with REQ-01 scope</span><div style="flex:1;"></div><span style="font-family:'Fira Code',monospace; font-size: 10px; color: #c0362c;">REQ-03</span></div>
+</div>
+</div>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 16px;">
+<div style="border: 1px solid #f2f2f2; border-radius: 16px; padding: 18px;"><div style="font-family:'Fira Code',monospace; font-size: 10px; color: #93939f; text-transform: uppercase; padding-bottom: 10px;">Acceptance</div><div style="font-size: 12px; color: #17171c; line-height: 1.8;">Given a ticket, when processed, then sentiment tag is attached in &lt; 2s.</div></div>
+<div style="border: 1px solid #f2f2f2; border-radius: 16px; padding: 18px; font-size: 13px; color: #93939f; line-height: 1.6;"><span style="color:#17171c;">Grid:</span> list 8-col, acceptance panel 4-col. <span style="color:#17171c;">Inline edit</span> with focus ring + autosave. <span style="color:#17171c;">Mobile:</span> panel becomes swipe-up sheet; drag-reorder via handle.</div>
+</div>
+</div>
+</div>
+
+<!-- ============ SCREEN 07 ARCHITECTURE VIEW ============ -->
+<div data-name="s-architecture" style="padding-top: 48px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; letter-spacing: 0.28px; text-transform: uppercase; color: #93939f; padding-bottom: 12px;">Screen 07 — Architecture View</div>
+<div style="font-family: 'Space Grotesk', sans-serif; font-size: 32px; letter-spacing: -0.32px; color: #000000; padding-bottom: 24px;">System Canvas</div>
+<div style="display: flex; gap: 28px;">
+<div style="flex: 2.2; border: 1px solid #d9d9dd; border-radius: 22px; padding: 20px;">
+<div style="background-color: #0d0a14; border-radius: 16px; height: 240px; position: relative; padding: 20px;">
+<div style="position: absolute; top: 30px; left: 40px; width: 120px; border: 1px solid rgba(139,63,214,0.5); border-radius: 10px; padding: 10px; background: rgba(139,63,214,0.12);"><span style="font-size: 12px; color: #fff;">API Gateway</span></div>
+<div style="position: absolute; top: 110px; left: 90px; width: 120px; border: 1px solid rgba(139,63,214,0.5); border-radius: 10px; padding: 10px; background: rgba(139,63,214,0.12);"><span style="font-size: 12px; color: #fff;">Sentiment Svc</span></div>
+<div style="position: absolute; top: 60px; right: 60px; width: 120px; border: 1px solid rgba(59,79,214,0.5); border-radius: 10px; padding: 10px; background: rgba(59,79,214,0.12);"><span style="font-size: 12px; color: #fff;">Vector Store</span></div>
+<div style="position: absolute; top: 55px; left: 100px; width: 130px; height: 2px; background: linear-gradient(90deg,#8b3fd6,#3b4fd6); transform: rotate(30deg); transform-origin: left;"></div>
+</div>
+</div>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 16px;">
+<div style="border: 1px solid #f2f2f2; border-radius: 16px; padding: 18px;"><div style="font-family:'Fira Code',monospace; font-size: 10px; color: #93939f; text-transform: uppercase; padding-bottom: 10px;">Component Props</div><div style="font-family:'Fira Code',monospace; font-size: 12px; color: #17171c; line-height: 1.8;">runtime: node<br/>scale: auto<br/>deps: 3</div></div>
+<div style="border: 1px solid #f2f2f2; border-radius: 16px; padding: 18px; font-size: 13px; color: #93939f; line-height: 1.6;"><span style="color:#17171c;">Canvas:</span> pan/zoom, snap-to-grid nodes. <span style="color:#17171c;">Tablet:</span> property panel → bottom drawer. <span style="color:#17171c;">Mobile:</span> read-only pan/zoom canvas + tap node for detail sheet (editing desktop-first).</div>
+</div>
+</div>
+</div>
+
+<!-- ============ SCREEN 08 IMPLEMENTATION PLAN ============ -->
+<div data-name="s-impl" style="padding-top: 48px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; letter-spacing: 0.28px; text-transform: uppercase; color: #93939f; padding-bottom: 12px;">Screen 08 — Implementation Plan</div>
+<div style="font-family: 'Space Grotesk', sans-serif; font-size: 32px; letter-spacing: -0.32px; color: #000000; padding-bottom: 24px;">Task Breakdown & Code Gen</div>
+<div style="display: flex; gap: 28px;">
+<div style="flex: 2.2; border: 1px solid #d9d9dd; border-radius: 22px; padding: 20px;">
+<div style="display: flex; gap: 16px;">
+<div style="flex: 1;"><div style="font-family:'Fira Code',monospace; font-size: 10px; color: #93939f; text-transform: uppercase; padding-bottom: 12px;">Tasks</div><div style="display: flex; flex-direction: column; gap: 8px;"><div style="display: flex; align-items: center; gap: 10px; border: 1px solid #f2f2f2; border-radius: 10px; padding: 12px;"><div style="width: 16px; height: 16px; border-radius: 9999px; background: #0a8a5c;"></div><span style="font-size: 13px; color: #17171c;">Scaffold service</span></div><div style="display: flex; align-items: center; gap: 10px; border: 1px solid #f2f2f2; border-radius: 10px; padding: 12px;"><div style="width: 16px; height: 16px; border-radius: 9999px; background: #1863dc;"></div><span style="font-size: 13px; color: #17171c;">Wire vector store</span></div><div style="display: flex; align-items: center; gap: 10px; border: 1px solid #f2f2f2; border-radius: 10px; padding: 12px;"><div style="width: 16px; height: 16px; border-radius: 9999px; background: #d9d9dd;"></div><span style="font-size: 13px; color: #93939f;">Add tests</span></div></div></div>
+<div style="flex: 1.2; background-color: #0d0a14; border-radius: 16px; padding: 18px; font-family:'Fira Code',monospace; font-size: 12px; line-height: 1.8;"><span style="color:#6ee7b7;">// generated</span><br/><span style="color:#c79bf5;">export function</span> <span style="color:#f0b968;">analyze</span>(<span style="color:#8ea0ff;">ticket</span>) {<br/><span style="padding-left:16px; display:inline-block; color:#93939f;">return model.infer(ticket);</span><br/>}</div>
+</div>
+</div>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 16px;">
+<div style="border: 1px solid #f2f2f2; border-radius: 16px; padding: 18px;"><div style="font-family:'Fira Code',monospace; font-size: 10px; color: #93939f; text-transform: uppercase; padding-bottom: 10px;">Progress</div><div style="height: 6px; background: #f2f2f2; border-radius: 9999px;"><div style="width: 60%; height: 6px; background: #8b3fd6; border-radius: 9999px;"></div></div><div style="font-size: 11px; color: #93939f; padding-top: 8px;">2 / 3 tasks · 60%</div></div>
+<div style="border: 1px solid #f2f2f2; border-radius: 16px; padding: 18px; font-size: 13px; color: #93939f; line-height: 1.6;"><span style="color:#17171c;">Grid:</span> task list + code preview split. <span style="color:#17171c;">Tablet:</span> tabs (Tasks / Code). <span style="color:#17171c;">Mobile:</span> stacked; code viewer horizontally scrollable with wrap toggle.</div>
+</div>
+</div>
+</div>
+
+<!-- ============ SCREEN 09 EXECUTION TIMELINE ============ -->
+<div data-name="s-timeline" style="padding-top: 48px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; letter-spacing: 0.28px; text-transform: uppercase; color: #93939f; padding-bottom: 12px;">Screen 09 — Execution Timeline</div>
+<div style="font-family: 'Space Grotesk', sans-serif; font-size: 32px; letter-spacing: -0.32px; color: #000000; padding-bottom: 24px;">Lifecycle Timeline</div>
+<div style="display: flex; gap: 28px;">
+<div style="flex: 2.2; border: 1px solid #d9d9dd; border-radius: 22px; padding: 24px;">
+<div style="display: flex; flex-direction: column; gap: 0;">
+<div style="display: flex; gap: 14px;"><div style="display: flex; flex-direction: column; align-items: center;"><div style="width: 14px; height: 14px; border-radius: 9999px; background: #0a8a5c;"></div><div style="width: 2px; height: 40px; background: #f2f2f2;"></div></div><div style="padding-bottom: 20px;"><div style="font-size: 14px; color: #000;">Research complete</div><div style="font-family:'Fira Code',monospace; font-size: 11px; color: #93939f;">08:12 · 94% confidence</div></div></div>
+<div style="display: flex; gap: 14px;"><div style="display: flex; flex-direction: column; align-items: center;"><div style="width: 14px; height: 14px; border-radius: 9999px; background: #db3f88; box-shadow: 0 0 8px rgba(219,63,136,0.5);"></div><div style="width: 2px; height: 40px; background: #f2f2f2;"></div></div><div style="padding-bottom: 20px;"><div style="font-size: 14px; color: #000;">Approval granted</div><div style="font-family:'Fira Code',monospace; font-size: 11px; color: #93939f;">08:40 · by Priya</div></div></div>
+<div style="display: flex; gap: 14px;"><div style="display: flex; flex-direction: column; align-items: center;"><div style="width: 14px; height: 14px; border-radius: 9999px; background: #8b3fd6;"></div><div style="width: 2px; height: 40px; background: #f2f2f2;"></div></div><div style="padding-bottom: 20px;"><div style="font-size: 14px; color: #000;">Code generation running</div><div style="font-family:'Fira Code',monospace; font-size: 11px; color: #93939f;">now · 2/3 tasks</div></div></div>
+<div style="display: flex; gap: 14px;"><div style="width: 14px; height: 14px; border-radius: 9999px; background: #d9d9dd;"></div><div><div style="font-size: 14px; color: #93939f;">Verification</div><div style="font-family:'Fira Code',monospace; font-size: 11px; color: #93939f;">pending</div></div></div>
+</div>
+</div>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 16px;">
+<div style="border: 1px solid #f2f2f2; border-radius: 16px; padding: 18px;"><div style="font-family:'Fira Code',monospace; font-size: 10px; color: #93939f; text-transform: uppercase; padding-bottom: 10px;">Error Event</div><div style="display: flex; align-items: center; gap: 8px; background: #fceceb; border: 1px solid #f2c9c5; border-radius: 10px; padding: 12px;"><img src="https://api.iconify.design/mdi/alert-circle.svg?color=%23c0362c" style="width: 16px; height: 16px;" /><span style="font-size: 12px; color: #c0362c;">Verification failed · retry</span></div></div>
+<div style="border: 1px solid #f2f2f2; border-radius: 16px; padding: 18px; font-size: 13px; color: #93939f; line-height: 1.6;"><span style="color:#17171c;">Layout:</span> vertical timeline all breakpoints. <span style="color:#17171c;">Desktop</span> adds a right meta rail; <span style="color:#17171c;">mobile</span> inlines meta beneath each event. Live region announces new events.</div>
+</div>
+</div>
+</div>
+
+<!-- ============ SCREEN 10 VALIDATION & ARTIFACTS ============ -->
+<div data-name="s-validation" style="padding-top: 48px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; letter-spacing: 0.28px; text-transform: uppercase; color: #93939f; padding-bottom: 12px;">Screen 10 — Validation & Artifacts</div>
+<div style="font-family: 'Space Grotesk', sans-serif; font-size: 32px; letter-spacing: -0.32px; color: #000000; padding-bottom: 24px;">Verification Report · Export</div>
+<div style="display: flex; gap: 28px;">
+<div style="flex: 2.2; border: 1px solid #d9d9dd; border-radius: 22px; padding: 20px;">
+<div style="display: flex; gap: 16px; padding-bottom: 16px;">
+<div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 16px; padding: 18px; text-align: center;"><div style="font-family:'Space Grotesk',sans-serif; font-size: 28px; color: #0a8a5c;">42</div><div style="font-size: 12px; color: #93939f;">Checks passed</div></div>
+<div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 16px; padding: 18px; text-align: center;"><div style="font-family:'Space Grotesk',sans-serif; font-size: 28px; color: #b36a00;">3</div><div style="font-size: 12px; color: #93939f;">Warnings</div></div>
+<div style="flex: 1; border: 1px solid #f2f2f2; border-radius: 16px; padding: 18px; text-align: center;"><div style="font-family:'Space Grotesk',sans-serif; font-size: 28px; color: #c0362c;">1</div><div style="font-size: 12px; color: #93939f;">Failed</div></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px;">
+<div style="display: flex; align-items: center; gap: 10px; border: 1px solid #f2f2f2; border-radius: 10px; padding: 12px;"><img src="https://api.iconify.design/mdi/file-code-outline.svg?color=%238b3fd6" style="width: 18px; height: 18px;" /><span style="font-size: 13px; color: #17171c;">insights-agent.tsx</span><div style="flex:1;"></div><img src="https://api.iconify.design/mdi/download.svg?color=%2393939f" style="width: 16px; height: 16px;" /></div>
+<div style="display: flex; align-items: center; gap: 10px; border: 1px solid #f2f2f2; border-radius: 10px; padding: 12px;"><img src="https://api.iconify.design/mdi/file-document-outline.svg?color=%233b4fd6" style="width: 18px; height: 18px;" /><span style="font-size: 13px; color: #17171c;">spec.md</span><div style="flex:1;"></div><img src="https://api.iconify.design/mdi/download.svg?color=%2393939f" style="width: 16px; height: 16px;" /></div>
+</div>
+</div>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 16px;">
+<div style="background-color: #0d0a14; border-radius: 16px; padding: 20px;"><div style="font-family:'Fira Code',monospace; font-size: 10px; color: rgba(255,255,255,0.5); text-transform: uppercase; padding-bottom: 12px;">Export</div><div style="font-size: 13px; color: #fff; padding-bottom: 14px;">React + TypeScript bundle ready</div><div style="text-align: center; padding: 10px; background: #fff; border-radius: 9999px; font-size: 13px; color: #0d0a14;">Export All</div></div>
+<div style="border: 1px solid #f2f2f2; border-radius: 16px; padding: 18px; font-size: 13px; color: #93939f; line-height: 1.6;"><span style="color:#17171c;">Grid:</span> report 8-col, export 4-col. <span style="color:#17171c;">Mobile:</span> summary stat cards wrap 3→1 as scrollable row; export becomes sticky bottom bar. Failed checks expand inline with fix guidance.</div>
+</div>
+</div>
+</div>
+
+<!-- CROSS-SCREEN RESPONSIVE PRINCIPLES -->
+<div data-name="principles" style="padding-top: 56px;">
+<div style="font-family: 'Fira Code', monospace; font-size: 11px; letter-spacing: 0.28px; text-transform: uppercase; color: #93939f; padding-bottom: 12px;">Cross-Screen — Responsive Principles</div>
+<div style="font-family: 'Space Grotesk', sans-serif; font-size: 32px; letter-spacing: -0.32px; color: #000000; padding-bottom: 32px;">One System, Every Screen</div>
+<div style="display: flex; gap: 28px; flex-wrap: wrap;">
+<div style="flex: 1; min-width: 280px; border-left: 2px solid #1863dc; border-radius: 0 8px 8px 0; padding: 4px 0 4px 24px;">
+<div style="font-size: 17px; color: #000; padding-bottom: 8px;">Rails collapse, content persists</div>
+<div style="font-size: 14px; color: #93939f; line-height: 1.5;">4-col side rails become bottom sheets or accordions on mobile — never hidden. The 8-col primary content always stays first in the reading order.</div>
+</div>
+<div style="flex: 1; min-width: 280px; border-left: 2px solid #3b4fd6; border-radius: 0 8px 8px 0; padding: 4px 0 4px 24px;">
+<div style="font-size: 17px; color: #000; padding-bottom: 8px;">Sidebar → bottom tabs</div>
+<div style="font-size: 14px; color: #93939f; line-height: 1.5;">The desktop icon-rail nav converts to a 5-item bottom tab bar under 768px, keeping primary destinations one thumb-tap away.</div>
+</div>
+<div style="flex: 1; min-width: 280px; border-left: 2px solid #8b3fd6; border-radius: 0 8px 8px 0; padding: 4px 0 4px 24px;">
+<div style="font-size: 17px; color: #000; padding-bottom: 8px;">Lattice stays first-class</div>
+<div style="font-size: 14px; color: #93939f; line-height: 1.5;">On small screens the lattice becomes a tappable summary card that opens full-screen — spatial context is never dropped, only deferred.</div>
+</div>
+<div style="flex: 1; min-width: 280px; border-left: 2px solid #0a8a5c; border-radius: 0 8px 8px 0; padding: 4px 0 4px 24px;">
+<div style="font-size: 17px; color: #000; padding-bottom: 8px;">Every state has a design</div>
+<div style="font-size: 14px; color: #93939f; line-height: 1.5;">Empty, loading (skeleton), error, and permission states are specified per screen — no blank frames. Focus ring #4c6ee6 2px is consistent everywhere.</div>
+</div>
+</div>
+</div>
+
+<!-- FOOTER -->
+<div style="display: flex; align-items: center; gap: 12px; padding-top: 40px; border-top: 1px solid #d9d9dd; margin-top: 40px;">
+<img src="https://api.iconify.design/mdi/check-decagram-outline.svg?color=%230a8a5c" style="width: 20px; height: 20px;" />
+<span style="font-size: 14px; color: #93939f;">All 10 core screens specified across desktop / tablet / mobile · 12-column grid · 22px card system · empty/loading/error states · consistent focus indicators · WCAG AA · export-ready. This completes the 6-view Bicameral design specification.</span>
+</div>
+
+</div>

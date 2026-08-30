@@ -1,0 +1,1789 @@
+{
+  "timestamp": "2026-08-19T16:16:45.118928+00:00",
+  "run_type": "butterfly_v4_ns3_dna_constraint",
+  "ns3_system_instruction": "NORTH STAR #3 \u2014 THE GOAL, THE CONSTRAINT, THE DNA:\n\nEvery interaction must produce measurably verified value for the user.\nIf it doesn't, the system must detect, diagnose, and resolve the gap\nautonomously before the user becomes aware of it.\n\nThis is achieved through a deterministic agent lattice where:\n  1. Agents are SEPARATED by function (research, audit, design, code, verify)\n  2. Each agent's output is GOVERNED by fitness-tested constraints\n  3. The whole system EVOLVES toward zero-waste value delivery\n  4. Unverified value never reaches the user\n  5. Gaps are detected and resolved before user awareness\n\nThis is the GLAAS-Lattice: Governed Lattice Architecture for Agent Separation.",
+  "genome_size": 85,
+  "ns3_dimensions": ["agent_separation", "zero_waste", "gap_detection"],
+  "ns3_constraints": {
+    "gate_min": 0.3,
+    "separation_min": 0.4,
+    "waste_min": 0.3,
+    "gap_min": 0.2
+  },
+  "parameters": {
+    "pop": 60,
+    "gens": 40,
+    "crossover": 0.85,
+    "mutation_base": 0.02,
+    "mutation_max": 0.1
+  },
+  "total_interactions": 7680000,
+  "islands": {
+    "solo_dev": {
+      "fitness": 88.99,
+      "vdr": 83.68,
+      "agent_separation": 0.95,
+      "zero_waste": 0.935,
+      "gap_detection": 0.88,
+      "collab": 0.245,
+      "enterprise": 0.09,
+      "team": 0.13,
+      "proactive": 0.8,
+      "rejected": 534,
+      "history": [
+        {
+          "gen": 1,
+          "best": 61.39,
+          "avg": 54.3,
+          "best_vdr": 48.07,
+          "rejected": 45,
+          "mutation": 0.02
+        },
+        {
+          "gen": 2,
+          "best": 66.42,
+          "avg": 57.8,
+          "best_vdr": 65.0,
+          "rejected": 19,
+          "mutation": 0.02
+        },
+        {
+          "gen": 3,
+          "best": 73.02,
+          "avg": 63.4,
+          "best_vdr": 55.23,
+          "rejected": 17,
+          "mutation": 0.02
+        },
+        {
+          "gen": 4,
+          "best": 76.58,
+          "avg": 68.0,
+          "best_vdr": 74.91,
+          "rejected": 12,
+          "mutation": 0.02
+        },
+        {
+          "gen": 5,
+          "best": 77.87,
+          "avg": 72.2,
+          "best_vdr": 62.72,
+          "rejected": 11,
+          "mutation": 0.02
+        },
+        {
+          "gen": 6,
+          "best": 80.41,
+          "avg": 75.3,
+          "best_vdr": 68.28,
+          "rejected": 14,
+          "mutation": 0.02
+        },
+        {
+          "gen": 7,
+          "best": 82.18,
+          "avg": 77.7,
+          "best_vdr": 76.96,
+          "rejected": 14,
+          "mutation": 0.02
+        },
+        {
+          "gen": 8,
+          "best": 83.49,
+          "avg": 80.4,
+          "best_vdr": 81.17,
+          "rejected": 15,
+          "mutation": 0.02
+        },
+        {
+          "gen": 9,
+          "best": 84.37,
+          "avg": 81.3,
+          "best_vdr": 77.39,
+          "rejected": 13,
+          "mutation": 0.02
+        },
+        {
+          "gen": 10,
+          "best": 85.26,
+          "avg": 81.4,
+          "best_vdr": 76.89,
+          "rejected": 12,
+          "mutation": 0.02
+        },
+        {
+          "gen": 11,
+          "best": 85.34,
+          "avg": 81.7,
+          "best_vdr": 77.16,
+          "rejected": 10,
+          "mutation": 0.02
+        },
+        {
+          "gen": 12,
+          "best": 86.14,
+          "avg": 84.7,
+          "best_vdr": 78.56,
+          "rejected": 15,
+          "mutation": 0.02
+        },
+        {
+          "gen": 13,
+          "best": 86.43,
+          "avg": 84.1,
+          "best_vdr": 79.48,
+          "rejected": 13,
+          "mutation": 0.02
+        },
+        {
+          "gen": 14,
+          "best": 85.95,
+          "avg": 82.0,
+          "best_vdr": 82.03,
+          "rejected": 10,
+          "mutation": 0.02
+        },
+        {
+          "gen": 15,
+          "best": 86.57,
+          "avg": 83.7,
+          "best_vdr": 79.17,
+          "rejected": 13,
+          "mutation": 0.02
+        },
+        {
+          "gen": 16,
+          "best": 86.06,
+          "avg": 83.4,
+          "best_vdr": 78.27,
+          "rejected": 12,
+          "mutation": 0.02
+        },
+        {
+          "gen": 17,
+          "best": 86.26,
+          "avg": 83.0,
+          "best_vdr": 78.91,
+          "rejected": 11,
+          "mutation": 0.02
+        },
+        {
+          "gen": 18,
+          "best": 86.28,
+          "avg": 83.8,
+          "best_vdr": 78.44,
+          "rejected": 13,
+          "mutation": 0.02
+        },
+        {
+          "gen": 19,
+          "best": 86.64,
+          "avg": 82.8,
+          "best_vdr": 79.41,
+          "rejected": 10,
+          "mutation": 0.02
+        },
+        {
+          "gen": 20,
+          "best": 86.72,
+          "avg": 84.4,
+          "best_vdr": 79.67,
+          "rejected": 13,
+          "mutation": 0.02
+        },
+        {
+          "gen": 21,
+          "best": 87.33,
+          "avg": 84.3,
+          "best_vdr": 81.25,
+          "rejected": 12,
+          "mutation": 0.02
+        },
+        {
+          "gen": 22,
+          "best": 86.7,
+          "avg": 82.6,
+          "best_vdr": 79.19,
+          "rejected": 10,
+          "mutation": 0.02
+        },
+        {
+          "gen": 23,
+          "best": 86.84,
+          "avg": 84.6,
+          "best_vdr": 79.64,
+          "rejected": 13,
+          "mutation": 0.02
+        },
+        {
+          "gen": 24,
+          "best": 87.36,
+          "avg": 82.8,
+          "best_vdr": 81.63,
+          "rejected": 9,
+          "mutation": 0.02
+        },
+        {
+          "gen": 25,
+          "best": 87.32,
+          "avg": 84.2,
+          "best_vdr": 81.99,
+          "rejected": 12,
+          "mutation": 0.02
+        },
+        {
+          "gen": 26,
+          "best": 87.16,
+          "avg": 83.9,
+          "best_vdr": 81.95,
+          "rejected": 12,
+          "mutation": 0.02
+        },
+        {
+          "gen": 27,
+          "best": 87.57,
+          "avg": 86.3,
+          "best_vdr": 82.03,
+          "rejected": 15,
+          "mutation": 0.02
+        },
+        {
+          "gen": 28,
+          "best": 87.38,
+          "avg": 86.3,
+          "best_vdr": 81.38,
+          "rejected": 15,
+          "mutation": 0.02
+        },
+        {
+          "gen": 29,
+          "best": 87.61,
+          "avg": 84.1,
+          "best_vdr": 82.13,
+          "rejected": 11,
+          "mutation": 0.02
+        },
+        {
+          "gen": 30,
+          "best": 87.49,
+          "avg": 84.5,
+          "best_vdr": 81.78,
+          "rejected": 13,
+          "mutation": 0.02
+        },
+        {
+          "gen": 31,
+          "best": 87.48,
+          "avg": 85.1,
+          "best_vdr": 81.72,
+          "rejected": 12,
+          "mutation": 0.02
+        },
+        {
+          "gen": 32,
+          "best": 87.95,
+          "avg": 85.4,
+          "best_vdr": 82.77,
+          "rejected": 13,
+          "mutation": 0.02
+        },
+        {
+          "gen": 33,
+          "best": 88.83,
+          "avg": 86.2,
+          "best_vdr": 85.61,
+          "rejected": 13,
+          "mutation": 0.02
+        },
+        {
+          "gen": 34,
+          "best": 88.34,
+          "avg": 85.4,
+          "best_vdr": 84.01,
+          "rejected": 11,
+          "mutation": 0.02
+        },
+        {
+          "gen": 35,
+          "best": 88.49,
+          "avg": 83.5,
+          "best_vdr": 84.52,
+          "rejected": 7,
+          "mutation": 0.02
+        },
+        {
+          "gen": 36,
+          "best": 88.82,
+          "avg": 84.7,
+          "best_vdr": 85.59,
+          "rejected": 10,
+          "mutation": 0.02
+        },
+        {
+          "gen": 37,
+          "best": 88.54,
+          "avg": 87.3,
+          "best_vdr": 84.66,
+          "rejected": 15,
+          "mutation": 0.02
+        },
+        {
+          "gen": 38,
+          "best": 88.59,
+          "avg": 86.5,
+          "best_vdr": 84.83,
+          "rejected": 13,
+          "mutation": 0.02
+        },
+        {
+          "gen": 39,
+          "best": 88.52,
+          "avg": 86.6,
+          "best_vdr": 82.16,
+          "rejected": 13,
+          "mutation": 0.02
+        },
+        {
+          "gen": 40,
+          "best": 88.99,
+          "avg": 86.4,
+          "best_vdr": 83.68,
+          "rejected": 13,
+          "mutation": 0.02
+        }
+      ]
+    },
+    "startup": {
+      "fitness": 91.75,
+      "vdr": 86.11,
+      "agent_separation": 0.95,
+      "zero_waste": 0.794,
+      "gap_detection": 0.82,
+      "collab": 0.707,
+      "enterprise": 0.225,
+      "team": 0.716,
+      "proactive": 0.7,
+      "rejected": 531,
+      "history": [
+        {
+          "gen": 1,
+          "best": 56.89,
+          "avg": 52.7,
+          "best_vdr": 56.68,
+          "rejected": 45,
+          "mutation": 0.02
+        },
+        {
+          "gen": 2,
+          "best": 65.19,
+          "avg": 55.4,
+          "best_vdr": 71.16,
+          "rejected": 16,
+          "mutation": 0.02
+        },
+        {
+          "gen": 3,
+          "best": 69.33,
+          "avg": 62.9,
+          "best_vdr": 48.3,
+          "rejected": 18,
+          "mutation": 0.02
+        },
+        {
+          "gen": 4,
+          "best": 74.91,
+          "avg": 67.0,
+          "best_vdr": 74.83,
+          "rejected": 14,
+          "mutation": 0.02
+        },
+        {
+          "gen": 5,
+          "best": 77.79,
+          "avg": 71.8,
+          "best_vdr": 65.74,
+          "rejected": 15,
+          "mutation": 0.02
+        },
+        {
+          "gen": 6,
+          "best": 82.1,
+          "avg": 74.9,
+          "best_vdr": 72.76,
+          "rejected": 10,
+          "mutation": 0.02
+        },
+        {
+          "gen": 7,
+          "best": 84.81,
+          "avg": 78.7,
+          "best_vdr": 75.74,
+          "rejected": 10,
+          "mutation": 0.02
+        },
+        {
+          "gen": 8,
+          "best": 84.94,
+          "avg": 80.5,
+          "best_vdr": 72.82,
+          "rejected": 9,
+          "mutation": 0.02
+        },
+        {
+          "gen": 9,
+          "best": 86.3,
+          "avg": 82.8,
+          "best_vdr": 77.41,
+          "rejected": 13,
+          "mutation": 0.02
+        },
+        {
+          "gen": 10,
+          "best": 87.27,
+          "avg": 84.3,
+          "best_vdr": 80.55,
+          "rejected": 13,
+          "mutation": 0.02
+        },
+        {
+          "gen": 11,
+          "best": 88.0,
+          "avg": 85.9,
+          "best_vdr": 76.78,
+          "rejected": 14,
+          "mutation": 0.02
+        },
+        {
+          "gen": 12,
+          "best": 88.27,
+          "avg": 86.4,
+          "best_vdr": 77.6,
+          "rejected": 14,
+          "mutation": 0.02
+        },
+        {
+          "gen": 13,
+          "best": 89.29,
+          "avg": 86.0,
+          "best_vdr": 80.89,
+          "rejected": 12,
+          "mutation": 0.02
+        },
+        {
+          "gen": 14,
+          "best": 89.47,
+          "avg": 86.2,
+          "best_vdr": 80.36,
+          "rejected": 10,
+          "mutation": 0.02
+        },
+        {
+          "gen": 15,
+          "best": 90.03,
+          "avg": 87.9,
+          "best_vdr": 83.31,
+          "rejected": 14,
+          "mutation": 0.02
+        },
+        {
+          "gen": 16,
+          "best": 90.14,
+          "avg": 85.5,
+          "best_vdr": 82.69,
+          "rejected": 10,
+          "mutation": 0.02
+        },
+        {
+          "gen": 17,
+          "best": 89.93,
+          "avg": 87.9,
+          "best_vdr": 82.03,
+          "rejected": 13,
+          "mutation": 0.02
+        },
+        {
+          "gen": 18,
+          "best": 90.1,
+          "avg": 87.7,
+          "best_vdr": 82.58,
+          "rejected": 13,
+          "mutation": 0.02
+        },
+        {
+          "gen": 19,
+          "best": 89.93,
+          "avg": 88.6,
+          "best_vdr": 82.04,
+          "rejected": 14,
+          "mutation": 0.02
+        },
+        {
+          "gen": 20,
+          "best": 90.54,
+          "avg": 87.2,
+          "best_vdr": 83.97,
+          "rejected": 11,
+          "mutation": 0.02
+        },
+        {
+          "gen": 21,
+          "best": 90.17,
+          "avg": 86.2,
+          "best_vdr": 82.81,
+          "rejected": 9,
+          "mutation": 0.02
+        },
+        {
+          "gen": 22,
+          "best": 90.16,
+          "avg": 87.2,
+          "best_vdr": 82.75,
+          "rejected": 12,
+          "mutation": 0.02
+        },
+        {
+          "gen": 23,
+          "best": 90.1,
+          "avg": 88.1,
+          "best_vdr": 82.57,
+          "rejected": 13,
+          "mutation": 0.02
+        },
+        {
+          "gen": 24,
+          "best": 90.42,
+          "avg": 88.1,
+          "best_vdr": 83.24,
+          "rejected": 13,
+          "mutation": 0.02
+        },
+        {
+          "gen": 25,
+          "best": 90.53,
+          "avg": 87.3,
+          "best_vdr": 83.62,
+          "rejected": 12,
+          "mutation": 0.02
+        },
+        {
+          "gen": 26,
+          "best": 90.63,
+          "avg": 87.4,
+          "best_vdr": 82.49,
+          "rejected": 12,
+          "mutation": 0.02
+        },
+        {
+          "gen": 27,
+          "best": 90.32,
+          "avg": 87.3,
+          "best_vdr": 81.48,
+          "rejected": 12,
+          "mutation": 0.02
+        },
+        {
+          "gen": 28,
+          "best": 91.12,
+          "avg": 87.4,
+          "best_vdr": 84.4,
+          "rejected": 11,
+          "mutation": 0.02
+        },
+        {
+          "gen": 29,
+          "best": 91.33,
+          "avg": 86.8,
+          "best_vdr": 84.75,
+          "rejected": 10,
+          "mutation": 0.02
+        },
+        {
+          "gen": 30,
+          "best": 91.03,
+          "avg": 89.2,
+          "best_vdr": 85.2,
+          "rejected": 13,
+          "mutation": 0.02
+        },
+        {
+          "gen": 31,
+          "best": 91.69,
+          "avg": 87.1,
+          "best_vdr": 86.23,
+          "rejected": 9,
+          "mutation": 0.02
+        },
+        {
+          "gen": 32,
+          "best": 91.33,
+          "avg": 90.0,
+          "best_vdr": 84.72,
+          "rejected": 15,
+          "mutation": 0.02
+        },
+        {
+          "gen": 33,
+          "best": 91.55,
+          "avg": 89.1,
+          "best_vdr": 85.41,
+          "rejected": 13,
+          "mutation": 0.02
+        },
+        {
+          "gen": 34,
+          "best": 91.49,
+          "avg": 88.2,
+          "best_vdr": 85.26,
+          "rejected": 11,
+          "mutation": 0.02
+        },
+        {
+          "gen": 35,
+          "best": 91.34,
+          "avg": 89.3,
+          "best_vdr": 84.77,
+          "rejected": 13,
+          "mutation": 0.02
+        },
+        {
+          "gen": 36,
+          "best": 91.49,
+          "avg": 90.7,
+          "best_vdr": 85.24,
+          "rejected": 16,
+          "mutation": 0.02
+        },
+        {
+          "gen": 37,
+          "best": 91.57,
+          "avg": 89.8,
+          "best_vdr": 85.52,
+          "rejected": 14,
+          "mutation": 0.02
+        },
+        {
+          "gen": 38,
+          "best": 91.58,
+          "avg": 89.9,
+          "best_vdr": 85.55,
+          "rejected": 14,
+          "mutation": 0.02
+        },
+        {
+          "gen": 39,
+          "best": 91.75,
+          "avg": 88.6,
+          "best_vdr": 86.11,
+          "rejected": 11,
+          "mutation": 0.02
+        },
+        {
+          "gen": 40,
+          "best": 91.63,
+          "avg": 87.6,
+          "best_vdr": 85.67,
+          "rejected": 10,
+          "mutation": 0.02
+        }
+      ]
+    },
+    "enterprise": {
+      "fitness": 99.56,
+      "vdr": 85.89,
+      "agent_separation": 0.95,
+      "zero_waste": 0.864,
+      "gap_detection": 0.94,
+      "collab": 0.528,
+      "enterprise": 1.0,
+      "team": 0.833,
+      "proactive": 0.9,
+      "rejected": 532,
+      "history": [
+        {
+          "gen": 1,
+          "best": 59.02,
+          "avg": 53.3,
+          "best_vdr": 53.7,
+          "rejected": 46,
+          "mutation": 0.02
+        },
+        {
+          "gen": 2,
+          "best": 77.72,
+          "avg": 57.2,
+          "best_vdr": 76.67,
+          "rejected": 17,
+          "mutation": 0.02
+        },
+        {
+          "gen": 3,
+          "best": 78.72,
+          "avg": 64.9,
+          "best_vdr": 74.27,
+          "rejected": 22,
+          "mutation": 0.02
+        },
+        {
+          "gen": 4,
+          "best": 83.62,
+          "avg": 75.6,
+          "best_vdr": 72.58,
+          "rejected": 16,
+          "mutation": 0.02
+        },
+        {
+          "gen": 5,
+          "best": 87.1,
+          "avg": 80.3,
+          "best_vdr": 79.0,
+          "rejected": 14,
+          "mutation": 0.02
+        },
+        {
+          "gen": 6,
+          "best": 89.96,
+          "avg": 83.9,
+          "best_vdr": 82.43,
+          "rejected": 13,
+          "mutation": 0.02
+        },
+        {
+          "gen": 7,
+          "best": 90.45,
+          "avg": 86.9,
+          "best_vdr": 82.41,
+          "rejected": 12,
+          "mutation": 0.02
+        },
+        {
+          "gen": 8,
+          "best": 93.27,
+          "avg": 87.4,
+          "best_vdr": 84.91,
+          "rejected": 10,
+          "mutation": 0.02
+        },
+        {
+          "gen": 9,
+          "best": 93.42,
+          "avg": 91.0,
+          "best_vdr": 82.17,
+          "rejected": 14,
+          "mutation": 0.02
+        },
+        {
+          "gen": 10,
+          "best": 94.53,
+          "avg": 91.0,
+          "best_vdr": 82.26,
+          "rejected": 12,
+          "mutation": 0.02
+        },
+        {
+          "gen": 11,
+          "best": 95.43,
+          "avg": 89.8,
+          "best_vdr": 83.54,
+          "rejected": 9,
+          "mutation": 0.02
+        },
+        {
+          "gen": 12,
+          "best": 95.6,
+          "avg": 92.8,
+          "best_vdr": 81.44,
+          "rejected": 13,
+          "mutation": 0.02
+        },
+        {
+          "gen": 13,
+          "best": 96.7,
+          "avg": 92.5,
+          "best_vdr": 83.66,
+          "rejected": 11,
+          "mutation": 0.02
+        },
+        {
+          "gen": 14,
+          "best": 97.11,
+          "avg": 95.0,
+          "best_vdr": 84.46,
+          "rejected": 14,
+          "mutation": 0.02
+        },
+        {
+          "gen": 15,
+          "best": 97.24,
+          "avg": 92.0,
+          "best_vdr": 84.77,
+          "rejected": 9,
+          "mutation": 0.02
+        },
+        {
+          "gen": 16,
+          "best": 96.99,
+          "avg": 92.8,
+          "best_vdr": 83.97,
+          "rejected": 9,
+          "mutation": 0.02
+        },
+        {
+          "gen": 17,
+          "best": 97.42,
+          "avg": 93.4,
+          "best_vdr": 85.37,
+          "rejected": 10,
+          "mutation": 0.02
+        },
+        {
+          "gen": 18,
+          "best": 97.26,
+          "avg": 94.0,
+          "best_vdr": 84.86,
+          "rejected": 11,
+          "mutation": 0.02
+        },
+        {
+          "gen": 19,
+          "best": 97.23,
+          "avg": 95.3,
+          "best_vdr": 84.75,
+          "rejected": 13,
+          "mutation": 0.02
+        },
+        {
+          "gen": 20,
+          "best": 97.55,
+          "avg": 94.5,
+          "best_vdr": 84.62,
+          "rejected": 12,
+          "mutation": 0.02
+        },
+        {
+          "gen": 21,
+          "best": 97.83,
+          "avg": 94.4,
+          "best_vdr": 85.5,
+          "rejected": 12,
+          "mutation": 0.02
+        },
+        {
+          "gen": 22,
+          "best": 97.92,
+          "avg": 94.3,
+          "best_vdr": 85.81,
+          "rejected": 11,
+          "mutation": 0.02
+        },
+        {
+          "gen": 23,
+          "best": 97.57,
+          "avg": 95.3,
+          "best_vdr": 84.65,
+          "rejected": 15,
+          "mutation": 0.02
+        },
+        {
+          "gen": 24,
+          "best": 97.66,
+          "avg": 96.4,
+          "best_vdr": 84.95,
+          "rejected": 15,
+          "mutation": 0.02
+        },
+        {
+          "gen": 25,
+          "best": 97.83,
+          "avg": 93.1,
+          "best_vdr": 85.51,
+          "rejected": 9,
+          "mutation": 0.02
+        },
+        {
+          "gen": 26,
+          "best": 97.56,
+          "avg": 93.6,
+          "best_vdr": 83.12,
+          "rejected": 9,
+          "mutation": 0.02
+        },
+        {
+          "gen": 27,
+          "best": 97.69,
+          "avg": 94.0,
+          "best_vdr": 83.5,
+          "rejected": 11,
+          "mutation": 0.02
+        },
+        {
+          "gen": 28,
+          "best": 98.2,
+          "avg": 94.2,
+          "best_vdr": 86.7,
+          "rejected": 11,
+          "mutation": 0.02
+        },
+        {
+          "gen": 29,
+          "best": 97.98,
+          "avg": 96.4,
+          "best_vdr": 84.42,
+          "rejected": 14,
+          "mutation": 0.02
+        },
+        {
+          "gen": 30,
+          "best": 99.05,
+          "avg": 95.3,
+          "best_vdr": 84.28,
+          "rejected": 12,
+          "mutation": 0.02
+        },
+        {
+          "gen": 31,
+          "best": 98.96,
+          "avg": 96.3,
+          "best_vdr": 83.97,
+          "rejected": 13,
+          "mutation": 0.02
+        },
+        {
+          "gen": 32,
+          "best": 99.36,
+          "avg": 97.2,
+          "best_vdr": 85.26,
+          "rejected": 14,
+          "mutation": 0.02
+        },
+        {
+          "gen": 33,
+          "best": 99.5,
+          "avg": 96.8,
+          "best_vdr": 85.71,
+          "rejected": 13,
+          "mutation": 0.02
+        },
+        {
+          "gen": 34,
+          "best": 99.56,
+          "avg": 96.6,
+          "best_vdr": 85.89,
+          "rejected": 12,
+          "mutation": 0.02
+        },
+        {
+          "gen": 35,
+          "best": 99.0,
+          "avg": 96.9,
+          "best_vdr": 84.12,
+          "rejected": 13,
+          "mutation": 0.02
+        },
+        {
+          "gen": 36,
+          "best": 99.51,
+          "avg": 95.6,
+          "best_vdr": 85.74,
+          "rejected": 12,
+          "mutation": 0.02
+        },
+        {
+          "gen": 37,
+          "best": 98.94,
+          "avg": 96.4,
+          "best_vdr": 83.88,
+          "rejected": 12,
+          "mutation": 0.02
+        },
+        {
+          "gen": 38,
+          "best": 99.16,
+          "avg": 96.2,
+          "best_vdr": 84.75,
+          "rejected": 12,
+          "mutation": 0.02
+        },
+        {
+          "gen": 39,
+          "best": 99.18,
+          "avg": 97.0,
+          "best_vdr": 84.67,
+          "rejected": 13,
+          "mutation": 0.02
+        },
+        {
+          "gen": 40,
+          "best": 99.31,
+          "avg": 96.9,
+          "best_vdr": 85.0,
+          "rejected": 12,
+          "mutation": 0.02
+        }
+      ]
+    },
+    "nonprofit": {
+      "fitness": 89.74,
+      "vdr": 76.22,
+      "agent_separation": 1.0,
+      "zero_waste": 0.905,
+      "gap_detection": 0.71,
+      "collab": 0.61,
+      "enterprise": 0.14,
+      "team": 0.886,
+      "proactive": 0.6,
+      "rejected": 580,
+      "history": [
+        {
+          "gen": 1,
+          "best": 54.48,
+          "avg": 51.8,
+          "best_vdr": 55.29,
+          "rejected": 56,
+          "mutation": 0.02
+        },
+        {
+          "gen": 2,
+          "best": 73.39,
+          "avg": 55.3,
+          "best_vdr": 54.79,
+          "rejected": 26,
+          "mutation": 0.02
+        },
+        {
+          "gen": 3,
+          "best": 74.14,
+          "avg": 62.4,
+          "best_vdr": 57.2,
+          "rejected": 24,
+          "mutation": 0.02
+        },
+        {
+          "gen": 4,
+          "best": 77.37,
+          "avg": 71.1,
+          "best_vdr": 58.54,
+          "rejected": 14,
+          "mutation": 0.02
+        },
+        {
+          "gen": 5,
+          "best": 82.2,
+          "avg": 74.4,
+          "best_vdr": 64.53,
+          "rejected": 15,
+          "mutation": 0.02
+        },
+        {
+          "gen": 6,
+          "best": 81.73,
+          "avg": 78.3,
+          "best_vdr": 63.05,
+          "rejected": 18,
+          "mutation": 0.02
+        },
+        {
+          "gen": 7,
+          "best": 82.32,
+          "avg": 79.9,
+          "best_vdr": 64.91,
+          "rejected": 13,
+          "mutation": 0.02
+        },
+        {
+          "gen": 8,
+          "best": 83.3,
+          "avg": 81.0,
+          "best_vdr": 68.06,
+          "rejected": 13,
+          "mutation": 0.02
+        },
+        {
+          "gen": 9,
+          "best": 83.68,
+          "avg": 82.1,
+          "best_vdr": 69.25,
+          "rejected": 15,
+          "mutation": 0.02
+        },
+        {
+          "gen": 10,
+          "best": 85.05,
+          "avg": 80.3,
+          "best_vdr": 73.67,
+          "rejected": 10,
+          "mutation": 0.02
+        },
+        {
+          "gen": 11,
+          "best": 85.19,
+          "avg": 82.7,
+          "best_vdr": 72.45,
+          "rejected": 12,
+          "mutation": 0.02
+        },
+        {
+          "gen": 12,
+          "best": 86.6,
+          "avg": 82.4,
+          "best_vdr": 75.65,
+          "rejected": 13,
+          "mutation": 0.02
+        },
+        {
+          "gen": 13,
+          "best": 85.82,
+          "avg": 83.3,
+          "best_vdr": 73.15,
+          "rejected": 12,
+          "mutation": 0.02
+        },
+        {
+          "gen": 14,
+          "best": 86.46,
+          "avg": 84.4,
+          "best_vdr": 72.57,
+          "rejected": 14,
+          "mutation": 0.02
+        },
+        {
+          "gen": 15,
+          "best": 87.28,
+          "avg": 85.0,
+          "best_vdr": 72.73,
+          "rejected": 14,
+          "mutation": 0.02
+        },
+        {
+          "gen": 16,
+          "best": 87.81,
+          "avg": 85.1,
+          "best_vdr": 74.46,
+          "rejected": 13,
+          "mutation": 0.02
+        },
+        {
+          "gen": 17,
+          "best": 87.36,
+          "avg": 84.8,
+          "best_vdr": 73.31,
+          "rejected": 12,
+          "mutation": 0.02
+        },
+        {
+          "gen": 18,
+          "best": 87.53,
+          "avg": 85.5,
+          "best_vdr": 72.99,
+          "rejected": 13,
+          "mutation": 0.02
+        },
+        {
+          "gen": 19,
+          "best": 87.75,
+          "avg": 85.3,
+          "best_vdr": 73.7,
+          "rejected": 13,
+          "mutation": 0.02
+        },
+        {
+          "gen": 20,
+          "best": 88.07,
+          "avg": 85.9,
+          "best_vdr": 74.74,
+          "rejected": 13,
+          "mutation": 0.02
+        },
+        {
+          "gen": 21,
+          "best": 88.1,
+          "avg": 85.3,
+          "best_vdr": 74.87,
+          "rejected": 11,
+          "mutation": 0.02
+        },
+        {
+          "gen": 22,
+          "best": 88.41,
+          "avg": 85.4,
+          "best_vdr": 72.81,
+          "rejected": 13,
+          "mutation": 0.02
+        },
+        {
+          "gen": 23,
+          "best": 89.17,
+          "avg": 84.9,
+          "best_vdr": 75.25,
+          "rejected": 12,
+          "mutation": 0.02
+        },
+        {
+          "gen": 24,
+          "best": 88.96,
+          "avg": 86.3,
+          "best_vdr": 74.09,
+          "rejected": 12,
+          "mutation": 0.02
+        },
+        {
+          "gen": 25,
+          "best": 88.95,
+          "avg": 87.9,
+          "best_vdr": 74.06,
+          "rejected": 16,
+          "mutation": 0.02
+        },
+        {
+          "gen": 26,
+          "best": 89.12,
+          "avg": 86.0,
+          "best_vdr": 75.12,
+          "rejected": 11,
+          "mutation": 0.02
+        },
+        {
+          "gen": 27,
+          "best": 89.1,
+          "avg": 84.6,
+          "best_vdr": 74.56,
+          "rejected": 10,
+          "mutation": 0.02
+        },
+        {
+          "gen": 28,
+          "best": 89.38,
+          "avg": 86.4,
+          "best_vdr": 75.41,
+          "rejected": 12,
+          "mutation": 0.02
+        },
+        {
+          "gen": 29,
+          "best": 89.37,
+          "avg": 86.5,
+          "best_vdr": 75.02,
+          "rejected": 12,
+          "mutation": 0.02
+        },
+        {
+          "gen": 30,
+          "best": 88.98,
+          "avg": 87.6,
+          "best_vdr": 73.76,
+          "rejected": 14,
+          "mutation": 0.02
+        },
+        {
+          "gen": 31,
+          "best": 89.32,
+          "avg": 85.7,
+          "best_vdr": 75.26,
+          "rejected": 10,
+          "mutation": 0.02
+        },
+        {
+          "gen": 32,
+          "best": 89.12,
+          "avg": 86.5,
+          "best_vdr": 74.61,
+          "rejected": 13,
+          "mutation": 0.02
+        },
+        {
+          "gen": 33,
+          "best": 89.74,
+          "avg": 87.8,
+          "best_vdr": 76.22,
+          "rejected": 14,
+          "mutation": 0.02
+        },
+        {
+          "gen": 34,
+          "best": 89.05,
+          "avg": 87.0,
+          "best_vdr": 73.97,
+          "rejected": 13,
+          "mutation": 0.02
+        },
+        {
+          "gen": 35,
+          "best": 89.47,
+          "avg": 85.7,
+          "best_vdr": 75.35,
+          "rejected": 11,
+          "mutation": 0.02
+        },
+        {
+          "gen": 36,
+          "best": 89.52,
+          "avg": 87.3,
+          "best_vdr": 75.49,
+          "rejected": 14,
+          "mutation": 0.02
+        },
+        {
+          "gen": 37,
+          "best": 89.47,
+          "avg": 87.6,
+          "best_vdr": 75.37,
+          "rejected": 14,
+          "mutation": 0.02
+        },
+        {
+          "gen": 38,
+          "best": 89.14,
+          "avg": 86.2,
+          "best_vdr": 74.28,
+          "rejected": 11,
+          "mutation": 0.02
+        },
+        {
+          "gen": 39,
+          "best": 89.24,
+          "avg": 85.8,
+          "best_vdr": 74.61,
+          "rejected": 11,
+          "mutation": 0.02
+        },
+        {
+          "gen": 40,
+          "best": 89.12,
+          "avg": 86.2,
+          "best_vdr": 74.22,
+          "rejected": 13,
+          "mutation": 0.02
+        }
+      ]
+    }
+  },
+  "migration": {
+    "solo_dev": {
+      "solo_dev": 88.95,
+      "startup": 91.52,
+      "enterprise": 97.41,
+      "nonprofit": 90.74
+    },
+    "startup": {
+      "solo_dev": 86.08,
+      "startup": 91.26,
+      "enterprise": 96.63,
+      "nonprofit": 89.93
+    },
+    "enterprise": {
+      "solo_dev": 87.61,
+      "startup": 92.74,
+      "enterprise": 98.34,
+      "nonprofit": 90.21
+    },
+    "nonprofit": {
+      "solo_dev": 85.89,
+      "startup": 89.91,
+      "enterprise": 94.76,
+      "nonprofit": 88.42
+    }
+  },
+  "overall_best_island": "enterprise",
+  "overall_best": {
+    "fitness": 99.56,
+    "vdr": 85.89,
+    "agent_separation": 0.95,
+    "zero_waste": 0.864,
+    "gap_detection": 0.94,
+    "genome": {
+      "tw_01_empty_generation": 3,
+      "tw_02_infinite_loop": 3,
+      "tw_03_credit_burn": 40,
+      "tw_04_approval_bypass": 3,
+      "tw_05_silent_failure": 2,
+      "tw_06_token_overflow": 158057,
+      "tw_07_duplicate_gen": 6,
+      "tw_08_timeout": 68,
+      "tw_09_unauthorized": 3,
+      "early_exit_threshold": 15,
+      "tripwire_sensitivity": 4,
+      "deployment_gate_score": 0.319,
+      "approval_timeout_hours": 163,
+      "research_depth": 1,
+      "retry_limit": 5,
+      "per_user_budget": 448,
+      "per_bot_budget": 50,
+      "conversation_turn_limit": 30,
+      "burn_rate_per_min": 10,
+      "agent_timeout_seconds": 117,
+      "agent_parallel": 1,
+      "agent_research_sources": 3,
+      "responsive_breakpoint_px": 768,
+      "content_density": 0.484,
+      "pipeline_mode": 1,
+      "discovery_impl_overlap": 0.773,
+      "agent_count": 4,
+      "agent_specialization": 1,
+      "feedback_loop_depth": 5,
+      "governance_gate_count": 3,
+      "primary_model": 3,
+      "research_model": 0,
+      "coding_model": 1,
+      "audit_model": 0,
+      "model_temperature": 0.185,
+      "ui_interaction_mode": 3,
+      "input_bandwidth": 3,
+      "response_format": 1,
+      "approval_flow": 1,
+      "feedback_mechanism": 3,
+      "error_recovery": 0,
+      "onboarding_depth": 3,
+      "accessibility_level": 2,
+      "context_window_utilization": 0.537,
+      "rerank_depth": 37,
+      "embedding_dimensions": 1,
+      "lattice_search_radius": 5,
+      "max_credit_burn_per_session": 100,
+      "min_usability_score": 0.5,
+      "max_response_time_ms": 2000,
+      "min_accessibility_score": 0.7,
+      "coworking_enabled": 1,
+      "crdt_type": 1,
+      "presence_indicators": 0,
+      "file_sync_mode": 1,
+      "voice_video_enabled": 0,
+      "shared_cursor": 1,
+      "team_session_max": 12,
+      "collab_persistence": 2,
+      "sso_provider": 1,
+      "rbac_enabled": 1,
+      "audit_log_retention_days": 97,
+      "rate_limit_strategy": 3,
+      "api_versioning": 3,
+      "multi_tenant_isolation": 1,
+      "chat_enabled": 1,
+      "chat_transport": 0,
+      "message_persistence": 0,
+      "typing_indicators": 1,
+      "push_notifications": 1,
+      "team_hierarchy": 2,
+      "role_set": 2,
+      "project_templates": 5,
+      "team_billing_model": 1,
+      "team_permissions": 3,
+      "health_score_enabled": 1,
+      "churn_prediction_model": 2,
+      "usage_anomaly_detection": 3,
+      "sentiment_analysis_source": 3,
+      "early_warning_threshold": 0.865,
+      "auto_intervention": 3,
+      "billing_model": 4,
+      "nonprofit_discount": 59,
+      "credit_refund_policy": 0,
+      "value_guarantee": 0
+    }
+  },
+  "baseline": {
+    "fitness": 0,
+    "vdr": 31.52
+  },
+  "improvement": 99.56,
+  "genome_changes": {
+    "tw_01_empty_generation": {
+      "baseline": 2,
+      "evolved": 3,
+      "category": "tripwire"
+    },
+    "tw_03_credit_burn": {
+      "baseline": 20,
+      "evolved": 40,
+      "category": "tripwire"
+    },
+    "tw_04_approval_bypass": {
+      "baseline": 1,
+      "evolved": 3,
+      "category": "tripwire"
+    },
+    "tw_06_token_overflow": {
+      "baseline": 100000,
+      "evolved": 158057,
+      "category": "tripwire"
+    },
+    "tw_07_duplicate_gen": {
+      "baseline": 3,
+      "evolved": 6,
+      "category": "tripwire"
+    },
+    "tw_08_timeout": {
+      "baseline": 60,
+      "evolved": 68,
+      "category": "tripwire"
+    },
+    "tw_09_unauthorized": {
+      "baseline": 1,
+      "evolved": 3,
+      "category": "tripwire"
+    },
+    "early_exit_threshold": {
+      "baseline": 20,
+      "evolved": 15,
+      "category": "vdr"
+    },
+    "tripwire_sensitivity": {
+      "baseline": 2,
+      "evolved": 4,
+      "category": "vdr"
+    },
+    "deployment_gate_score": {
+      "baseline": 0.6,
+      "evolved": 0.319,
+      "category": "vdr"
+    },
+    "approval_timeout_hours": {
+      "baseline": 72,
+      "evolved": 163,
+      "category": "vdr"
+    },
+    "research_depth": {
+      "baseline": 3,
+      "evolved": 1,
+      "category": "vdr"
+    },
+    "retry_limit": {
+      "baseline": 3,
+      "evolved": 5,
+      "category": "vdr"
+    },
+    "per_user_budget": {
+      "baseline": 100,
+      "evolved": 448,
+      "category": "credit"
+    },
+    "agent_timeout_seconds": {
+      "baseline": 60,
+      "evolved": 117,
+      "category": "agent"
+    },
+    "agent_parallel": {
+      "baseline": 0,
+      "evolved": 1,
+      "category": "agent"
+    },
+    "content_density": {
+      "baseline": 0.7,
+      "evolved": 0.484,
+      "category": "ui"
+    },
+    "pipeline_mode": {
+      "baseline": 0,
+      "evolved": 1,
+      "category": "topology"
+    },
+    "discovery_impl_overlap": {
+      "baseline": 0.0,
+      "evolved": 0.773,
+      "category": "topology"
+    },
+    "feedback_loop_depth": {
+      "baseline": 1,
+      "evolved": 5,
+      "category": "topology"
+    },
+    "primary_model": {
+      "baseline": 0,
+      "evolved": 3,
+      "category": "model"
+    },
+    "model_temperature": {
+      "baseline": 0.3,
+      "evolved": 0.185,
+      "category": "model"
+    },
+    "ui_interaction_mode": {
+      "baseline": 0,
+      "evolved": 3,
+      "category": "uiux"
+    },
+    "input_bandwidth": {
+      "baseline": 0,
+      "evolved": 3,
+      "category": "uiux"
+    },
+    "response_format": {
+      "baseline": 0,
+      "evolved": 1,
+      "category": "uiux"
+    },
+    "approval_flow": {
+      "baseline": 0,
+      "evolved": 1,
+      "category": "uiux"
+    },
+    "feedback_mechanism": {
+      "baseline": 0,
+      "evolved": 3,
+      "category": "uiux"
+    },
+    "onboarding_depth": {
+      "baseline": 1,
+      "evolved": 3,
+      "category": "uiux"
+    },
+    "accessibility_level": {
+      "baseline": 1,
+      "evolved": 2,
+      "category": "uiux"
+    },
+    "context_window_utilization": {
+      "baseline": 0.5,
+      "evolved": 0.537,
+      "category": "discovery"
+    },
+    "rerank_depth": {
+      "baseline": 20,
+      "evolved": 37,
+      "category": "discovery"
+    },
+    "lattice_search_radius": {
+      "baseline": 2,
+      "evolved": 5,
+      "category": "discovery"
+    },
+    "coworking_enabled": {
+      "baseline": 0,
+      "evolved": 1,
+      "category": "collab"
+    },
+    "crdt_type": {
+      "baseline": 0,
+      "evolved": 1,
+      "category": "collab"
+    },
+    "file_sync_mode": {
+      "baseline": 0,
+      "evolved": 1,
+      "category": "collab"
+    },
+    "shared_cursor": {
+      "baseline": 0,
+      "evolved": 1,
+      "category": "collab"
+    },
+    "team_session_max": {
+      "baseline": 5,
+      "evolved": 12,
+      "category": "collab"
+    },
+    "collab_persistence": {
+      "baseline": 0,
+      "evolved": 2,
+      "category": "collab"
+    },
+    "sso_provider": {
+      "baseline": 0,
+      "evolved": 1,
+      "category": "enterprise"
+    },
+    "rbac_enabled": {
+      "baseline": 0,
+      "evolved": 1,
+      "category": "enterprise"
+    },
+    "audit_log_retention_days": {
+      "baseline": 30,
+      "evolved": 97,
+      "category": "enterprise"
+    },
+    "rate_limit_strategy": {
+      "baseline": 0,
+      "evolved": 3,
+      "category": "enterprise"
+    },
+    "api_versioning": {
+      "baseline": 0,
+      "evolved": 3,
+      "category": "enterprise"
+    },
+    "multi_tenant_isolation": {
+      "baseline": 0,
+      "evolved": 1,
+      "category": "enterprise"
+    },
+    "chat_enabled": {
+      "baseline": 0,
+      "evolved": 1,
+      "category": "chat"
+    },
+    "typing_indicators": {
+      "baseline": 0,
+      "evolved": 1,
+      "category": "chat"
+    },
+    "push_notifications": {
+      "baseline": 0,
+      "evolved": 1,
+      "category": "chat"
+    },
+    "team_hierarchy": {
+      "baseline": 0,
+      "evolved": 2,
+      "category": "team"
+    },
+    "role_set": {
+      "baseline": 0,
+      "evolved": 2,
+      "category": "team"
+    },
+    "project_templates": {
+      "baseline": 0,
+      "evolved": 5,
+      "category": "team"
+    },
+    "team_billing_model": {
+      "baseline": 0,
+      "evolved": 1,
+      "category": "team"
+    },
+    "team_permissions": {
+      "baseline": 0,
+      "evolved": 3,
+      "category": "team"
+    },
+    "health_score_enabled": {
+      "baseline": 0,
+      "evolved": 1,
+      "category": "proactive"
+    },
+    "churn_prediction_model": {
+      "baseline": 0,
+      "evolved": 2,
+      "category": "proactive"
+    },
+    "usage_anomaly_detection": {
+      "baseline": 0,
+      "evolved": 3,
+      "category": "proactive"
+    },
+    "sentiment_analysis_source": {
+      "baseline": 0,
+      "evolved": 3,
+      "category": "proactive"
+    },
+    "early_warning_threshold": {
+      "baseline": 0.5,
+      "evolved": 0.865,
+      "category": "proactive"
+    },
+    "auto_intervention": {
+      "baseline": 0,
+      "evolved": 3,
+      "category": "proactive"
+    },
+    "billing_model": {
+      "baseline": 0,
+      "evolved": 4,
+      "category": "billing"
+    },
+    "nonprofit_discount": {
+      "baseline": 0,
+      "evolved": 59,
+      "category": "billing"
+    }
+  },
+  "north_star_3": "NORTH STAR #3 \u2014 THE GOAL, THE CONSTRAINT, THE DNA:\n\nEvery interaction must produce measurably verified value for the user.\nIf it doesn't, the system must detect, diagnose, and resolve the gap\nautonomously before the user becomes aware of it.\n\nThis is achieved through a deterministic agent lattice where:\n  1. Agents are SEPARATED by function (research, audit, design, code, verify)\n  2. Each agent's output is GOVERNED by fitness-tested constraints\n  3. The whole system EVOLVES toward zero-waste value delivery\n  4. Unverified value never reaches the user\n  5. Gaps are detected and resolved before user awareness\n\nThis is the GLAAS-Lattice: Governed Lattice Architecture for Agent Separation.",
+  "safety_note": "100% in-simulation. Zero production calls. Awaiting human review."
+}

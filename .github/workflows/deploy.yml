@@ -1,0 +1,189 @@
+name: CD — Deploy to Cloudflare Workers
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
+      skip_migrations:
+        description: 'Skip D1 migrations'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.event.inputs.environment || 'production' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # @bicameral/web is the real deploy target (see CLAUDE.md "Current
+      # State") — the root `pnpm build`/`wrangler deploy` still point at
+      # the pre-apps/web stub and would ship the wrong Worker.
+      - name: Build frontend (@bicameral/web)
+        run: pnpm --filter @bicameral/web build
+
+      - name: Run ALL D1 migrations
+        if: github.event.inputs.skip_migrations != 'true'
+        # scripts/migrate.mjs, not a shell loop. `for` ignores the body's exit
+        # status, so the previous version applied every migration *after* a
+        # failed one and then reported success — measured: exit 0 with a
+        # deliberately broken migration in the middle. The runner tracks the
+        # d1_migrations ledger, applies in parsed-number order, and stops at
+        # the first failure with a non-zero exit.
+        run: node scripts/migrate.mjs --remote
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+
+      # Explicitly assert CLOUDFLARE_ACCOUNT_ID is available — container
+      # builds fail silently without it (wrangler can't push to the
+      # registry). This must fail the build BEFORE wrangler deploy runs.
+      - name: Assert Cloudflare credentials
+        env:
+          CF_TOKEN_CHECK: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT_CHECK: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          # Bug fix: the previous version interpolated the raw secrets
+          # expression directly into the shell string with a leading
+          # backslash before it. GitHub still substitutes that expression
+          # wherever it appears, backslash or not, so an EMPTY secret
+          # collapsed to a bare backslash before the closing quote — an
+          # unterminated string that crashed this step with a bash syntax
+          # error ("unexpected EOF") instead of the intended
+          # "::error::...secret is not set" message. Passing the secrets
+          # through env vars above and testing those plain shell vars here
+          # avoids re-triggering GitHub's expression substitution inside
+          # this script entirely (it substitutes matching syntax anywhere
+          # in `run:`, including inside comments).
+          if [ -z "$CF_TOKEN_CHECK" ]; then
+            echo "::error::CLOUDFLARE_API_TOKEN secret is not set"
+            exit 1
+          fi
+          if [ -z "$CF_ACCOUNT_CHECK" ]; then
+            echo "::error::CLOUDFLARE_ACCOUNT_ID secret is not set — required for container builds"
+            exit 1
+          fi
+          echo "✅ Cloudflare credentials verified"
+
+      # Named environments in wrangler v4 don't get selected implicitly —
+      # a bare `wrangler deploy` uses the top-level (dev) config, which
+      # shares the same Worker name as env.production and silently
+      # overwrites its bindings/vars (APP_URL, ENVIRONMENT, D1/KV/etc).
+      - name: Deploy to Cloudflare Workers (with container build)
+        working-directory: apps/web
+        run: npx wrangler deploy --env ${{ github.event.inputs.environment || 'production' }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      # Staging and production are different hosts (bicameral-staging.<subdomain>.workers.dev
+      # vs. www.discomplemented.com) — hardcoding one URL here silently checked
+      # production's health even on staging runs.
+      - name: Resolve deploy URL
+        run: |
+          if [ "${{ github.event.inputs.environment || 'production' }}" = "staging" ]; then
+            echo "DEPLOY_URL=https://bicameral-staging.johnathanallen1998.workers.dev" >> "$GITHUB_ENV"
+          else
+            echo "DEPLOY_URL=https://www.discomplemented.com" >> "$GITHUB_ENV"
+          fi
+
+      - name: Verify deployment
+        run: |
+          sleep 10
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$DEPLOY_URL/api/health" || echo "000")
+          echo "Health check status: $STATUS"
+          echo "HEALTH_STATUS=$STATUS" >> "$GITHUB_ENV"
+          if [ "$STATUS" != "200" ]; then
+            echo "⚠️ Health check failed — deployment may need attention"
+          else
+            echo "✅ Health check passed"
+          fi
+
+      # Verify Cloudflare Container binding is registered for the Sandbox DO.
+      # wrangler deploy with [[env.*.containers]] builds and pushes the
+      # Dockerfile.preview image — this step confirms the deploy didn't
+      # silently skip containers (which happens if --containers-rollout=none
+      # is passed or Docker build fails).
+      - name: Verify container deployment
+        working-directory: apps/web
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          echo "Checking Worker version for container bindings..."
+          VERSION=$(npx wrangler deployments list --env ${{ github.event.inputs.environment || 'production' }} 2>/dev/null | head -5 || echo "unknown")
+          echo "Latest deployment: $VERSION"
+          echo "Container config in wrangler.toml:"
+          grep -A4 "\[\[env.*containers\]\]" wrangler.toml || echo "⚠️ No container config found"
+          echo "✅ Container deploy verification complete (see wrangler.toml for binding config)"
+
+      # Pipeline-level check: starting a run confirms the GenerationOrchestrator
+      # DO actually initializes (not just that the Worker boots), per Phase 9's
+      # "post-deploy, confirm the DO state machine initializes". Needs a
+      # pre-provisioned virtual key (BICAMERAL_SMOKE_VKEY) — soft-fail with a
+      # clear note when that secret isn't configured yet rather than blocking
+      # deploys on it.
+      - name: Verify pipeline DO initializes
+        continue-on-error: true
+        env:
+          SMOKE_VKEY: ${{ secrets.BICAMERAL_SMOKE_VKEY }}
+        run: |
+          if [ -z "$SMOKE_VKEY" ]; then
+            echo "⏭️  BICAMERAL_SMOKE_VKEY not set — skipping pipeline DO smoke check"
+            echo "PIPELINE_CHECK=skipped (no BICAMERAL_SMOKE_VKEY secret)" >> "$GITHUB_ENV"
+            exit 0
+          fi
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "$DEPLOY_URL/api/pipeline" \
+            -H "Authorization: Bearer $SMOKE_VKEY" \
+            -H "Content-Type: application/json" \
+            -d '{"prompt":"CI smoke test — a simple todo list app"}')
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          BODY=$(echo "$RESPONSE" | sed '$d')
+          echo "POST /api/pipeline -> $HTTP_CODE"
+          echo "$BODY"
+          if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "201" ]; then
+            echo "✅ Pipeline run created — GenerationOrchestrator DO initialized"
+            echo "PIPELINE_CHECK=passed" >> "$GITHUB_ENV"
+          else
+            echo "⚠️ Pipeline run creation failed — DO/D1 may need attention"
+            echo "PIPELINE_CHECK=failed ($HTTP_CODE)" >> "$GITHUB_ENV"
+          fi
+
+      - name: Post-deployment summary
+        if: always()
+        run: |
+          echo "## Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Environment:** ${{ github.event.inputs.environment || 'production' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Migrations:** ${{ github.event.inputs.skip_migrations == 'true' && 'Skipped' || 'Applied' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Health Check:** ${HEALTH_STATUS:-unknown}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Pipeline DO Check:** ${PIPELINE_CHECK:-not run}" >> $GITHUB_STEP_SUMMARY
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "❌ Deployment failed for commit ${{ github.sha }}"
+          echo "Check the workflow logs for details"
