@@ -66,6 +66,13 @@ import { resolve, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { treeIdentity, EVIDENCE_PATH } from './run-gate.mjs';
 import {
+  CORRECTIONS_FILE,
+  formatLatticeSection,
+  queueCorrections,
+  readLattice,
+  validateCorrections,
+} from './audit-lattice.mjs';
+import {
   auditorEndpoint,
   auditorKey,
   auditorModel,
@@ -75,6 +82,7 @@ import {
 } from './auditor-provider.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const AUDIT_DIR = resolve(ROOT, '.audit');
 const LEDGER_PATH = resolve(ROOT, '.audit', 'ledger.jsonl');
 
 /**
@@ -183,8 +191,34 @@ Respond with ONLY a JSON object, no prose and no markdown fences:
       "summary": string,
       "failure_scenario": string
     }
+  ],
+  "lattice_correction_directive": [
+    {
+      "node_id": string,
+      "action": "delete" | "rewrite",
+      "reason": string,
+      "evidence": string,
+      "replacement": string | null
+    }
   ]
-}`;
+}
+
+"lattice_correction_directive" is for the Developer Intent and Historical
+Context block, not for the code. Emit an entry ONLY when a specific numbered
+node in that block is demonstrably wrong — it names something that does not
+exist, it asserts something the code contradicts, or the diff has just made it
+false. "node_id" must be one of the ids shown in that block; an id you did not
+see there is discarded. "evidence" must point at the code or the diff that
+proves the node wrong, in the same way a finding names a failure scenario.
+"action" is "delete" when the claim should not have been recorded at all, and
+"rewrite" when there is a true version of it — in which case "replacement" is
+that true version, stated plainly.
+
+These directives are QUEUED FOR A HUMAN. Nothing you write here edits or
+removes anything. Do not treat the queue as a way to make a problem go away,
+and do not emit a directive in place of a finding: a wrong record and a wrong
+line of code are two different defects and each belongs in its own list.
+An empty list is the normal answer.`;
 
 function git(args) {
   const run = spawnSync('git', args, {
@@ -244,7 +278,7 @@ function loadEvidence({ allowPartial }) {
   return { ok: true, evidence };
 }
 
-function buildUserPrompt({ diff, evidence, task }) {
+function buildUserPrompt({ diff, evidence, task, lattice }) {
   const legs = evidence.results
     .map(
       (r) =>
@@ -260,6 +294,8 @@ function buildUserPrompt({ diff, evidence, task }) {
   return `## The task this change was supposed to accomplish
 
 ${task}
+
+${formatLatticeSection(lattice)}
 
 ## Constraints this change must not violate
 
@@ -544,7 +580,12 @@ function arg(name, fallback = null) {
 }
 
 async function auditDiff({ diff, task, evidence, model, label }) {
-  const userPrompt = buildUserPrompt({ diff, evidence, task });
+  // The lattice is read fresh per audit rather than cached: it includes this
+  // repo's own ledger, which the previous commit appended to, and an auditor
+  // reasoning about "what this project believes" from a stale copy would miss
+  // exactly the compounded errors it is being asked to hunt for.
+  const lattice = readLattice(AUDIT_DIR);
+  const userPrompt = buildUserPrompt({ diff, evidence, task, lattice });
 
   // req 7: cost is bounded. A diff far past the model's useful context is not
   // audited badly, it is split — skipping the audit is not one of the options.
@@ -580,6 +621,16 @@ async function auditDiff({ diff, task, evidence, model, label }) {
   const counts = { HIGH: 0, MEDIUM: 0, LOW: 0 };
   for (const f of kept) counts[f.severity]++;
 
+  // Memory pruning directives. Queued for a person, never applied — the
+  // auditor can say a recorded assumption is wrong, and cannot act on it.
+  // A rejected directive is counted, not discarded silently: a model that
+  // keeps naming ids it was never shown is a signal about the prompt.
+  const corrections = validateCorrections(
+    result.parsed.lattice_correction_directive,
+    lattice
+  );
+  const queued = queueCorrections(AUDIT_DIR, corrections.kept, { model, task });
+
   appendLedger({
     kind: 'audit',
     at: new Date().toISOString(),
@@ -592,6 +643,9 @@ async function auditDiff({ diff, task, evidence, model, label }) {
     tokensIn: usage.prompt_tokens ?? 0,
     tokensOut: usage.completion_tokens ?? 0,
     costUsd: cost,
+    latticeNodes: lattice.nodes.length,
+    latticeCorrectionsQueued: queued,
+    latticeCorrectionsRejected: corrections.rejected.length,
   });
 
   return {
@@ -599,6 +653,7 @@ async function auditDiff({ diff, task, evidence, model, label }) {
     summary: result.parsed.summary,
     findings: kept,
     rejected,
+    corrections: corrections.kept,
     counts,
     costUsd: cost,
     durationMs: result.durationMs,
@@ -625,6 +680,24 @@ function report(result, model) {
       console.log(`  ${f.summary}`);
       console.log(`  fails when: ${f.failure_scenario}\n`);
     }
+  }
+
+  if (result.corrections?.length > 0) {
+    // Printed here rather than left in the file. A queue nobody is told about
+    // is a queue nobody reads, and the whole point of flagging a bad memory is
+    // that a person decides what to do about it. This does not block the
+    // commit: the record being wrong is not the same as the diff being wrong.
+    console.log(
+      `${result.corrections.length} Memory Lattice correction(s) queued for review ` +
+        `in .audit/${CORRECTIONS_FILE} — the auditor believes these recorded ` +
+        'assumptions are wrong. Nothing has been changed.'
+    );
+    for (const d of result.corrections) {
+      console.log(`  - [${d.action}] ${d.node_id}: ${d.reason}`);
+      console.log(`    evidence: ${d.evidence}`);
+      if (d.replacement) console.log(`    replace with: ${d.replacement}`);
+    }
+    console.log('');
   }
 
   if (result.rejected.length > 0) {

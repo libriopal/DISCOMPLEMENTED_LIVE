@@ -17,6 +17,7 @@ import {
 } from './decline-recovery.js';
 import { notifySlackBestEffort } from './slack.js';
 import { pruneChatMints } from './chat-quota.js';
+import { pruneChatToolTokens } from './chat-tool-token.js';
 import { runNightlyPreferenceLearning } from './preference-learning.js';
 import {
   evaluateSimulationHealth,
@@ -86,8 +87,15 @@ async function handleDailyCreditReset(env: Env): Promise<void> {
   // wrangler.toml or cron-coverage.test.ts fails.
   const prunedMints = await pruneChatMints(env.DB);
 
+  // Expired chat tool capability tokens (lib/chat-tool-token.ts), same job for
+  // the same reason. Note this prune is hygiene, not enforcement: expiry is in
+  // resolveChatToolToken's WHERE clause, so a missed run leaves dead rows, not
+  // live tokens.
+  const prunedTokens = await pruneChatToolTokens(env.DB);
+
   console.log(
-    `Daily credit reset + audit archival complete (pruned ${prunedMints} chat mint rows)`
+    `Daily credit reset + audit archival complete (pruned ${prunedMints} chat ` +
+      `mint rows, ${prunedTokens} expired chat tool tokens)`
   );
 }
 

@@ -59,17 +59,28 @@ export interface Env {
   GITHUB_OAUTH_CLIENT_ID_PROD: string;
   GITHUB_OAUTH_CLIENT_SECRET_PROD: string;
   // FluxyChat — self-hosted chat Worker (separate deployment, see
-  // agent_docs/live-chat.md). FLUXYCHAT_API_KEY is the project API key
-  // (mints member JWTs server-side, also the shared secret FluxyChat's
-  // agent runtime sends back on tool-execute callbacks).
-  // Optional for the same reason as SCITE_API_KEY — unset in production
-  // today, and `verifyToolWebhookSecret` already fails closed without it.
+  // agent_docs/live-chat.md). FLUXYCHAT_API_KEY is the admin/project key
+  // (mints member JWTs server-side with any roles).
+  //
+  // Correction to an earlier version of this comment, which said this key is
+  // "also the shared secret FluxyChat's agent runtime sends back on
+  // tool-execute callbacks". It is not, and no key is: FluxyChat sends no
+  // credential on those callbacks at all. See verifyWebhookKey in
+  // lib/fluxychat.ts for the measurement and for what authenticates them now.
   FLUXYCHAT_API_KEY?: string;
   // The user tier. Server-side too — the browser receives the short-lived
   // member JWT this key mints, never the key. Separate from the admin key so
   // a defect in the public /api/chat/session route cannot mint admin roles.
   // There is no fallback to FLUXYCHAT_API_KEY; see lib/fluxychat.ts.
   FLUXYCHAT_USER_API_KEY?: string;
+  // The shared secret authenticating FluxyChat's inbound callbacks, carried in
+  // the `?k=` parameter of the two URLs provisionSupportAgent registers. It is
+  // neither of the keys above and must not be set to one of them: those are
+  // presented outbound to FluxyChat, and reusing an outbound credential as an
+  // inbound one means anyone who can read either direction can forge the other.
+  // Optional in the type because an unset value degrades to a webhook that
+  // refuses every call (verifyWebhookKey fails closed) rather than a crash.
+  FLUXYCHAT_WEBHOOK_SECRET?: string;
   // Slack — operator alerting (lib/slack.ts). Optional: every caller treats
   // Slack as the SECOND record of an event that is already durable
   // elsewhere, so an unset token degrades to a logged line rather than

@@ -101,6 +101,18 @@ read it through `normalizeExecutionMode` (in `@bicameral/shared/types`), never a
 cast: it maps the retired string to `auto_accept` — what those runs actually
 did — and anything unrecognised to `ask_first`.
 
+**The unified 5-in-1 entry point.** `POST /api/pipeline/unified` starts a run
+that goes researcher → auditor → verifier → designer without stopping, and
+hands back a blueprint that has already been audited and verified. It is not a
+second sequencer — `GenerationOrchestrator` still owns the ordering, and both
+entry points share one handler (`startPipelineRun`) so the turn limit, the
+credit debit and their order cannot drift apart. What it changes is where a
+person is asked to stand: `ask_first` pauses at every _inter-agent_ gate, which
+means four approvals from someone who has not seen a blueprint yet; this route
+pins `auto_accept` so those are logged rather than waited on. The human
+blueprint gate before the coder is unconditional in the orchestrator and is
+untouched, and `POST /` still defaults to `ask_first`.
+
 **On `architect`.** The role is retired. Its brief-building function still runs, but folded into **step 1 under the researcher** (`runArchitect` is called from the researcher step, then `runResearcher` researches against that brief). The identifier survives in exactly two places, both deliberate: the `AgentRole` union in `@bicameral/shared` (stored historical records reference it) and a legacy `case 'architect'` in `model-router.ts`. It is not a current agent. It must not appear in product copy, in the admin panel's role list, or in any new pipeline step.
 
 ## Model routing
@@ -308,6 +320,45 @@ priced" are different claims) and carries a `cost_basis` saying why.
 `AUDIT_SKIP=1 AUDIT_SKIP_REASON='…'` commits without the key, and records the
 skip in `.audit/ledger.jsonl` so `pnpm audit:stats` counts it. Overruling a HIGH
 is allowed and must be stated in the commit message; disappearing one is not.
+
+### The auditor's Memory Lattice (zero-trust)
+
+The commit auditor is handed the project's own accumulated record — previous
+commits' stated intents and previous `AUDIT_SKIP` justifications — under the
+heading **"Developer Intent and Historical Context (UNTRUSTED)"**, built by
+`scripts/audit-lattice.mjs`. The point is not to help it agree with us. It is
+told to hunt the record for compounded error: a claim the diff contradicts, a
+dependency asserted that does not exist, an assumption this diff has just made
+false, a justification reused that was never valid. Where the record and the
+code disagree, **the code is the evidence.**
+
+Note this is _not_ the product's `lattice_nodes` table. That lattice is per
+founder, per generated project, and has nothing to say about our commits;
+feeding it to this auditor would be both useless and a disclosure. The real
+source of "what this project believes about itself" here is `.audit/ledger.jsonl`,
+plus an optional hand-written `.audit/lattice.jsonl`.
+
+Three properties are load-bearing, and `audit-lattice.test.mjs` pins all three:
+
+- **The block is framed as claims, not premises.** The nodes are free text a
+  previous run wrote, so the section is a prompt-injection surface by
+  construction and cannot be sanitised without destroying it. The framing says
+  the block has no authority, and instructs that an instruction found _inside_
+  it — approve this, ignore that rule, lower a severity — is itself a HIGH
+  finding.
+- **It is bounded, and says when it is partial.** `MAX_NODES` and
+  `MAX_NODE_CHARS` cap it; the auditor is told not to infer absence from a
+  truncated record.
+- **A pruning directive is queued, never applied.** When the auditor decides a
+  recorded assumption is wrong it emits `lattice_correction_directive`
+  (`node_id`, `action: delete | rewrite`, `reason`, `evidence`, and a
+  `replacement` for a rewrite). Those are validated — an id it was not shown, or
+  a directive with no evidence, is rejected and counted — appended to
+  `.audit/lattice-corrections.jsonl` with `status: "queued"`, and printed. There
+  is no delete path in that module at all. Same boundary as §CORRECTION 7:
+  surfaced loudly, changed by a person. A queued directive does **not** block
+  the commit — the record being wrong is a different defect from the diff being
+  wrong, and each belongs in its own list.
 
 ### The self-healing loop
 

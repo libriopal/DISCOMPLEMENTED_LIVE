@@ -43,6 +43,11 @@ export default defineConfig({
             // a value both the right secret and the wrong one fail, so the
             // rejection test would pass for the wrong reason.
             SIMULATION_INGEST_SECRET: 'test-simulation-secret',
+            // The FluxyChat callback secret (routes/chat.ts webhooks). Set for
+            // the same reason as the line above: with no value configured,
+            // verifyWebhookKey fails closed on every input, so the "wrong key
+            // is refused" assertions would pass without the check working.
+            FLUXYCHAT_WEBHOOK_SECRET: 'test-fluxy-webhook-secret',
           },
         },
       };

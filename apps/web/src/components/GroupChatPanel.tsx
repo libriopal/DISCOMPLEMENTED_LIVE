@@ -25,6 +25,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { VERBOSENESS_LEVELS, type Verboseness } from '../lib/verboseness.js';
 import { ReviewGate } from './ReviewGate.js';
+import { BlockSuggestions } from './BlockSuggestions.js';
 
 export interface AgentMessage {
   id: string;
@@ -287,7 +288,15 @@ export function GroupChatPanel({
           the centre of the experience, and it is the one structural claim the
           field does not make. It does not wait its turn in a scroll. */}
       {awaitingApproval && (
-        <ReviewGate onDecide={(approved, fb) => onApprove(approved, fb)} />
+        <>
+          <ReviewGate onDecide={(approved, fb) => onApprove(approved, fb)} />
+          {/* Below the gate, never inside it: these are proposals to weigh
+              while deciding, not part of what approval applies to. */}
+          <BlockSuggestions
+            pipelineId={pipelineId}
+            enabled={awaitingApproval}
+          />
+        </>
       )}
 
       {messagesByAgent.map(

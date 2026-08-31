@@ -1,5 +1,6 @@
 /**
- * Pipeline — the 5 routes driving the 4-agent "CTO-in-a-Box" system.
+ * Pipeline — the routes driving the 5-agent "CTO-in-a-Box" system
+ * (researcher, auditor, verifier, designer, coder).
  * See @agent_docs/api-spec.md "Pipeline" and @agent_docs/autonomous-dev-team.md.
  *
  * The GenerationOrchestrator DO (state machine + agent execution, see
@@ -11,9 +12,10 @@
  * polling, not by reading from the DO.
  */
 import { Hono } from 'hono';
+import type { Context } from 'hono';
 import { BicameralError, CreditsError } from '@bicameral/shared/errors';
 import { CREDIT_COSTS, SIM_EVOLVED } from '@bicameral/shared/constants';
-import type { PipelineStatus } from '@bicameral/shared/types';
+import type { ExecutionMode, PipelineStatus } from '@bicameral/shared/types';
 import { normalizeExecutionMode } from '@bicameral/shared/types';
 import { debitCredits } from '../lib/virtual-key.js';
 import { selectModel } from '../lib/cohere.js';
@@ -25,6 +27,12 @@ import {
   showsStepTelemetry,
 } from '../lib/verboseness.js';
 import { loadUserSettings } from './settings.js';
+import { fetchLatticeContext } from '../lib/lattice-context.js';
+import {
+  emptySuggestionReason,
+  suggestBlocks,
+  type ExistingComponent,
+} from '../lib/block-suggestions.js';
 import type { Env } from '../env.js';
 import type { AuthVariables } from '../lib/require-auth.js';
 
@@ -32,6 +40,15 @@ export const pipelineRoutes = new Hono<{
   Bindings: Env;
   Variables: AuthVariables;
 }>();
+
+/**
+ * The window `SIM_EVOLVED.conversationTurnLimit` is counted over. Named once
+ * because it was previously spelled three times in three notations — a SQL
+ * modifier string, the words "15-minute" in the founder-facing message, and
+ * `retry_after_seconds: 900` — which is how a limit comes to advertise a
+ * window it does not enforce.
+ */
+const TURN_LIMIT_WINDOW_MS = 15 * 60 * 1000;
 
 interface PipelineRunRow {
   id: string;
@@ -206,13 +223,25 @@ async function kickOffOrchestrator(
   }
 }
 
-pipelineRoutes.post('/', async (c) => {
+interface StartRunBody {
+  prompt?: string;
+  projectId?: string;
+  executionMode?: string;
+}
+
+/**
+ * Starts a run. Shared by `POST /` and `POST /unified` so the turn limit, the
+ * credit debit and their ordering cannot drift apart between two entry points.
+ *
+ * `forcedMode`, when given, overrides whatever the client asked for. Only the
+ * unified route passes it, and only to pin `auto_accept`.
+ */
+async function startPipelineRun(
+  c: Context<{ Bindings: Env; Variables: AuthVariables }>,
+  forcedMode?: ExecutionMode
+) {
   const userId = c.get('userId');
-  const body = await c.req.json<{
-    prompt?: string;
-    projectId?: string;
-    executionMode?: string;
-  }>();
+  const body = await c.req.json<StartRunBody>();
   if (!body.prompt) {
     throw new BicameralError('prompt is required', 'VALIDATION_ERROR', 400);
   }
@@ -221,7 +250,54 @@ pipelineRoutes.post('/', async (c) => {
   // sending the retired `dangerously_automated` gets `auto_accept` — what that
   // mode always did — rather than being silently dropped to `ask_first`, which
   // would change the behaviour of an integration that never asked for it.
-  const executionMode = normalizeExecutionMode(body.executionMode);
+  const executionMode =
+    forcedMode ?? normalizeExecutionMode(body.executionMode);
+
+  // Simulation-evolved conversation turn limit (Butterfly v7).
+  //
+  // This runs BEFORE debitCredits and before the pipeline_runs insert. It used
+  // to run after both — and after `waitUntil(kickOffOrchestrator(...))` — so an
+  // over-limit caller was charged, had a run started in the background, and was
+  // then told the request was refused. A 429 issued after the side effects is
+  // not a rejection; it is a charge with a rejection message attached.
+  //
+  // The window bound is computed in JS rather than in SQL, and that is
+  // load-bearing rather than stylistic. `created_date` is written with
+  // toISOString() ("2026-08-31T03:33:23.704Z"), while SQLite renders
+  // datetime('now','-15 minutes') as "2026-08-31 06:18:23" — space separator,
+  // no zone. D1 compares TEXT lexicographically and 'T' (0x54) sorts above
+  // ' ' (0x20), so against a SQL-rendered bound EVERY row written on the same
+  // calendar day compares as "inside the window". Measured in sqlite3: a
+  // three-hour-old row and a midnight row both test as recent. A founder with
+  // 15 runs at any hour would be refused for the rest of the day.
+  //
+  // The previous binding was `datetime(?, ?)` with ('-15 minutes', 'now') —
+  // the arguments reversed. SQLite's datetime() takes (timevalue, modifier...),
+  // so that expression returns NULL, `created_date > NULL` is NULL, and the
+  // limit had never fired even once. Correcting only the argument order would
+  // have swapped a limit that never fires for one that fires all day; both
+  // halves are needed. lib/chat-quota.ts records the same trap on the same
+  // column convention.
+  const since = new Date(Date.now() - TURN_LIMIT_WINDOW_MS).toISOString();
+  const recentRuns = await c.env.DB.prepare(
+    'SELECT COUNT(*) as count FROM pipeline_runs WHERE user_id = ? AND created_date > ?'
+  )
+    .bind(userId, since)
+    .first<{ count: number }>();
+
+  if (recentRuns && recentRuns.count >= SIM_EVOLVED.conversationTurnLimit) {
+    return c.json(
+      {
+        error: 'Conversation turn limit reached',
+        detail:
+          `Maximum ${SIM_EVOLVED.conversationTurnLimit} pipeline runs per ` +
+          `${TURN_LIMIT_WINDOW_MS / 60_000}-minute window. Please wait before ` +
+          `starting a new generation.`,
+        retry_after_seconds: TURN_LIMIT_WINDOW_MS / 1000,
+      },
+      429
+    );
+  }
 
   const debited = await debitCredits(c.env.DB, userId, CREDIT_COSTS.generation);
   if (!debited) throw new CreditsError();
@@ -259,29 +335,54 @@ pipelineRoutes.post('/', async (c) => {
 
   c.executionCtx.waitUntil(kickOffOrchestrator(c.env.DB, c.env, id));
 
-  // Simulation-evolved: conversation turn limit (Butterfly v7: 15 turns)
-  const recentRuns = await c.env.DB.prepare(
-    'SELECT COUNT(*) as count FROM pipeline_runs WHERE user_id = ? AND created_date > datetime(?, ?)'
-  )
-    .bind(userId, '-15 minutes', 'now')
-    .first<{ count: number }>();
-
-  if (recentRuns && recentRuns.count >= SIM_EVOLVED.conversationTurnLimit) {
-    return c.json(
-      {
-        error: 'Conversation turn limit reached',
-        detail: `Maximum ${SIM_EVOLVED.conversationTurnLimit} pipeline runs per 15-minute window. Please wait before starting a new generation.`,
-        retry_after_seconds: 900,
-      },
-      429
-    );
-  }
-
   // `projectId` is part of the response because the client needs it to reach
   // /api/preview/:projectId. Without it the founder's browser holds a pipeline
   // id and nothing else, and the full-stack preview is unaddressable.
-  return c.json({ pipelineId: id, projectId, status: 'pending' }, 201);
-});
+  return c.json(
+    { pipelineId: id, projectId, status: 'pending', executionMode },
+    201
+  );
+}
+
+pipelineRoutes.post('/', async (c) => startPipelineRun(c));
+
+// ============ POST /api/pipeline/unified ============
+/**
+ * The 5-in-1 pipeline: one request, the four pre-gate stages run end to end,
+ * and what comes back to the founder is a blueprint that has already been
+ * audited and verified.
+ *
+ * What this is NOT: a second sequencer. The five stages already run in order
+ * inside `GenerationOrchestrator`, with an independent-provider audit between
+ * research and verification. Consolidating them again in a route would mean two
+ * implementations of the same ordering, and the one this route did not use
+ * would be the one that kept the gates.
+ *
+ * What it actually changes is where a human is asked to stand. In `ask_first`
+ * the run stops at every INTER-AGENT gate — after the researcher, after the
+ * auditor, after the verifier — so producing a blueprint takes four separate
+ * approvals from someone who has not seen a blueprint yet and cannot judge the
+ * intermediate artefacts. This route pins `auto_accept`, so those four gates
+ * auto-advance and are logged rather than waited on, and the founder is asked
+ * once, about the thing they can actually evaluate.
+ *
+ * Two boundaries this does not move, and must not:
+ *
+ *  - **The human blueprint gate is unconditional.** The designer step sets
+ *    `status = 'awaiting_approval'` with no reference to execution mode, so
+ *    step 5 (the coder — the expensive, hard-to-reverse one) still waits for a
+ *    person here exactly as it does on `POST /`. "Pre-verified" describes what
+ *    the blueprint has been through, not permission to skip reading it.
+ *  - **`ask_first` remains the default.** This is an explicit, separately
+ *    addressed endpoint. `POST /` is untouched and still defaults to pausing at
+ *    every gate; nothing here changes what an existing client gets.
+ *
+ * Everything else — the turn limit, its ordering before the credit debit, the
+ * project row — is the same code path, by construction.
+ */
+pipelineRoutes.post('/unified', async (c) =>
+  startPipelineRun(c, 'auto_accept')
+);
 
 pipelineRoutes.get('/', async (c) => {
   const userId = c.get('userId');
@@ -759,6 +860,54 @@ pipelineRoutes.get('/:id/blueprint', async (c) => {
     deployConfig: blueprint.deploy_config
       ? JSON.parse(blueprint.deploy_config)
       : {},
+  });
+});
+
+// ============ GET /api/pipeline/:id/block-suggestions ============
+/**
+ * Modular blocks the Memory Lattice says this project needs and this blueprint
+ * does not yet have. Rendered at the review gate, beside the blueprint the
+ * founder is deciding on.
+ *
+ * It is a separate request from `/blueprint` on purpose. The blueprint is what
+ * the pipeline produced and what approval applies to; these are proposals
+ * derived afterwards from a different record, and merging them into one payload
+ * would make it possible to read a suggestion as part of what the designer
+ * decided. `lib/block-suggestions.ts` carries the reasoning and its limits.
+ *
+ * Empty is a real answer, and it comes back with the reason — an empty lattice
+ * and a fully-covered one are different facts and a bare `[]` states neither.
+ */
+pipelineRoutes.get('/:id/block-suggestions', async (c) => {
+  const userId = c.get('userId');
+  const id = c.req.param('id');
+  const run = await loadOwnedRun(c.env.DB, id, userId);
+
+  const blueprint = await c.env.DB.prepare(
+    'SELECT components FROM blueprints WHERE pipeline_run_id = ? ORDER BY version DESC LIMIT 1'
+  )
+    .bind(id)
+    .first<{ components: string }>();
+
+  const parsed = safeJsonParse(blueprint?.components ?? null);
+  const components: ExistingComponent[] = Array.isArray(parsed)
+    ? (parsed as Array<{ path?: unknown; description?: unknown }>).map((x) => ({
+        path: typeof x.path === 'string' ? x.path : '',
+        description: typeof x.description === 'string' ? x.description : '',
+      }))
+    : [];
+
+  // Scoped to this run's project, and to the owner — fetchLatticeContext joins
+  // projects on userId, so run.project_id is a narrowing and not a trust.
+  const context = await fetchLatticeContext(c.env.DB, userId, {
+    projectId: run.project_id,
+  });
+
+  const input = { context, components };
+  const suggestions = suggestBlocks(input);
+  return c.json({
+    suggestions,
+    reason: suggestions.length === 0 ? emptySuggestionReason(input) : null,
   });
 });
 
