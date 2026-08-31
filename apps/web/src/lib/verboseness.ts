@@ -116,7 +116,20 @@ const SECRET_VALUE_PATTERNS: RegExp[] = [
   /^sk-[A-Za-z0-9_-]{16,}$/, // OpenAI-style, incl. OpenRouter's sk-or-v1-…
   /^gh[pousr]_[A-Za-z0-9]{20,}$/, // GitHub PAT / OAuth / refresh / server
   /^github_pat_[A-Za-z0-9_]{20,}$/,
-  /^xox[baprs]-[A-Za-z0-9-]{10,}$/, // Slack
+  // Slack. `xoxe.` (the refresh/rotation token) uses a dot after the prefix
+  // rather than a dash, so it needs the alternation — the token in this
+  // repo's .env is an `xoxe.`-prefixed one and the dash-only pattern let it
+  // through.
+  /^xox[baprse][-.][A-Za-z0-9.-]{10,}$/, // Slack
+  // NVIDIA Build (`integrate.api.nvidia.com`), the auditor's provider as of
+  // 2026-08-30. Added when the client-bundle test grew an NVIDIA row and a
+  // key sitting in a free-text `note` field survived redaction: the key-name
+  // rule above only catches values that arrive under a credential-ish key,
+  // and a leaked value rarely does.
+  /^nvapi-[A-Za-z0-9_-]{20,}$/,
+  // Fluxy project/user keys. We issue these ourselves, so the shape is ours
+  // to declare; both tiers share it.
+  /^fc_[A-Za-z0-9_-]{16,}$/,
   /^(?:whsec|rk_live|sk_live|pk_live)_[A-Za-z0-9]{10,}$/, // Stripe
   /^ey[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}$/, // JWT
 ];

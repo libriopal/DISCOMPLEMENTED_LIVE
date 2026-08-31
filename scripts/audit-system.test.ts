@@ -32,7 +32,7 @@ function runCli(args: string[]) {
     // key is needed and none is passed — if a guard ever regressed into
     // running first, this would spend real money and the absence of a key is
     // the backstop.
-    env: { ...process.env, OPENROUTER_API_KEY: '' },
+    env: { ...process.env, NVIDIA_API_KEY: '' },
   });
 }
 
@@ -180,16 +180,26 @@ describe('the bounds are enforced, not documented', () => {
     // A free run costs nothing, so it cannot exceed any positive budget — and
     // testing the gate against a run that spends nothing would assert that
     // zero is less than the budget, not that the gate works.
-    const r = runCli(['--budget-usd', '0.0001', '--paid']);
+    const r = runCli(['--budget-tokens', '1']);
     expect(r.status).toBe(2);
-    expect(r.stderr).toMatch(/exceeds --budget-usd/);
+    expect(r.stderr).toMatch(/exceeds --budget-tokens/);
     // The distinction that matters: it must not quietly audit what fits.
     expect(r.stderr).toContain('Refusing');
   });
 
   it('rejects a non-positive budget', () => {
-    expect(runCli(['--budget-usd', '0']).status).toBe(2);
-    expect(runCli(['--budget-usd', 'abc']).status).toBe(2);
+    expect(runCli(['--budget-tokens', '0']).status).toBe(2);
+    expect(runCli(['--budget-tokens', 'abc']).status).toBe(2);
+  });
+
+  it('refuses --budget-usd rather than ignoring it', () => {
+    // `--budget-usd 2` was the documented invocation until 2026-08-30. An
+    // unrecognised flag that is silently dropped leaves the operator believing
+    // they set a ceiling, which is worse than having no ceiling at all.
+    const r = runCli(['--dry-run', '--budget-usd', '2']);
+    expect(r.status).toBe(2);
+    expect(r.stderr).toContain('--budget-usd no longer exists');
+    expect(r.stderr).toContain('--budget-tokens');
   });
 
   it('spends nothing on --dry-run', () => {
@@ -199,54 +209,76 @@ describe('the bounds are enforced, not documented', () => {
   });
 });
 
-describe('the free tier is a disclosure, and it is stated', () => {
-  it('defaults to the free model and says what that means', () => {
+describe('sending our source to a third party is stated, every run', () => {
+  it('names what is sent and what is not', () => {
     const r = runCli(['--dry-run']);
     expect(r.status).toBe(0);
-    expect(r.stdout).toContain(':free');
-    // The warning is the point. A free-tier run sends this repository's source
-    // to an endpoint that trains on it — a person choosing that should see it
-    // as they choose, not find it in a comment later.
-    expect(r.stdout).toContain('OpenRouter trains on prompts');
+    // A person choosing to ship this repository's source to NVIDIA should see
+    // it as they choose, not find it in a comment later.
+    expect(r.stdout).toContain("repository's own source to NVIDIA");
     expect(r.stdout).toContain("does NOT send any user's generated code");
   });
 
-  it('does not print the training warning on --paid', () => {
-    const r = runCli(['--dry-run', '--paid']);
-    expect(r.status).toBe(0);
-    expect(r.stdout).not.toContain(':free');
-    expect(r.stdout).not.toContain('OpenRouter trains on prompts');
-  });
-
-  it('prices the free tier at zero rather than at the paid rates', () => {
-    // Not cosmetic: pricing a free run at paid rates makes the budget gate
-    // refuse runs that cost nothing, which is a gate that blocks the safe
-    // option and permits the expensive one.
+  it('has no free tier left to advertise', () => {
+    // OpenRouter's `:free` ids trained on submitted prompts, which is why this
+    // script used a different model from the Worker. The direct NVIDIA
+    // endpoint has one tier, so the split is gone rather than hidden — and a
+    // `:free` suffix reaching the endpoint would 404 per chunk and be recorded
+    // as "unreachable", i.e. as a network problem.
     const r = runCli(['--dry-run']);
-    expect(r.stdout).toMatch(/est\. cost\s+~\$0\.0000/);
+    expect(r.stdout).not.toContain(':free');
+    expect(r.stdout).not.toContain('trains on prompts');
   });
 
-  it('reads both ids from the pinned module rather than building one', () => {
-    // `AUDITOR_MODEL + ':free'` computed here would drift the moment the pin
-    // moves, and the drift would be invisible: a slug OpenRouter does not
-    // recognise fails per-chunk, which reads as an unreachable provider.
+  it('budgets and reports in tokens, not in invented dollars', () => {
+    // NVIDIA Build publishes no per-token list price and the API returns no
+    // rate. A dollar figure here would be enforced against a number this repo
+    // made up, which ground rule 2 forbids.
+    const r = runCli(['--dry-run']);
+    expect(r.stdout).toMatch(/est\. total\s+~[\d,]+ tokens/);
+    expect(r.stdout).not.toMatch(/est\. cost/);
+  });
+
+  it('reads the model and the endpoint from the pinned module', () => {
+    // Recomputing either here would drift the moment the pin moves, and the
+    // drift would be invisible: an id the provider does not recognise fails
+    // per-chunk, which reads as an unreachable provider.
     const src = readFileSync(resolve(__dirname, 'audit-system.mjs'), 'utf8');
-    expect(src).toContain("free ? 'AUDITOR_MODEL_DEV_FREE' : 'AUDITOR_MODEL'");
+    expect(src).toContain("from './auditor-provider.mjs'");
+    expect(src).toContain('auditorModel()');
+    expect(src).toContain('auditorEndpoint()');
+    expect(src).not.toContain('openrouter.ai');
+  });
+
+  it('shares one provider module with the commit gate', () => {
+    // The two gates read two different constants until 2026-08-30, so they
+    // audited on two different models while both reported "the pinned
+    // auditor". Findings that cannot be compared across the gates are worth
+    // less than either gate alone.
+    const diff = readFileSync(resolve(__dirname, 'audit-diff.mjs'), 'utf8');
+    expect(diff).toContain("from './auditor-provider.mjs'");
+    // The constant is named in a comment recording why it went away; what
+    // must not survive is a read of it.
+    expect(diff).not.toMatch(/export const AUDITOR_MODEL_DEV_FREE/);
+    expect(diff).not.toContain('openrouter.ai');
   });
 });
 
 describe('rate limiting is retried, and the retry is bounded', () => {
   const src = readFileSync(resolve(__dirname, 'audit-system.mjs'), 'utf8');
 
-  it('retries only 429, so a 402 is not waited out', () => {
-    // The 402 run that motivated the free tier took the full wall-clock of a
+  it('retries only the transients, so a 402 is not waited out', () => {
+    // The 402 run that motivated all of this took the full wall-clock of a
     // real audit to report that the account had no credits. Retrying every
-    // status would restore that, multiplied by the retry count.
-    expect(src).toContain('if (response.status !== 429) break;');
+    // status would restore that, multiplied by the retry count. 429 and 503
+    // are the two that say "come back shortly" and nothing about the request.
+    expect(src).toContain(
+      'if (call.status !== 429 && call.status !== 503) break;'
+    );
   });
 
   it('honours Retry-After rather than guessing', () => {
-    expect(src).toContain("response.headers.get('retry-after')");
+    expect(src).toContain("call.headers.get('retry-after')");
   });
 
   it('bounds both the attempt count and the wait', () => {
@@ -263,8 +295,10 @@ describe('rate limiting is retried, and the retry is bounded', () => {
     // The whole design rests on this distinction and rate limiting is the
     // newest way to blur it: a chunk that gave up after four 429s contributes
     // the same zero findings as a chunk that was audited and was clean.
-    const start = src.indexOf('if (response.status !== 429) break;');
-    const end = src.indexOf('if (!response.ok)');
+    const start = src.indexOf(
+      'if (call.status !== 429 && call.status !== 503) break;'
+    );
+    const end = src.indexOf('if (!call.ok) {');
     const window = src.slice(start, end);
     expect(window).toContain('rate limited on all');
     expect(window).not.toMatch(/outcome: 'completed'/);
@@ -278,11 +312,35 @@ describe('an incomplete run cannot read as a clean one', () => {
   const src = readFileSync(resolve(__dirname, 'audit-system.mjs'), 'utf8');
 
   it('bounds every request so a stalled provider cannot hang the run', () => {
-    // fetch has no default timeout. Without this, a provider that accepts the
-    // connection and then stalls hangs forever, and a run that never returns
-    // is indistinguishable from a slow one.
-    expect(src).toContain('AbortSignal.timeout(REQUEST_TIMEOUT_MS)');
-    expect(src).toMatch(/const REQUEST_TIMEOUT_MS = [\d_]+;/);
+    // fetch has no default timeout. Without a bound, a provider that accepts
+    // the connection and then stalls hangs forever, and a run that never
+    // returns is indistinguishable from a slow one.
+    //
+    // The bound MOVED on 2026-08-30, it was not removed. It used to be a
+    // 240s ceiling on the whole request, asserted here as
+    // `AbortSignal.timeout(REQUEST_TIMEOUT_MS)`. Measured against the pinned
+    // NVIDIA model, a real ~19K-token audit prompt runs well past 240s
+    // because the model reasons before it answers — so every chunk aborted
+    // and the report read "0 findings" for a reason unrelated to the code.
+    // Raising the ceiling would have hidden a dead connection behind a slow
+    // one; streaming distinguishes them, so the timeout now measures silence
+    // (STREAM_STALL_MS) with a separate absolute ceiling (STREAM_TOTAL_MS)
+    // that a dribbling response still cannot outlast.
+    expect(src).toContain('postChatCompletion');
+    expect(src).not.toContain('AbortSignal.timeout(REQUEST_TIMEOUT_MS)');
+
+    const provider = readFileSync(
+      resolve(__dirname, 'auditor-provider.mjs'),
+      'utf8'
+    );
+    expect(provider).toMatch(/export const STREAM_STALL_MS = [\d_]+;/);
+    expect(provider).toMatch(/export const STREAM_TOTAL_MS = [\d_]+;/);
+    // Both timers must actually reach the request, and silence must re-arm
+    // the idle timer on every chunk — otherwise the "stall" timeout is just
+    // the total timeout under a different name.
+    expect(provider).toContain('signal: controller.signal');
+    expect(provider).toContain('setTimeout(() => controller.abort(), totalMs)');
+    expect(provider).toContain('armIdle()');
   });
 
   it('refuses to start without a key rather than producing an empty report', () => {
@@ -291,9 +349,9 @@ describe('an incomplete run cannot read as a clean one', () => {
     // "unreachable" and the summary said so — but it spent the full wall-clock
     // of a real audit to reach a report whose finding count was zero for a
     // reason unrelated to the code. Honest late is still late.
-    const r = runCli(['--budget-usd', '5']);
+    const r = runCli(['--budget-tokens', '3000000']);
     expect(r.status).toBe(2);
-    expect(r.stderr).toContain('OPENROUTER_API_KEY is not set');
+    expect(r.stderr).toContain('NVIDIA_API_KEY is not set');
     expect(r.stderr).toContain('Refusing to start');
   });
 

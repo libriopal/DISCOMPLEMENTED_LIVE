@@ -15,7 +15,11 @@ import {
   type ChatRequest,
   type ChatResponse,
 } from '@bicameral/cohere/chat';
-import { callOpenRouter } from '@bicameral/cohere/openrouter';
+import {
+  callOpenAICompatible,
+  callOpenRouter,
+} from '@bicameral/cohere/openrouter';
+import { AUDITOR_BASE_URL } from '@bicameral/cohere/auditor-model';
 import {
   selectModel,
   getThinkingConfig,
@@ -30,6 +34,21 @@ export type { PipelineComplexity };
 
 function isOpenRouterModel(model: string): boolean {
   return model.includes('/') || model.endsWith(':free');
+}
+
+/**
+ * Models served by NVIDIA directly rather than through OpenRouter.
+ *
+ * Only the auditor is here today (`nvidia/nemotron-3-*`, see
+ * packages/cohere/src/auditor-model.ts). The test is the vendor prefix rather
+ * than an equality check against the pin, because `AUDITOR_MODEL` in
+ * wrangler.toml can move the pin to the escalation model or to another
+ * Nemotron without a deploy — and a routing rule that silently stops applying
+ * when the pin moves would send the auditor's traffic to OpenRouter with an
+ * NVIDIA-only key and 401.
+ */
+function isNvidiaModel(model: string): boolean {
+  return model.startsWith('nvidia/');
 }
 
 // North models 400 on `response_format: json_object` — unlike R7B/Command A,
@@ -59,6 +78,19 @@ export async function callModel(
     // to malformed/degenerate output, not just theory.
     fullRequest.temperature = 1.0;
     fullRequest.topP = 0.95;
+  }
+
+  // Ordered before the OpenRouter branch: an `nvidia/` slug satisfies both
+  // tests (it contains a "/"), and before 2026-08-30 it took the OpenRouter
+  // path. The auditor now has its own account.
+  if (isNvidiaModel(model)) {
+    return callOpenAICompatible(fullRequest, {
+      label: 'NVIDIA',
+      baseUrl: AUDITOR_BASE_URL,
+      apiKey: env.NVIDIA_API_KEY,
+      keyVar: 'NVIDIA_API_KEY',
+      codePrefix: 'NVIDIA',
+    });
   }
 
   if (isOpenRouterModel(model)) {

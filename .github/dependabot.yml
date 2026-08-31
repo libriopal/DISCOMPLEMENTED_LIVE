@@ -8,6 +8,14 @@ updates:
       day: "monday"
       time: "06:00"
     open-pull-requests-limit: 10
+    # Wait for a release to survive contact with the world before proposing it.
+    # The npm compromises worth defending against (event-stream, ua-parser-js,
+    # the 2025 chalk/debug wave) were all caught and yanked within days; a bot
+    # that opens a PR minutes after publish is the fastest possible path from a
+    # hijacked maintainer account into this lockfile.
+    cooldown:
+      default-days: 7
+      semver-major-days: 30
     labels:
       - "dependencies"
       - "automated"
@@ -48,6 +56,9 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 7
+      semver-major-days: 30
     labels:
       - "dependencies"
       - "github-actions"

@@ -18,10 +18,10 @@
 import { describe, it, expect } from 'vitest';
 import { selectModel, type PipelineComplexity } from './model-router.js';
 import {
+  AUDITOR_BASE_URL,
   AUDITOR_MODEL,
-  AUDITOR_MODEL_DEV_FREE,
   AUDITOR_MODEL_ESCALATION,
-  auditCostUsd,
+  AUDITOR_PRICING_USD_PER_MTOK,
   resolveAuditorModel,
 } from './auditor-model.js';
 
@@ -107,49 +107,43 @@ describe('resolveAuditorModel', () => {
   });
 });
 
-describe('the free tier stays on our own source', () => {
-  // OpenRouter's free tier trains on submitted prompts. The dev scripts audit
-  // this repository, which is ours to disclose; the pipeline auditor reads
-  // users' generated code, which is not. The whole safety of the split rests
-  // on the free id never reaching the runtime, and the failure mode is silent
-  // in exactly the way this file's other tests describe: users' code would go
-  // to a training endpoint and every log would look identical.
+describe('the provider is NVIDIA, directly', () => {
+  // Until 2026-08-30 the auditor was reached through OpenRouter, and the
+  // safety property that needed testing was that OpenRouter's `:free` tier —
+  // which trains on submitted prompts — could never be reached from the
+  // runtime, because the runtime submits users' generated code. That whole
+  // split is gone: the direct endpoint has one tier and no `:free` suffix.
+  //
+  // What replaced it as the thing worth pinning is narrower and still real —
+  // the endpoint has to be NVIDIA's, and a stale `:free` override has to fail
+  // at config time rather than 404 per call.
 
-  it('keeps the free id out of the production dispatch path', () => {
-    for (const complexity of COMPLEXITIES) {
-      for (const tier of TIERS) {
-        expect(selectModel('auditor', complexity, tier)).not.toBe(
-          AUDITOR_MODEL_DEV_FREE
-        );
-      }
-    }
-    expect(resolveAuditorModel()).not.toBe(AUDITOR_MODEL_DEV_FREE);
+  it('points at NVIDIA and not at a router', () => {
+    expect(AUDITOR_BASE_URL).toBe('https://integrate.api.nvidia.com/v1');
+    expect(AUDITOR_BASE_URL).not.toContain('openrouter');
+    // `apps/web/src/lib/cohere.ts` routes on the vendor prefix, so a pin that
+    // stopped carrying it would silently go back out over OpenRouter's key.
+    expect(AUDITOR_MODEL.startsWith('nvidia/')).toBe(true);
+    expect(AUDITOR_MODEL_ESCALATION.startsWith('nvidia/')).toBe(true);
   });
 
-  it('refuses an env override that would put users’ code on the free tier', () => {
-    // The override is an operational tuning knob. Reaching the free tier
-    // through it would be a data-disclosure decision made by a config value.
+  it('refuses a leftover :free override rather than 404ing per call', () => {
+    // NVIDIA does not serve `:free`. Left alone the call fails per chunk and
+    // the audit scripts record each one as "unreachable" — an audit that
+    // reports itself incomplete for what reads as a network fault.
     expect(() =>
-      resolveAuditorModel({ AUDITOR_MODEL: AUDITOR_MODEL_DEV_FREE })
-    ).toThrow(/free tier/i);
-  });
-
-  it('is the same weights as the pin, so findings stay comparable', () => {
-    // If these diverge, the §4B calibration evidence recorded against the pin
-    // stops describing the model that actually audits our commits.
-    expect(AUDITOR_MODEL_DEV_FREE).toBe(`${AUDITOR_MODEL}:free`);
+      resolveAuditorModel({ AUDITOR_MODEL: `${AUDITOR_MODEL}:free` })
+    ).toThrow(/:free|NVIDIA/i);
   });
 });
 
-describe('audit cost is a number, not an assurance', () => {
-  it('prices an audit at the pinned model list rates', () => {
-    // 100K in / 4K out is the rough shape of a §4B diff audit: a large diff and
-    // test output going in, a short findings list coming back.
-    // 100_000 * 0.085/1e6 = 0.0085; 4_000 * 0.40/1e6 = 0.0016.
-    expect(auditCostUsd(100_000, 4_000)).toBeCloseTo(0.0101, 6);
-  });
-
-  it('is zero for a call that never happened', () => {
-    expect(auditCostUsd(0, 0)).toBe(0);
+describe('audit cost is not asserted, because it is not published', () => {
+  it('reports no per-token price rather than an invented one', () => {
+    // OpenRouter listed $0.085 / $0.40 per Mtok, so a run could report a
+    // figure that matched a line on a bill. NVIDIA Build publishes none and
+    // the API returns none. Ground rule 2: no number in this repo that has no
+    // reproducible derivation in this repo. The budget moved to tokens, which
+    // the endpoint does report — see scripts/auditor-provider.mjs.
+    expect(AUDITOR_PRICING_USD_PER_MTOK).toBeNull();
   });
 });

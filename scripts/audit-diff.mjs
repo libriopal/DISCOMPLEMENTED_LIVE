@@ -55,9 +55,9 @@
  *   node scripts/audit-diff.mjs --calibrate         # prove the gate still works
  *   node scripts/audit-diff.mjs --stats             # finding rate to date
  *
- * Requires OPENROUTER_API_KEY in the environment. It is not read from
- * wrangler — Cloudflare secrets are write-only, so the Worker having it says
- * nothing about this process having it.
+ * Requires NVIDIA_API_KEY in the environment. It is not read from wrangler —
+ * Cloudflare secrets are write-only, so the Worker having it says nothing
+ * about this process having it.
  */
 
 import { spawnSync } from 'node:child_process';
@@ -65,45 +65,32 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { treeIdentity, EVIDENCE_PATH } from './run-gate.mjs';
+import {
+  auditorEndpoint,
+  auditorKey,
+  auditorModel,
+  postChatCompletion,
+  AUDITOR_KEY_VAR,
+  COST_USD,
+} from './auditor-provider.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const LEDGER_PATH = resolve(ROOT, '.audit', 'ledger.jsonl');
 
 /**
- * The pinned auditor model, read from the same module the Worker uses so the
- * two auditors cannot drift apart. Parsed rather than imported because this is
- * a plain .mjs script and the source is TypeScript — a build step here would
- * mean the pre-commit hook depends on a build, which is the wrong dependency
- * direction for a gate.
+ * The pinned auditor model and its endpoint come from `auditor-provider.mjs`,
+ * which parses `packages/cohere/src/auditor-model.ts` — the same module the
+ * Worker imports, so the commit gate and the runtime auditor cannot drift.
+ *
+ * This gate used to read `AUDITOR_MODEL_DEV_FREE` instead: a `:free` id was
+ * acceptable here (our own diff of our own repository, ours to disclose) and
+ * not in the Worker (users' generated code). That split existed because
+ * OpenRouter's free tier trains on submitted prompts. The auditor now calls
+ * NVIDIA directly, which has one tier, so both gates read one pin.
+ *
+ * Cost is `null`, not 0 — see COST_USD.
  */
-function pinnedModel() {
-  const source = readFileSync(
-    resolve(ROOT, 'packages', 'cohere', 'src', 'auditor-model.ts'),
-    'utf8'
-  );
-  // The free-tier id, not the pin. What this gate submits is our own diff of
-  // our own repository — ours to disclose — so the tier that trains on
-  // prompts is acceptable here and is not acceptable in the Worker, which
-  // submits users' generated code. Same weights either way, so the §4B
-  // calibration evidence still describes the model doing the auditing.
-  // `resolveAuditorModel` refuses a `:free` override for the runtime path.
-  const match = /export const AUDITOR_MODEL_DEV_FREE = '([^']+)'/.exec(source);
-  if (!match) {
-    throw new Error(
-      'Could not read AUDITOR_MODEL_DEV_FREE from ' +
-        'packages/cohere/src/auditor-model.ts. The auditor will not run ' +
-        'against a guessed model.'
-    );
-  }
-  return match[1];
-}
-
-/**
- * Free tier, so an audit costs nothing and the ledger records that rather
- * than a paid-rate estimate of a bill nobody received. The list prices remain
- * in auditCostUsd() for the runtime auditor, which is genuinely billed.
- */
-const costUsd = () => 0;
+const pinnedModel = auditorModel;
 
 /**
  * Free-tier rate limits are real. A 429 on the commit gate would abort a
@@ -291,12 +278,12 @@ ${diff}
 }
 
 async function callAuditor({ model, userPrompt }) {
-  const key = process.env.OPENROUTER_API_KEY;
+  const key = auditorKey();
   if (!key) {
     return {
       outcome: 'unreachable',
       error:
-        'OPENROUTER_API_KEY is not set in this environment, so the independent ' +
+        `${AUDITOR_KEY_VAR} is not set in this environment, so the independent ` +
         'auditor could not be called. This is a refusal, not a pass — the commit ' +
         'is not audited. Cloudflare secrets are write-only, so the Worker having ' +
         'the key does not give this process the key.',
@@ -304,8 +291,8 @@ async function callAuditor({ model, userPrompt }) {
   }
 
   if (!model.includes('/')) {
-    // req 1, asserted rather than assumed. A model id without a "/" is not an
-    // OpenRouter slug, which means it would be a Cohere model — the same
+    // req 1, asserted rather than assumed. A model id without a "/" is not a
+    // vendor-qualified slug, which means it would be a Cohere model — the same
     // provider as the agent that wrote the diff. That is not an audit.
     return {
       outcome: 'unreachable',
@@ -314,39 +301,57 @@ async function callAuditor({ model, userPrompt }) {
   }
 
   const started = Date.now();
-  let response;
+  let call;
+  let progressDots = 0;
   let attempt = 0;
-  // 429 only. Every other status falls through to the refusal below: retrying
-  // a 402 or a 400 spends wall-clock to reach the same answer, and a gate that
-  // retries everything cannot tell "busy" from "wrong".
+  // Retries 429 and 503 only. Both mean "come back shortly" and nothing about
+  // the request; every other status falls straight through to the refusal
+  // below, because retrying a 402 or a 400 spends wall-clock to arrive at the
+  // same answer and a script that retries everything cannot tell "busy" from
+  // "wrong".
+  //
+  // 503 was added on 2026-08-30 after the first NVIDIA run: the endpoint
+  // answered `{"message":"Service temporarily overloaded"}` and the chunk was
+  // recorded as unreachable, so a whole-system audit came back with a
+  // subsystem missing for a condition that clears in seconds. That is not a
+  // weakened check — an unretried 503 makes the audit report LESS complete,
+  // and the bound below is the same one that already caps 429.
   for (;;) {
     try {
-      response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${key}`,
-          'Content-Type': 'application/json',
+      // Streamed, and the timeout measures silence rather than duration — see
+      // STREAM_STALL_MS in auditor-provider.mjs. This gate runs from
+      // commit-msg, so the person waiting on it is watching a terminal that
+      // says nothing; a dot per 4KB is the difference between "the auditor is
+      // thinking" and "the hook has hung and I should ^C".
+      call = await postChatCompletion({
+        key,
+        model,
+        system: SYSTEM_PROMPT,
+        user: userPrompt,
+        maxTokens: MAX_OUTPUT_TOKENS,
+        onProgress: (len) => {
+          if (Math.floor(len / 4096) > progressDots) {
+            progressDots = Math.floor(len / 4096);
+            process.stderr.write('.');
+          }
         },
-        body: JSON.stringify({
-          model,
-          messages: [
-            { role: 'system', content: SYSTEM_PROMPT },
-            { role: 'user', content: userPrompt },
-          ],
-          response_format: { type: 'json_object' },
-          temperature: 0.1,
-          max_tokens: MAX_OUTPUT_TOKENS,
-        }),
       });
     } catch (err) {
-      return { outcome: 'unreachable', error: `network error: ${err.message}` };
+      return {
+        outcome: 'unreachable',
+        error:
+          err.name === 'AuditorStall'
+            ? err.message
+            : `network error: ${err.message}`,
+      };
     }
 
-    if (response.status !== 429) break;
+    if (call.ok) break;
+    if (call.status !== 429 && call.status !== 503) break;
 
     // Retry-After when the provider sends one; it knows when the window
     // opens and backoff is a guess. Seconds or an HTTP date, per RFC 9110.
-    const header = response.headers.get('retry-after');
+    const header = call.headers.get('retry-after');
     let waitMs = RATE_LIMIT_BASE_DELAY_MS * 2 ** attempt;
     if (header) {
       const seconds = Number(header);
@@ -367,23 +372,20 @@ async function callAuditor({ model, userPrompt }) {
     }
 
     process.stderr.write(
-      `  auditor rate-limited, waiting ${Math.round(waitMs / 1000)}s ...\n`
+      `  auditor busy (${call.status}), waiting ${Math.round(waitMs / 1000)}s ...\n`
     );
     await new Promise((r) => setTimeout(r, waitMs));
     attempt += 1;
   }
 
-  if (!response.ok) {
+  if (!call.ok) {
     return {
       outcome: 'unreachable',
-      error: `OpenRouter returned ${response.status}: ${(await response.text()).slice(0, 500)}`,
+      error: `auditor endpoint returned ${call.status}: ${call.bodyText}`,
     };
   }
 
-  const body = await response.json();
-  const content = body.choices?.[0]?.message?.content ?? '';
-  const finishReason = body.choices?.[0]?.finish_reason ?? 'unknown';
-  const usage = body.usage ?? {};
+  const { content, finishReason, usage } = call;
 
   let parsed;
   try {
@@ -490,7 +492,16 @@ function stats() {
   const withAny = completed.filter(
     (a) => a.counts && a.counts.HIGH + a.counts.MEDIUM + a.counts.LOW > 0
   );
-  const totalCost = rows.reduce((sum, r) => sum + (r.costUsd ?? 0), 0);
+  // Tokens, not dollars. Rows written before 2026-08-30 carry a real
+  // OpenRouter cost and rows written after carry null, so summing the column
+  // would produce a total that silently stops growing — a spend figure that
+  // looks like restraint and is actually a provider change. Tokens are
+  // reported by both providers and are comparable across the switch.
+  const totalTokens = rows.reduce(
+    (sum, r) => sum + (r.tokensIn ?? 0) + (r.tokensOut ?? 0),
+    0
+  );
+  const pricedCost = rows.reduce((sum, r) => sum + (r.costUsd ?? 0), 0);
 
   console.log(`audits recorded          ${audits.length}`);
   console.log(`  completed              ${completed.length}`);
@@ -511,7 +522,11 @@ function stats() {
         ? '   <-- the gate missed something; investigate before trusting a pass'
         : '')
   );
-  console.log(`total spend              $${totalCost.toFixed(4)}`);
+  console.log(`total tokens             ${totalTokens.toLocaleString()}`);
+  console.log(
+    `  of which priced        $${pricedCost.toFixed(4)}  ` +
+      '(OpenRouter rows only; NVIDIA publishes no per-token list price)'
+  );
 
   if (completed.length >= 10 && withAny.length === 0) {
     console.error(
@@ -546,7 +561,7 @@ async function auditDiff({ diff, task, evidence, model, label }) {
 
   const result = await callAuditor({ model, userPrompt });
   const usage = result.usage ?? {};
-  const cost = costUsd();
+  const cost = COST_USD;
 
   if (result.outcome !== 'completed') {
     appendLedger({
@@ -628,7 +643,8 @@ function report(result, model) {
 
   console.log(
     `${result.counts.HIGH} HIGH, ${result.counts.MEDIUM} MEDIUM, ${result.counts.LOW} LOW · ` +
-      `${(result.durationMs / 1000).toFixed(1)}s · $${result.costUsd.toFixed(4)}`
+      `${(result.durationMs / 1000).toFixed(1)}s · ` +
+      `${((result.usage?.prompt_tokens ?? 0) + (result.usage?.completion_tokens ?? 0)).toLocaleString()} tok`
   );
 
   if (result.counts.HIGH > 0) {
@@ -754,7 +770,7 @@ async function main() {
       model,
       outcome: 'refused',
       error: loaded.reason,
-      costUsd: 0,
+      costUsd: COST_USD,
     });
     process.exit(1);
   }

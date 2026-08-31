@@ -24,18 +24,32 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: ${{ github.event.inputs.environment || 'production' }}
+    # Resolve the dispatch inputs ONCE into job-level environment variables and
+    # read them as "$DEPLOY_ENV" / "$SKIP_MIGRATIONS" in every `run:` below.
+    #
+    # `${{ github.event.inputs.* }}` interpolated directly into a `run:` script
+    # is substituted textually before the shell ever sees it, so the input's
+    # contents become shell source. The `environment` input is a `choice`, which
+    # constrains it today — but the constraint lives in the trigger definition,
+    # not at the point of use, and `skip_migrations` sits in the same scripts.
+    # Passing through `env:` means the value arrives as data on every path.
+    env:
+      DEPLOY_ENV: ${{ github.event.inputs.environment || 'production' }}
+      SKIP_MIGRATIONS: ${{ github.event.inputs.skip_migrations || 'false' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: '22'
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
+        # No `version:` pin — pnpm/action-setup reads `packageManager` from
+        # package.json, so the runner and a developer's machine are guaranteed
+        # to be the same pnpm. That matters here specifically: pnpm 9 silently
+        # ignores the supply-chain settings in pnpm-workspace.yaml.
+        uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v4.4.0
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -94,7 +108,7 @@ jobs:
       # overwrites its bindings/vars (APP_URL, ENVIRONMENT, D1/KV/etc).
       - name: Deploy to Cloudflare Workers (with container build)
         working-directory: apps/web
-        run: npx wrangler deploy --env ${{ github.event.inputs.environment || 'production' }}
+        run: npx wrangler deploy --env "$DEPLOY_ENV"
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -104,7 +118,7 @@ jobs:
       # production's health even on staging runs.
       - name: Resolve deploy URL
         run: |
-          if [ "${{ github.event.inputs.environment || 'production' }}" = "staging" ]; then
+          if [ "$DEPLOY_ENV" = "staging" ]; then
             echo "DEPLOY_URL=https://bicameral-staging.johnathanallen1998.workers.dev" >> "$GITHUB_ENV"
           else
             echo "DEPLOY_URL=https://www.discomplemented.com" >> "$GITHUB_ENV"
@@ -134,7 +148,7 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           echo "Checking Worker version for container bindings..."
-          VERSION=$(npx wrangler deployments list --env ${{ github.event.inputs.environment || 'production' }} 2>/dev/null | head -5 || echo "unknown")
+          VERSION=$(npx wrangler deployments list --env "$DEPLOY_ENV" 2>/dev/null | head -5 || echo "unknown")
           echo "Latest deployment: $VERSION"
           echo "Container config in wrangler.toml:"
           grep -A4 "\[\[env.*containers\]\]" wrangler.toml || echo "⚠️ No container config found"
@@ -175,15 +189,16 @@ jobs:
       - name: Post-deployment summary
         if: always()
         run: |
-          echo "## Deployment Summary" >> $GITHUB_STEP_SUMMARY
-          echo "- **Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Environment:** ${{ github.event.inputs.environment || 'production' }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Migrations:** ${{ github.event.inputs.skip_migrations == 'true' && 'Skipped' || 'Applied' }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Health Check:** ${HEALTH_STATUS:-unknown}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Pipeline DO Check:** ${PIPELINE_CHECK:-not run}" >> $GITHUB_STEP_SUMMARY
+          echo "## Deployment Summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Commit:** $GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Environment:** $DEPLOY_ENV" >> "$GITHUB_STEP_SUMMARY"
+          if [ "$SKIP_MIGRATIONS" = "true" ]; then MIG=Skipped; else MIG=Applied; fi
+          echo "- **Migrations:** $MIG" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Health Check:** ${HEALTH_STATUS:-unknown}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Pipeline DO Check:** ${PIPELINE_CHECK:-not run}" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Notify on failure
         if: failure()
         run: |
-          echo "❌ Deployment failed for commit ${{ github.sha }}"
+          echo "❌ Deployment failed for commit $GITHUB_SHA"
           echo "Check the workflow logs for details"

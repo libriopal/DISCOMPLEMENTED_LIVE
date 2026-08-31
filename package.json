@@ -1,6 +1,7 @@
 {
   "name": "bicameral",
   "version": "1.0.0",
+  "packageManager": "pnpm@10.34.5",
   "private": true,
   "type": "module",
   "description": "Bicameral — Cohere-native prompt-to-app platform on Cloudflare Workers",
@@ -79,7 +80,7 @@
   },
   "engines": {
     "node": ">=22.0.0",
-    "pnpm": ">=9.0.0"
+    "pnpm": ">=10.18.0"
   },
   "lint-staged": {
     "*.{ts,tsx}": [

@@ -15,6 +15,7 @@ import {
   exhaustWorkflow,
   checkGracePeriod,
 } from './decline-recovery.js';
+import { notifySlackBestEffort } from './slack.js';
 import { runNightlyPreferenceLearning } from './preference-learning.js';
 import {
   evaluateSimulationHealth,
@@ -184,7 +185,7 @@ export async function handleSimulationWatchdog(env: Env): Promise<void> {
       // same two rows every morning until a new report lands, so without
       // this a standing problem would re-raise daily and train whoever
       // reads the table to stop reading it.
-      await env.DB.prepare(
+      const written = await env.DB.prepare(
         `INSERT OR IGNORE INTO simulation_alerts
            (id, run_id, kind, severity, summary, detail, dedupe_key, created_date)
          VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'))`
@@ -199,6 +200,30 @@ export async function handleSimulationWatchdog(env: Env): Promise<void> {
           alert.dedupeKey
         )
         .run();
+
+      // Slack only on a row that was actually inserted. The dedupe argument
+      // above applies with more force to a notification than to a table: a
+      // standing problem re-announced every morning is how an alert channel
+      // becomes something people mute, and a muted channel is worse than no
+      // channel because it still looks like coverage.
+      //
+      // `meta.changes` is 0 when OR IGNORE suppressed the write. Deliberately
+      // read from the result rather than doing a SELECT first — a check-then-
+      // insert would notify twice if two crons ever overlapped.
+      if (written.meta.changes > 0) {
+        await notifySlackBestEffort(
+          env,
+          {
+            text: `:warning: Simulation alert — *${alert.kind}* (${alert.severity})\n${alert.summary}`,
+            fields: {
+              Run: alert.runId ?? 'n/a',
+              Severity: alert.severity,
+              Detail: alert.detail,
+            },
+          },
+          `simulation alert ${alert.dedupeKey}`
+        );
+      }
     }
 
     console.log(

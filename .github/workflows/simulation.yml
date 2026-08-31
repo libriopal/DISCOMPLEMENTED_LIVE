@@ -41,10 +41,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         with:
           python-version: '3.11'
 
@@ -54,6 +54,12 @@ jobs:
       - name: Run simulation and ingest the report
         env:
           SIMULATION_INGEST_SECRET: ${{ secrets.SIMULATION_INGEST_SECRET }}
+          # Bound as env rather than interpolated into the python3 line below:
+          # `${{ inputs.* }}` is pasted in as shell source before bash parses
+          # it, so the surrounding double quotes do not contain it. Both are
+          # numbers, so they are also range-checked before use.
+          SIM_BOTS: ${{ inputs.bots || '12' }}
+          SIM_BUDGET: ${{ inputs.budget || '120' }}
         run: |
           set -euo pipefail
           # The engine refuses to run without the secret rather than exiting 0
@@ -66,16 +72,22 @@ jobs:
             echo "  wrangler secret put SIMULATION_INGEST_SECRET --env production"
             exit 1
           fi
+          for pair in "bots=$SIM_BOTS" "budget=$SIM_BUDGET"; do
+            if ! printf '%s' "${pair#*=}" | grep -qE '^[0-9]{1,6}$'; then
+              echo "::error::--${pair%%=*} must be a positive integer, got '${pair#*=}'"
+              exit 1
+            fi
+          done
           python3 simulation/monte_carlo_engine.py \
             --api https://discomplemented.com \
-            --bots "${{ inputs.bots || '12' }}" \
-            --budget "${{ inputs.budget || '120' }}" \
+            --bots "$SIM_BOTS" \
+            --budget "$SIM_BUDGET" \
             --concurrency 4 \
             --ingest-url https://discomplemented.com/api/simulation/ingest
 
       - name: Upload report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: simulation-report
           path: simulation/report_*.json
@@ -95,7 +107,7 @@ jobs:
     permissions:
       issues: write
     steps:
-      - uses: actions/github-script@v7
+      - uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
         with:
           script: |
             const title = 'Nightly Monte Carlo simulation is failing';

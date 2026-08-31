@@ -11,7 +11,8 @@
     "./rerank": "./src/rerank.ts",
     "./streaming": "./src/streaming.ts",
     "./openrouter": "./src/openrouter.ts",
-    "./model-router": "./src/model-router.ts"
+    "./model-router": "./src/model-router.ts",
+    "./auditor-model": "./src/auditor-model.ts"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json"

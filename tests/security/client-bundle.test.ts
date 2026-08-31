@@ -38,16 +38,23 @@ import {
 const CLIENT_DIST = resolve(__dirname, '../../apps/web/dist/client/assets');
 
 /** Hostnames that must only ever be contacted from the Worker. */
-const SERVER_ONLY_HOSTS = ['api.cohere.com', 'api.you.com', 'openrouter.ai'];
+const SERVER_ONLY_HOSTS = [
+  'api.cohere.com',
+  'api.you.com',
+  'openrouter.ai',
+  'integrate.api.nvidia.com',
+];
 
 /** Secret-shaped env names that must never reach a client bundle. */
 const SERVER_ONLY_SECRETS = [
   'COHERE_API_KEY',
   'OPENROUTER_API_KEY',
+  'NVIDIA_API_KEY',
   'BETTER_AUTH_SECRET',
   'GITHUB_OAUTH_CLIENT_SECRET',
   'STRIPE_SECRET_KEY',
   'FLUXYCHAT_API_KEY',
+  'FLUXYCHAT_USER_API_KEY',
 ];
 
 let bundles: Array<{ name: string; body: string }> = [];
@@ -108,11 +115,17 @@ describe('client bundle', () => {
 const SECRET_SHAPED_VALUES: Record<string, string> = {
   COHERE_API_KEY: 'sk-cohere0123456789abcdefghijklmnop',
   OPENROUTER_API_KEY: 'sk-or-v1-0123456789abcdef0123456789abcdef',
+  // NVIDIA Build issues `nvapi-` keys; this is the shape, not a real one.
+  NVIDIA_API_KEY: 'nvapi-EXAMPLE0123456789abcdefghijklmnopqrstuvwxyz012345',
   BETTER_AUTH_SECRET:
     'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dBjftJeZ4CVPmB92K27uhbUJU1p1r_wW1gFWFOEjXk',
   GITHUB_OAUTH_CLIENT_SECRET: 'ghp_0123456789abcdefghijklmnopqrstuvwxyz',
   STRIPE_SECRET_KEY: 'sk_live_0123456789abcdefghij',
-  FLUXYCHAT_API_KEY: 'xoxb-EXAMPLE-NOT-A-REAL-TOKEN',
+  FLUXYCHAT_API_KEY: 'fc_EXAMPLE0admin0key0not0real0000000000000',
+  // The user tier is still a server-side credential. The browser receives the
+  // short-lived member JWT it mints, never the key itself — so it belongs in
+  // this list for the same reason the admin key does.
+  FLUXYCHAT_USER_API_KEY: 'fc_EXAMPLE0user0key0not0real00000000000000',
 };
 
 describe('verbose transcript', () => {
@@ -182,5 +195,62 @@ describe('verbose transcript', () => {
     // land in quiet by default — the safe failure is over-hiding.
     expect(messageVisibleAt('provider_debug', 'quiet')).toBe(false);
     expect(messageVisibleAt('provider_debug', 'normal')).toBe(false);
+  });
+});
+
+describe('the Fluxy admin key is unreachable from the user path', () => {
+  // FLUXYCHAT_API_KEY mints JWTs for any userId with any roles, provisions
+  // the support agent, and is the shared secret on FluxyChat's tool-execute
+  // callbacks. FLUXYCHAT_USER_API_KEY mints a member JWT for one user. The
+  // separation only means anything if the publicly reachable path cannot
+  // reach the admin credential — including by falling back to it, which is
+  // the failure mode that looks like it works.
+  const lib = readFileSync(
+    resolve(__dirname, '../../apps/web/src/lib/fluxychat.ts'),
+    'utf8'
+  );
+  const route = readFileSync(
+    resolve(__dirname, '../../apps/web/src/routes/chat.ts'),
+    'utf8'
+  );
+
+  it('mints user sessions on the user tier', () => {
+    const start = lib.indexOf('export async function mintChatSession');
+    expect(start).toBeGreaterThan(-1);
+    const body = lib.slice(start, lib.indexOf('\n}\n', start));
+    expect(body).toContain("tierKey(env, 'user')");
+    expect(body).toContain("serverClient(env, userId, 'user')");
+    // The whole point: the admin key is never READ here. It is named, in the
+    // refusal message, to tell an operator which key not to reach for — so
+    // match a property access rather than the bare name.
+    expect(body).not.toMatch(/env\.FLUXYCHAT_API_KEY/);
+    expect(body).not.toMatch(/tierKey\(env, 'admin'\)/);
+  });
+
+  it('has no fallback from the user tier to the admin key', () => {
+    // `env.FLUXYCHAT_USER_API_KEY ?? env.FLUXYCHAT_API_KEY` and its `||`
+    // spelling both silently delete the separation the moment the user key is
+    // unset — which is exactly when nobody is looking.
+    expect(lib).not.toMatch(
+      /FLUXYCHAT_USER_API_KEY\s*(\?\?|\|\|)\s*[\w.]*FLUXYCHAT_API_KEY/
+    );
+    expect(lib).not.toMatch(
+      /FLUXYCHAT_API_KEY\s*(\?\?|\|\|)\s*[\w.]*FLUXYCHAT_USER_API_KEY/
+    );
+  });
+
+  it('guards the public route on the credential that route actually uses', () => {
+    // Guarding a user route on the admin key's presence is a coupling wearing
+    // a config check's clothes: it answers 200-then-500 when the admin key is
+    // set and the user key is not.
+    expect(route).toContain('!c.env.FLUXYCHAT_USER_API_KEY');
+    expect(route).not.toMatch(/!c\.env\.FLUXYCHAT_API_KEY/);
+  });
+
+  it('keeps the admin key on admin-only operations', () => {
+    const start = lib.indexOf('export async function provisionSupportAgent');
+    expect(start).toBeGreaterThan(-1);
+    const body = lib.slice(start, lib.indexOf('\n}\n', start));
+    expect(body).toContain("'admin'");
   });
 });

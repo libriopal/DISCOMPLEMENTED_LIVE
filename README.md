@@ -17,7 +17,7 @@ The production repository behind **discomplemented.com** — a Cohere-native pro
 | D1 database        | `bicameral` (`24dd57ec-9c20-46df-aaa9-d4f99dc570bb`)                      |
 | R2 bucket          | `bicameral-assets` (generated project files)                              |
 | Vectorize index    | `bicameral-lattice`                                                       |
-| Node / pnpm        | `>=22.0.0` / `>=9.0.0`                                                    |
+| Node / pnpm        | `>=22.0.0` / `>=10.18.0` (pinned `pnpm@10.34.5` via `packageManager`)     |
 
 ## Stack
 
@@ -40,7 +40,7 @@ apps/web/            # the deployed Worker + React SPA
   src/components/    # marketing/, LoginScreen, IDE, admin panel
   src/views/         # authenticated app views
 packages/shared/     # types, schemas, constants
-packages/cohere/     # Cohere + OpenRouter wrappers, model-router.ts
+packages/cohere/     # Cohere + OpenAI-compatible (OpenRouter, NVIDIA) wrappers, model-router.ts
 packages/admin-stub/ # admin surface; every op throws (real impl: DISCOMPLEMENTED_ADMIN)
 migrations/          # D1 migrations, 001–024
 simulation/          # offline Monte Carlo experiments (not production code)

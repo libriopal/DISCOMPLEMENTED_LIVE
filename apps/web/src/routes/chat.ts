@@ -35,13 +35,21 @@ export const chatRoutes = new Hono<{
 chatRoutes.post('/token', async (c) => {
   const userId = c.get('userId');
 
-  // FLUXYCHAT_API_KEY is unset in production and no FluxyChat Worker is
-  // deployed at FLUXYCHAT_WORKER_URL yet, so this route's normal outcome
-  // today is "unconfigured", not "broken". Answer 503 rather than letting
+  // Checks the USER key, which is the one mintChatSession presents — not the
+  // admin key. Guarding a user path on the presence of an admin credential
+  // reads as a configuration check and is really a coupling: it would answer
+  // 200-then-500 once the admin key was set and the user key was not, and it
+  // would answer 503 for a correctly configured user tier if the admin key
+  // were ever rotated out. The guard has to name the credential in play.
+  //
+  // No FluxyChat Worker is deployed at FLUXYCHAT_WORKER_URL yet (verified
+  // 2026-08-30: `wrangler deployments list --name fluxychat` -> code 10007,
+  // and the URL 404s), so this route's normal outcome today is
+  // "unconfigured", not "broken". Answer 503 rather than letting
   // mintChatSession's throw surface as a 500: the widget already renders
   // "Support chat is unavailable right now." for any !res.ok, and a 500
   // would file every widget open as a server fault in telemetry.
-  if (!c.env.FLUXYCHAT_API_KEY) {
+  if (!c.env.FLUXYCHAT_USER_API_KEY) {
     throw new BicameralError(
       'Live chat is not configured',
       'CHAT_UNAVAILABLE',

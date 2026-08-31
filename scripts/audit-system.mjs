@@ -47,18 +47,26 @@
  *
  * ## Usage
  *
- *   node scripts/audit-system.mjs --dry-run    # partition + token estimate, $0
- *   node scripts/audit-system.mjs --budget-usd 2
+ *   node scripts/audit-system.mjs --dry-run    # partition + token estimate
+ *   node scripts/audit-system.mjs --budget-tokens 3000000
  *   node scripts/audit-system.mjs --subsystem routes
  *   node scripts/audit-system.mjs --pass 2 --since .audit/system-<sha>.json
  *
- * Requires OPENROUTER_API_KEY. Writes only to `.audit/`.
+ * Requires NVIDIA_API_KEY. Writes only to `.audit/`.
  */
 
 import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
 import { resolve, dirname, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  auditorEndpoint,
+  auditorKey,
+  auditorModel,
+  postChatCompletion,
+  AUDITOR_KEY_VAR,
+  COST_USD,
+} from './auditor-provider.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const OUT_DIR = resolve(ROOT, '.audit');
@@ -82,37 +90,39 @@ const CHARS_PER_TOKEN = 3.2;
 /** Leave room for the system prompt, the seam extract and the response. */
 const MAX_SUBSYSTEM_TOKENS = 60_000;
 
-/**
- * Per-request ceiling. `fetch` has no default timeout, so without this a
- * provider that accepts the connection and then stalls hangs the whole run
- * indefinitely — and a 17-chunk audit that never returns looks exactly like a
- * slow one, which is the same "silence reads as progress" failure this script
- * exists to find. A stalled chunk is recorded as unreachable and the run
- * continues; a partial audit that says which chunks are missing is worth
- * having, and one that pretends to be complete is not.
+/*
+ * The per-request ceiling lives in scripts/auditor-provider.mjs now
+ * (STREAM_STALL_MS / STREAM_TOTAL_MS), because the response is streamed and
+ * the timeout it enforces is silence rather than duration. `fetch` still has
+ * no default timeout, and the property this had to preserve is unchanged: a
+ * stalled chunk is recorded as unreachable and the run continues, because a
+ * partial audit that names its gaps is worth having and one that pretends to
+ * be complete is not.
  */
-const REQUEST_TIMEOUT_MS = 240_000;
-
-/** Matches auditCostUsd() in packages/cohere/src/auditor-model.ts. */
-const PRICE_IN_PER_MTOK = 0.085;
-const PRICE_OUT_PER_MTOK = 0.4;
 
 /**
- * The free tier is free, and pricing it at the paid rates would make the
- * budget gate refuse runs that cost nothing. It is still priced through the
- * same function rather than bypassed, so the report's `cost_usd` keeps meaning
- * "what this run cost" for both tiers instead of being absent on one.
+ * The budget, in tokens.
+ *
+ * It used to be `--budget-usd`, priced from OpenRouter's published $0.085 /
+ * $0.40 per Mtok. NVIDIA Build publishes no per-token list price and the API
+ * returns no rate, so a dollar figure here would be a number nobody could
+ * reproduce from anything in this repo — exactly what ground rule 2 forbids.
+ *
+ * The gate did not go away; it changed denomination to the unit the endpoint
+ * actually reports. 3,000,000 is roughly one full-repository pass at the
+ * current chunking (17 chunks, worst-cased at the 32K output ceiling each),
+ * so the default admits one whole-system audit and refuses a runaway.
  */
-const FREE_PRICE_PER_MTOK = 0;
+const DEFAULT_BUDGET_TOKENS = 3_000_000;
 
 /**
- * Free-tier requests are rate-limited per minute and per day, and a 429 is a
- * "come back shortly", not a failure to audit. Recording it as unreachable
- * would put a chunk in the "not covered" list for a reason that resolves
- * itself in seconds — the report would be honest and needlessly incomplete.
+ * A 429 is a "come back shortly", not a failure to audit. Recording it as
+ * unreachable would put a chunk in the "not covered" list for a reason that
+ * resolves itself in seconds — the report would be honest and needlessly
+ * incomplete.
  *
  * Bounded, because the alternative shape is a script that waits forever on a
- * daily quota that will not reset within the run.
+ * quota that will not reset within the run.
  */
 const RATE_LIMIT_MAX_RETRIES = 4;
 const RATE_LIMIT_BASE_DELAY_MS = 15_000;
@@ -123,31 +133,6 @@ const RATE_LIMIT_MAX_WAIT_MS = 180_000;
 // at all, which surfaced as a parse failure rather than as the budget problem
 // it was. This is sized for the reasoning, not for the answer.
 const MAX_OUTPUT_TOKENS = 32_000;
-const costUsd = (inTok, outTok, free) =>
-  free
-    ? (inTok + outTok) * FREE_PRICE_PER_MTOK
-    : (inTok * PRICE_IN_PER_MTOK + outTok * PRICE_OUT_PER_MTOK) / 1_000_000;
-
-/**
- * The pinned model, parsed from the same source `audit-diff.mjs` parses, for
- * the same reason: two auditors that can drift apart are two auditors whose
- * findings cannot be compared.
- */
-function pinnedModel({ free }) {
-  const source = readFileSync(
-    resolve(ROOT, 'packages', 'cohere', 'src', 'auditor-model.ts'),
-    'utf8'
-  );
-  const name = free ? 'AUDITOR_MODEL_DEV_FREE' : 'AUDITOR_MODEL';
-  const match = new RegExp(`export const ${name} = '([^']+)'`).exec(source);
-  if (!match) {
-    throw new Error(
-      `Could not read ${name} from packages/cohere/src/auditor-model.ts. ` +
-        'The auditor will not run against a guessed model.'
-    );
-  }
-  return match[1];
-}
 
 function git(args) {
   const r = spawnSync('git', args, { cwd: ROOT, encoding: 'utf8' });
@@ -378,12 +363,13 @@ Empty findings array is a valid and expected answer.
 `.trim();
 
 async function callAuditor({ model, userPrompt, maxTokens = MAX_OUTPUT_TOKENS }) {
-  const key = process.env.OPENROUTER_API_KEY;
+  let progressDots = 0;
+  const key = auditorKey();
   if (!key) {
     return {
       outcome: 'unreachable',
       error:
-        'OPENROUTER_API_KEY is not set, so the independent auditor could not ' +
+        `${AUDITOR_KEY_VAR} is not set, so the independent auditor could not ` +
         'be called. This is a refusal, not a clean report.',
     };
   }
@@ -395,48 +381,56 @@ async function callAuditor({ model, userPrompt, maxTokens = MAX_OUTPUT_TOKENS })
   }
 
   const started = Date.now();
-  let response;
+  let call;
   let attempt = 0;
-  // Retries only 429. Every other status falls straight through to the
-  // refusal below: retrying a 402 or a 400 spends wall-clock to arrive at the
-  // same answer, and a script that retries everything cannot tell "busy" from
+  // Retries 429 and 503 only. Both mean "come back shortly" and nothing about
+  // the request; every other status falls straight through to the refusal
+  // below, because retrying a 402 or a 400 spends wall-clock to arrive at the
+  // same answer and a script that retries everything cannot tell "busy" from
   // "wrong".
+  //
+  // 503 was added on 2026-08-30 after the first NVIDIA run: the endpoint
+  // answered `{"message":"Service temporarily overloaded"}` and the chunk was
+  // recorded as unreachable, so a whole-system audit came back with a
+  // subsystem missing for a condition that clears in seconds. That is not a
+  // weakened check — an unretried 503 makes the audit report LESS complete,
+  // and the bound below is the same one that already caps 429.
   for (;;) {
     try {
-      response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${key}`,
-          'Content-Type': 'application/json',
+      call = await postChatCompletion({
+        key,
+        model,
+        system: SYSTEM_PROMPT,
+        user: userPrompt,
+        maxTokens,
+        // A dot per 4KB of output. Not decoration: the whole reason this is
+        // streamed is that a thinking model and a dead socket are otherwise
+        // indistinguishable, and that is as true for the person watching the
+        // terminal as it is for the timeout.
+        onProgress: (len) => {
+          if (Math.floor(len / 4096) > progressDots) {
+            progressDots = Math.floor(len / 4096);
+            process.stdout.write('.');
+          }
         },
-        body: JSON.stringify({
-          model,
-          messages: [
-            { role: 'system', content: SYSTEM_PROMPT },
-            { role: 'user', content: userPrompt },
-          ],
-          response_format: { type: 'json_object' },
-          temperature: 0.1,
-          max_tokens: maxTokens,
-        }),
-        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
       });
     } catch (err) {
-      const stalled = err.name === 'TimeoutError' || err.name === 'AbortError';
       return {
         outcome: 'unreachable',
-        error: stalled
-          ? `no response within ${REQUEST_TIMEOUT_MS / 1000}s — chunk not audited`
-          : `network error: ${err.message}`,
+        error:
+          err.name === 'AuditorStall'
+            ? err.message
+            : `network error: ${err.message}`,
       };
     }
 
-    if (response.status !== 429) break;
+    if (call.ok) break;
+    if (call.status !== 429 && call.status !== 503) break;
 
     // Honour Retry-After when the provider sends one — it knows when the
     // window opens and exponential backoff is a guess. Seconds or an HTTP
     // date, per RFC 9110.
-    const header = response.headers.get('retry-after');
+    const header = call.headers.get('retry-after');
     let waitMs = RATE_LIMIT_BASE_DELAY_MS * 2 ** attempt;
     if (header) {
       const seconds = Number(header);
@@ -454,7 +448,7 @@ async function callAuditor({ model, userPrompt, maxTokens = MAX_OUTPUT_TOKENS })
         error:
           `rate limited, and the provider asked for ${Math.round(waitMs / 1000)}s — ` +
           'longer than a burst limit, so this is a quota. Chunk not audited; ' +
-          're-run later or use the paid model with --paid.',
+          're-run later, or narrow the run with --subsystem.',
       };
     }
 
@@ -468,22 +462,21 @@ async function callAuditor({ model, userPrompt, maxTokens = MAX_OUTPUT_TOKENS })
       };
     }
 
-    process.stdout.write(`429, waiting ${Math.round(waitMs / 1000)}s ... `);
+    process.stdout.write(
+      `${call.status}, waiting ${Math.round(waitMs / 1000)}s ... `
+    );
     await new Promise((r) => setTimeout(r, waitMs));
     attempt += 1;
   }
 
-  if (!response.ok) {
+  if (!call.ok) {
     return {
       outcome: 'unreachable',
-      error: `OpenRouter returned ${response.status}: ${(await response.text()).slice(0, 400)}`,
+      error: `auditor endpoint returned ${call.status}: ${call.bodyText}`,
     };
   }
 
-  const body = await response.json();
-  const content = body.choices?.[0]?.message?.content ?? '';
-  const finishReason = body.choices?.[0]?.finish_reason ?? 'unknown';
-  const usage = body.usage ?? {};
+  const { content, finishReason, usage } = call;
 
   // The pinned auditor is a reasoning model and will happily emit its
   // deliberation around the JSON even in json_object mode. Pull the outermost
@@ -615,19 +608,29 @@ async function main() {
     return i !== -1 && argv[i + 1] ? argv[i + 1] : fallback;
   };
   const dryRun = argv.includes('--dry-run');
-  // Free by default. What this script sends is this repository's own source,
-  // which is ours to disclose; the paid tier is the opt-in, not the reverse,
-  // because the failure mode of forgetting the flag should be a slower audit
-  // rather than an unexpected bill. `--paid` exists for the case free-tier
-  // quota makes a run impossible.
-  const free = !argv.includes('--paid');
   const only = arg('--subsystem', null);
-  const budgetUsd = Number(arg('--budget-usd', '5'));
+  const budgetTokens = Number(arg('--budget-tokens', DEFAULT_BUDGET_TOKENS));
   const passNum = Number(arg('--pass', '1'));
   const prior = loadPrior(arg('--since', null));
 
-  if (!Number.isFinite(budgetUsd) || budgetUsd <= 0) {
-    console.error(`--budget-usd must be a positive number, got "${budgetUsd}"`);
+  // Refused loudly rather than accepted and ignored. `--budget-usd 2` used to
+  // be the documented invocation, and a script that silently disregards the
+  // flag someone typed to bound their spend is worse than one that never had
+  // a budget: the operator believes there is a ceiling where there is none.
+  if (argv.includes('--budget-usd')) {
+    console.error(
+      '\n--budget-usd no longer exists. The auditor moved from OpenRouter to ' +
+        'NVIDIA on 2026-08-30, and NVIDIA publishes no per-token list price — ' +
+        'a dollar ceiling here would be enforced against a rate this repo ' +
+        'invented. Use --budget-tokens (default ' +
+        `${DEFAULT_BUDGET_TOKENS.toLocaleString()}).\n`
+    );
+    process.exit(2);
+  }
+  if (!Number.isFinite(budgetTokens) || budgetTokens <= 0) {
+    console.error(
+      `--budget-tokens must be a positive number, got "${budgetTokens}"`
+    );
     process.exit(2);
   }
   if (passNum > MAX_PASSES) {
@@ -640,7 +643,7 @@ async function main() {
     process.exit(2);
   }
 
-  const model = pinnedModel({ free });
+  const model = auditorModel();
   const sha = git(['rev-parse', 'HEAD']).trim();
   let chunks = partition(sourceFiles());
   if (only) chunks = chunks.filter((c) => c.subsystem === only);
@@ -655,31 +658,29 @@ async function main() {
   const seams = seamExtract();
   const seamTokens = Math.ceil(seams.length / CHARS_PER_TOKEN);
   const estIn = chunks.reduce((n, c) => n + c.tokens + seamTokens, 0);
-  // Worst case, deliberately: every chunk is priced as if it used the whole
+  // Worst case, deliberately: every chunk is counted as if it used the whole
   // output ceiling. A budget gate that estimates optimistically is a budget
   // gate that lets the run exceed the number the user typed.
-  const estCost = costUsd(estIn, chunks.length * MAX_OUTPUT_TOKENS, free);
+  const estTotal = estIn + chunks.length * MAX_OUTPUT_TOKENS;
 
-  if (free) {
-    // Printed every run, not documented once. The person running this is
-    // choosing to send this repository's source to an endpoint that trains on
-    // it, and that choice should be in front of them at the moment they make
-    // it rather than in a comment they read a month ago.
-    console.log(
-      '\nFREE TIER — OpenRouter trains on prompts submitted to `:free` models.\n' +
-        'This run sends this repository\'s own source, which is ours to disclose.\n' +
-        'It does NOT send any user\'s generated code; the pipeline auditor is a\n' +
-        'separate, paid model and resolveAuditorModel() refuses a `:free` override.\n' +
-        'Use --paid to audit on the billed endpoint instead.'
-    );
-  }
+  // Printed every run, not documented once. The person running this is
+  // choosing to send this repository's source to a third party, and that
+  // choice should be in front of them at the moment they make it rather than
+  // in a comment they read a month ago.
+  console.log(
+    '\nThis run sends this repository\'s own source to NVIDIA, which is ours\n' +
+      'to disclose. It does NOT send any user\'s generated code.'
+  );
 
   console.log(`\nmodel      ${model}`);
   console.log(`commit     ${sha.slice(0, 12)}`);
   console.log(`pass       ${passNum} of ${MAX_PASSES}`);
   console.log(`chunks     ${chunks.length}`);
   console.log(`est. input ~${estIn.toLocaleString()} tokens`);
-  console.log(`est. cost  ~$${estCost.toFixed(4)} (budget $${budgetUsd.toFixed(2)})\n`);
+  console.log(
+    `est. total ~${estTotal.toLocaleString()} tokens ` +
+      `(budget ${budgetTokens.toLocaleString()})\n`
+  );
   for (const c of chunks) {
     const label =
       c.parts > 1 ? `${c.subsystem} (${c.part}/${c.parts})` : c.subsystem;
@@ -693,15 +694,15 @@ async function main() {
     return;
   }
 
-  if (estCost > budgetUsd) {
+  if (estTotal > budgetTokens) {
     // Refused, not clamped — the same choice the simulation engine makes about
     // its credit budget. Silently auditing a subset would produce a report
     // that reads as whole-system and is not.
     console.error(
-      `\nEstimated cost $${estCost.toFixed(4)} exceeds --budget-usd ${budgetUsd}. ` +
-        'Raise the budget deliberately or narrow with --subsystem. Refusing ' +
-        'rather than auditing part of the system and calling it a whole-system ' +
-        'audit.\n'
+      `\nEstimated ${estTotal.toLocaleString()} tokens exceeds --budget-tokens ` +
+        `${budgetTokens.toLocaleString()}. Raise the budget deliberately or ` +
+        'narrow with --subsystem. Refusing rather than auditing part of the ' +
+        'system and calling it a whole-system audit.\n'
     );
     process.exit(2);
   }
@@ -712,9 +713,9 @@ async function main() {
   // the full wall-clock of a real run to say so, and a reader skimming the
   // finding count sees zero. A precondition that is only enforced at the point
   // of use is a precondition that gets discovered late.
-  if (!process.env.OPENROUTER_API_KEY) {
+  if (!auditorKey()) {
     console.error(
-      '\nOPENROUTER_API_KEY is not set. Refusing to start: every chunk would ' +
+      `\n${AUDITOR_KEY_VAR} is not set. Refusing to start: every chunk would ` +
         'record as unreachable and the report would contain zero findings for ' +
         'a reason that has nothing to do with the code.\n'
     );
@@ -778,20 +779,25 @@ async function main() {
   );
   for (const f of findings) f.repeat = priorKeys.has(`${f.file}:${f.summary}`);
 
-  const spend = costUsd(tokensIn, tokensOut, free);
   const report = {
     kind: 'system-audit',
     model,
-    // Recorded, because "$0.0000" in a report is ambiguous between a free run
-    // and a run that never called anything.
-    tier: free ? 'free' : 'paid',
+    // Named, because a report that says only "nvidia/nemotron-..." does not say
+    // whether that came from NVIDIA directly or through a router, and the two
+    // are different accounts with different keys.
+    provider: auditorEndpoint(),
     commit: sha,
     pass: passNum,
     created_at: new Date().toISOString(),
     chunks: chunkResults,
     tokens_in: tokensIn,
     tokens_out: tokensOut,
-    cost_usd: spend,
+    // Deliberately null, not 0 — "free" and "not priced" are different claims
+    // and only the second one is true here. See COST_USD in auditor-provider.mjs.
+    cost_usd: COST_USD,
+    cost_basis:
+      'NVIDIA Build publishes no per-token list price; this run is bounded and ' +
+      'reported in tokens, not dollars.',
     dropped_unspecific: droppedTotal,
     findings,
   };
@@ -808,7 +814,8 @@ async function main() {
       `${droppedTotal ? `  (${droppedTotal} dropped as unspecific)` : ''}`
   );
   console.log(
-    `${tokensIn.toLocaleString()} in / ${tokensOut.toLocaleString()} out — $${spend.toFixed(4)}`
+    `${tokensIn.toLocaleString()} in / ${tokensOut.toLocaleString()} out ` +
+      `(${(tokensIn + tokensOut).toLocaleString()} of ${budgetTokens.toLocaleString()} budgeted)`
   );
   console.log(`written to ${relative(ROOT, outPath)}`);
 

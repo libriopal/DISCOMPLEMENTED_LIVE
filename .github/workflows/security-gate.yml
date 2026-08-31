@@ -53,10 +53,33 @@ jobs:
   scan:
     runs-on: ubuntu-latest
     permissions: {}
+    # `pipelineRunId` / `scanId` are free-text workflow_dispatch inputs supplied
+    # over the API by GenerationOrchestrator, so they carry whatever reached the
+    # pipeline — genuinely untrusted. Interpolated straight into a `run:` script
+    # they are pasted in as shell source before bash parses the line, inside a
+    # job that holds SECURITY_GATE_WEBHOOK_SECRET. Bound here as job-level env
+    # and quoted at every use so they arrive as data, and validated below.
+    env:
+      APP_ENVIRONMENT: ${{ inputs.environment || 'production' }}
+      PIPELINE_RUN_ID: ${{ inputs.pipelineRunId }}
+      SCAN_ID: ${{ inputs.scanId }}
     steps:
+      # Fail loudly on anything that is not an id. Both values are used in URL
+      # paths; the env binding above stops shell injection, this stops the
+      # request being aimed somewhere else entirely.
+      - name: Validate dispatch inputs
+        run: |
+          for pair in "PIPELINE_RUN_ID=$PIPELINE_RUN_ID" "SCAN_ID=$SCAN_ID"; do
+            name=${pair%%=*}; value=${pair#*=}
+            if ! printf '%s' "$value" | grep -qE '^[A-Za-z0-9_-]{1,128}$'; then
+              echo "::error::$name is not a plain id: refusing to build a URL from it"
+              exit 1
+            fi
+          done
+
       - name: Resolve app URL
         run: |
-          if [ "${{ inputs.environment }}" = "staging" ]; then
+          if [ "$APP_ENVIRONMENT" = "staging" ]; then
             echo "APP_URL=https://bicameral-staging.johnathanallen1998.workers.dev" >> "$GITHUB_ENV"
           else
             echo "APP_URL=https://www.discomplemented.com" >> "$GITHUB_ENV"
@@ -67,7 +90,7 @@ jobs:
         env:
           WEBHOOK_SECRET: ${{ secrets.SECURITY_GATE_WEBHOOK_SECRET }}
         run: |
-          curl -sf "$APP_URL/api/security-gate/${{ inputs.pipelineRunId }}/files" \
+          curl -sf "$APP_URL/api/security-gate/$PIPELINE_RUN_ID/files" \
             -H "x-webhook-secret: $WEBHOOK_SECRET" \
             -o files.json
 
@@ -134,12 +157,10 @@ jobs:
             }));
             console.log(error ? `Error: ${error}` : `${findings.length} finding(s)`);
           '
-        env:
-          SCAN_ID: ${{ inputs.scanId }}
 
       - name: Upload findings
         if: always()
-        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2 # v4.4.3
         with:
           name: callback-body
           path: callback-body.json
@@ -154,10 +175,33 @@ jobs:
     if: always()
     runs-on: ubuntu-latest
     permissions: {}
+    # `pipelineRunId` / `scanId` are free-text workflow_dispatch inputs supplied
+    # over the API by GenerationOrchestrator, so they carry whatever reached the
+    # pipeline — genuinely untrusted. Interpolated straight into a `run:` script
+    # they are pasted in as shell source before bash parses the line, inside a
+    # job that holds SECURITY_GATE_WEBHOOK_SECRET. Bound here as job-level env
+    # and quoted at every use so they arrive as data, and validated below.
+    env:
+      APP_ENVIRONMENT: ${{ inputs.environment || 'production' }}
+      PIPELINE_RUN_ID: ${{ inputs.pipelineRunId }}
+      SCAN_ID: ${{ inputs.scanId }}
     steps:
+      # Fail loudly on anything that is not an id. Both values are used in URL
+      # paths; the env binding above stops shell injection, this stops the
+      # request being aimed somewhere else entirely.
+      - name: Validate dispatch inputs
+        run: |
+          for pair in "PIPELINE_RUN_ID=$PIPELINE_RUN_ID" "SCAN_ID=$SCAN_ID"; do
+            name=${pair%%=*}; value=${pair#*=}
+            if ! printf '%s' "$value" | grep -qE '^[A-Za-z0-9_-]{1,128}$'; then
+              echo "::error::$name is not a plain id: refusing to build a URL from it"
+              exit 1
+            fi
+          done
+
       - name: Resolve app URL
         run: |
-          if [ "${{ inputs.environment }}" = "staging" ]; then
+          if [ "$APP_ENVIRONMENT" = "staging" ]; then
             echo "APP_URL=https://bicameral-staging.johnathanallen1998.workers.dev" >> "$GITHUB_ENV"
           else
             echo "APP_URL=https://www.discomplemented.com" >> "$GITHUB_ENV"
@@ -181,15 +225,13 @@ jobs:
               error: "Scan job did not complete or produced no results",
             }));
           '
-        env:
-          SCAN_ID: ${{ inputs.scanId }}
 
       - name: Report findings
         if: always()
         env:
           WEBHOOK_SECRET: ${{ secrets.SECURITY_GATE_WEBHOOK_SECRET }}
         run: |
-          curl -sf -X POST "$APP_URL/api/security-gate/${{ inputs.pipelineRunId }}/callback" \
+          curl -sf -X POST "$APP_URL/api/security-gate/$PIPELINE_RUN_ID/callback" \
             -H "x-webhook-secret: $WEBHOOK_SECRET" \
             -H "Content-Type: application/json" \
             -d @callback-body.json

@@ -9,6 +9,7 @@ import { COHERE_MODELS } from '@bicameral/shared/constants';
 import type { Env } from '../env.js';
 import { timingSafeEqual } from './virtual-key.js';
 import { sendEmail } from './email.js';
+import { notifySlackBestEffort } from './slack.js';
 
 export const SUPPORT_AGENT_HANDLE = 'support-ai';
 
@@ -18,11 +19,42 @@ export function supportRoomId(userId: string): string {
   return `${SUPPORT_ROOM_PREFIX}${userId}`;
 }
 
-function serverClient(env: Env, userId: string): FluxyChatClient {
+/**
+ * The two Fluxy credentials, and why there are two.
+ *
+ * `FLUXYCHAT_API_KEY` is the admin/project key. It mints JWTs for ANY userId
+ * with ANY roles, provisions the support agent, and is the shared secret that
+ * authenticates FluxyChat's tool-execute callbacks. A holder of it can mint
+ * themselves an admin token for another user's room. It is server-side only
+ * and must never be reachable from a request a browser can make.
+ *
+ * `FLUXYCHAT_USER_API_KEY` is the user tier. It is what the public support
+ * widget's session-mint path uses. It is still server-side — the browser never
+ * sees either key, it sees the short-lived member JWT that comes back — but
+ * keeping the mint path off the admin key means a defect in the public route
+ * (a userId that is not validated, a roles array taken from the request body)
+ * cannot escalate past what the user tier is allowed to issue.
+ *
+ * There is deliberately NO fallback from the user tier to the admin key. A
+ * fallback would mean the separation silently stops existing the moment the
+ * user key is unset, which is precisely when someone would be least likely to
+ * notice.
+ */
+type FluxyTier = 'admin' | 'user';
+
+function tierKey(env: Env, tier: FluxyTier): string | undefined {
+  return tier === 'admin' ? env.FLUXYCHAT_API_KEY : env.FLUXYCHAT_USER_API_KEY;
+}
+
+function serverClient(
+  env: Env,
+  userId: string,
+  tier: FluxyTier
+): FluxyChatClient {
   return new FluxyChatClient({
     baseUrl: env.FLUXYCHAT_WORKER_URL,
     userId,
-    apiKey: env.FLUXYCHAT_API_KEY,
+    apiKey: tierKey(env, tier),
   });
 }
 
@@ -46,19 +78,24 @@ export async function mintChatSession(
   env: Env,
   userId: string
 ): Promise<ChatSession> {
-  // FLUXYCHAT_API_KEY is unset in production today. Unlike the research path,
-  // this one cannot degrade — without the key the request below would send
-  // `X-Fluxy-Api-Key: undefined` and fail at FluxyChat with an opaque auth
-  // error. Say which secret is missing instead.
-  const apiKey = env.FLUXYCHAT_API_KEY;
+  // The user tier, never the admin key — see the note on serverClient. This
+  // route is reachable by any logged-in user, so the credential it presents
+  // upstream has to be the one whose blast radius is a member JWT.
+  //
+  // Unset is a refusal, not a degrade: without the key the request below would
+  // send `X-Fluxy-Api-Key: undefined` and fail at FluxyChat with an opaque
+  // auth error. Say which secret is missing instead.
+  const apiKey = tierKey(env, 'user');
   if (!apiKey) {
     throw new Error(
-      'FLUXYCHAT_API_KEY is not set — live chat is unavailable. ' +
-        'Set it with `wrangler secret put FLUXYCHAT_API_KEY`.'
+      'FLUXYCHAT_USER_API_KEY is not set — live chat is unavailable. ' +
+        'Set it with `wrangler secret put FLUXYCHAT_USER_API_KEY`. ' +
+        'It is deliberately not the admin FLUXYCHAT_API_KEY: the user-facing ' +
+        'mint path must not hold a credential that can mint admin roles.'
     );
   }
 
-  const client = serverClient(env, userId);
+  const client = serverClient(env, userId, 'user');
   const roomId = supportRoomId(userId);
 
   const tokenRes = await fetch(`${env.FLUXYCHAT_WORKER_URL}/auth/token`, {
@@ -275,49 +312,72 @@ export async function escalateToHuman(
     ? reason
     : 'general';
 
+  // No early return when the email is unconfigured. It used to return here,
+  // which meant the one configuration where Slack is the ONLY notification
+  // channel was the one configuration where Slack was never called. The email
+  // block below is skipped instead, and the Slack send at the end still runs.
   if (!env.SUPPORT_ESCALATION_EMAIL) {
     console.error(
       `[chat escalation] ${category} — user ${userId}: ${summary} ` +
         `(SUPPORT_ESCALATION_EMAIL not configured, not emailed)`
     );
-    return { escalated: true };
-  }
-
-  try {
-    // summary/userId originate from an AI tool call driven by the
-    // founder's own chat messages — escape before interpolating into HTML,
-    // same as any other untrusted input reaching an email template.
-    const esc = (s: string) =>
-      s.replace(
-        /[&<>"']/g,
-        (c) =>
-          ({
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#39;',
-          })[c]!
-      );
-    await sendEmail(
-      {
-        to: env.SUPPORT_ESCALATION_EMAIL,
-        subject: `[Bicameral support] ${category} escalation — ${userId}`,
-        html: `
+  } else {
+    try {
+      // summary/userId originate from an AI tool call driven by the
+      // founder's own chat messages — escape before interpolating into HTML,
+      // same as any other untrusted input reaching an email template.
+      const esc = (s: string) =>
+        s.replace(
+          /[&<>"']/g,
+          (c) =>
+            ({
+              '&': '&amp;',
+              '<': '&lt;',
+              '>': '&gt;',
+              '"': '&quot;',
+              "'": '&#39;',
+            })[c]!
+        );
+      await sendEmail(
+        {
+          to: env.SUPPORT_ESCALATION_EMAIL,
+          subject: `[Bicameral support] ${category} escalation — ${userId}`,
+          html: `
           <p><strong>Category:</strong> ${esc(category)}</p>
           <p><strong>Founder user id:</strong> ${esc(userId)}</p>
           <p><strong>Summary:</strong> ${esc(summary)}</p>
           <p>Room: ${esc(supportRoomId(userId))}</p>
         `.trim(),
-      },
-      env
-    );
-  } catch (err) {
-    console.error(
-      `[chat escalation] failed to send escalation email for user ${userId}:`,
-      err
-    );
+        },
+        env
+      );
+    } catch (err) {
+      console.error(
+        `[chat escalation] failed to send escalation email for user ${userId}:`,
+        err
+      );
+    }
   }
+
+  // Slack, after the email. Order is deliberate: the email is the record of
+  // record (it reaches SUPPORT_ESCALATION_EMAIL, which is monitored), and
+  // Slack is the thing that makes somebody look at it in minutes rather than
+  // hours. If the email path above threw, it was already caught and logged —
+  // and this still fires, because an escalation nobody was told about is the
+  // worst outcome available here.
+  await notifySlackBestEffort(
+    env,
+    {
+      text: `:rotating_light: Support escalation — *${category}*`,
+      fields: {
+        User: userId,
+        Room: supportRoomId(userId),
+        Summary: summary,
+        Emailed: env.SUPPORT_ESCALATION_EMAIL ?? 'not configured',
+      },
+    },
+    `escalation for user ${userId}`
+  );
 
   return { escalated: true };
 }
@@ -340,7 +400,9 @@ export async function provisionSupportAgent(env: Env) {
     );
   }
 
-  const client = serverClient(env, 'system');
+  // Admin tier: provisioning the support agent is exactly what the project
+  // key is for, and this is called only from an admin-guarded route.
+  const client = serverClient(env, 'system', 'admin');
   return client.createAgent({
     name: 'Bicameral Support Assistant',
     handle: SUPPORT_AGENT_HANDLE,

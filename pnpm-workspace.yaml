@@ -5,3 +5,31 @@ allowBuilds:
   esbuild: true
   msw: true
   workerd: true
+
+# --- supply-chain settings (require pnpm >= 10.18; see engines in package.json) ---
+# These are pnpm 10 keys, and pnpm 9 parses them without ever reading them.
+# Measured on 9.15.9 vs 10.34.5, with `allowBuilds` above already in the file:
+#
+#   pnpm@9.15.9  config get allowBuilds            -> undefined
+#   pnpm@9.15.9  config get onlyBuiltDependencies  -> undefined
+#   pnpm@10.34.5 config get allowBuilds            -> undefined
+#   pnpm@10.34.5 config get onlyBuiltDependencies  -> esbuild,msw,workerd
+#
+# So `allowBuilds` is pnpm 10's spelling of `onlyBuiltDependencies` and does
+# resolve — but only on 10. Every CI job ran pnpm 9, which means build-script
+# approval was silently unenforced on every runner. The pnpm floor was raised
+# to 10.18 (packageManager in package.json, and the `version:` pins removed
+# from pnpm/action-setup) at the same time as adding the three settings below,
+# so all four are in effect rather than decorative.
+
+# Wait 7 days (10080 minutes) before resolving a newly published version. Every
+# large npm compromise of the last few years was yanked well inside that window.
+minimumReleaseAge: 10080
+
+# Refuse transitive dependencies resolved from git/tarball/link URLs rather than
+# the registry — the usual way an audited dependency pulls in an unaudited one.
+blockExoticSubdeps: true
+
+# Refuse a package whose provenance/signature is weaker than the version already
+# in the lockfile, so an attacker cannot strip attestation by publishing a patch.
+trustPolicy: no-downgrade

@@ -24,7 +24,7 @@
 | Entry point | `apps/web/src/index.ts` (the root `wrangler.toml` is a retired stub)     |
 | D1          | `bicameral` (`24dd57ec-9c20-46df-aaa9-d4f99dc570bb`)                     |
 | R2          | `bicameral-assets` · Vectorize: `bicameral-lattice` · KV: `CONFIG_KV`    |
-| Node / pnpm | `>=22.0.0` / `>=9.0.0`                                                   |
+| Node / pnpm | `>=22.0.0` / `>=10.18.0` (pinned `pnpm@10.34.5` via `packageManager`)    |
 
 ## Stack (frozen — do not swap these out)
 
@@ -247,7 +247,12 @@ the logs able to tell that apart from a real audit.
 
 `packages/cohere/src/auditor-model.ts` holds the pin
 (`nvidia/nemotron-3-super-120b-a12b`, resolved against OpenRouter's live model
-list on 2026-08-29 — the header records the comparison it came out of).
+list on 2026-08-29 and re-resolved against NVIDIA's on 2026-08-30 — the header
+records the comparison it came out of). It is called **directly at
+`https://integrate.api.nvidia.com/v1`** on `NVIDIA_API_KEY`, not through
+OpenRouter; `callModel` in `lib/cohere.ts` routes on the `nvidia/` vendor
+prefix, so a pin that stopped carrying it would quietly go back out over the
+OpenRouter key and 401.
 `selectModel` resolves the auditor **before** the tier branch, because enterprise
 used to short-circuit every role to Command A+ and would otherwise have put the
 auditor back on Cohere for the accounts paying most for the gate.
@@ -284,11 +289,25 @@ indistinguishable from fresh green output by inspection, which is why it is
 compared rather than trusted. A missing key, an unparseable response, or an
 over-large diff are all refusals — never passes.
 
-Requires `OPENROUTER_API_KEY` **in the local environment**. The Worker having
+Requires `NVIDIA_API_KEY` **in the local environment**. The Worker having
 the secret does not help; Cloudflare secrets are write-only.
-`AUDIT_SKIP=1 AUDIT_SKIP_REASON='…'` commits without it, and records the skip in
-`.audit/ledger.jsonl` so `pnpm audit:stats` counts it. Overruling a HIGH is
-allowed and must be stated in the commit message; disappearing one is not.
+
+Both scripts read the model, the endpoint and the key through
+`scripts/auditor-provider.mjs`, which parses `auditor-model.ts` — the module
+the Worker imports. They used to hold separate copies and had already drifted
+(the commit gate read `AUDITOR_MODEL_DEV_FREE`, the system audit read
+`AUDITOR_MODEL`), so the two gates audited on different models while both
+reported "the pinned auditor".
+
+**Audits are budgeted in tokens, not dollars.** `--budget-usd` is refused, not
+ignored. NVIDIA Build publishes no per-token list price and the API returns no
+rate, so a dollar ceiling would be enforced against a number this repo invented
+— ground rule 2. `cost_usd` in a report is `null` (not `0`: "free" and "not
+priced" are different claims) and carries a `cost_basis` saying why.
+
+`AUDIT_SKIP=1 AUDIT_SKIP_REASON='…'` commits without the key, and records the
+skip in `.audit/ledger.jsonl` so `pnpm audit:stats` counts it. Overruling a HIGH
+is allowed and must be stated in the commit message; disappearing one is not.
 
 ### The self-healing loop
 

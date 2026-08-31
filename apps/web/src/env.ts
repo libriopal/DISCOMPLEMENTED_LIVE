@@ -45,6 +45,12 @@ export interface Env {
   GITHUB_TOKEN: string;
   // OpenRouter — alternate LLM provider (see lib/cohere.ts fallback)
   OPENROUTER_API_KEY: string;
+  // NVIDIA Build — the independent auditor's provider since 2026-08-30, called
+  // directly at integrate.api.nvidia.com rather than routed through
+  // OpenRouter. Declared `string`, not optional, on purpose: the auditor has
+  // no fallback by design (see CLAUDE.md, "No silent fallback"), so an unset
+  // key must surface as a loud failure at the call, never as a skipped audit.
+  NVIDIA_API_KEY: string;
   BETTER_AUTH_SECRET: string;
   // GitHub OAuth — dual apps (dev app callback = localhost/*.workers.dev,
   // prod app callback = custom domain). See lib/auth.ts.
@@ -59,6 +65,20 @@ export interface Env {
   // Optional for the same reason as SCITE_API_KEY — unset in production
   // today, and `verifyToolWebhookSecret` already fails closed without it.
   FLUXYCHAT_API_KEY?: string;
+  // The user tier. Server-side too — the browser receives the short-lived
+  // member JWT this key mints, never the key. Separate from the admin key so
+  // a defect in the public /api/chat/session route cannot mint admin roles.
+  // There is no fallback to FLUXYCHAT_API_KEY; see lib/fluxychat.ts.
+  FLUXYCHAT_USER_API_KEY?: string;
+  // Slack — operator alerting (lib/slack.ts). Optional: every caller treats
+  // Slack as the SECOND record of an event that is already durable
+  // elsewhere, so an unset token degrades to a logged line rather than
+  // failing the request it was reporting on.
+  SLACK_BOT_TOKEN?: string;
+  // A channel ID (starts with "C"), not a "#name" — the bot has no
+  // channels:read scope to resolve names with, and reading a workspace's
+  // whole channel list is a far broader grant than posting to one channel.
+  SLACK_ALERT_CHANNEL?: string;
   // Stripe — billing (routes wired in routes/billing.ts + lib/stripe.ts;
   // LIVE as of Aug 21, 2026 — Stripe account connected, all 3 secrets
   // provisioned on the worker. lib/stripe.ts makes real API calls.

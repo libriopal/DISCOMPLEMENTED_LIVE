@@ -11,14 +11,41 @@ Usage:
 """
 import json
 import sys
+import urllib.parse
 import urllib.request
 from genome_config import GENOME_COUNT, MONTE_CARLO_POPULATION, DAILY_STAGING_BOTS, GENERATION_COUNT, SIM_SEED
+
+
+def _require_https_url(candidate):
+    """Reject anything that is not a plain https:// origin.
+
+    `urllib.request.urlopen` honours the scheme it is handed, and that includes
+    `file://` — so `--production-url file:///etc` would make this script read a
+    local path and compare its bytes against the genome config, and a plain
+    `http://` origin would send the request in the clear. The base URL reaches
+    here from argv, which on a runner is workflow input. Validate the scheme
+    and require a host before the URL is ever opened, rather than trusting the
+    default value to be the only one that is ever passed.
+    """
+    parsed = urllib.parse.urlparse(candidate)
+    if parsed.scheme != 'https':
+        raise ValueError(
+            f"--production-url must be https://, got {parsed.scheme or '(no scheme)'}://"
+        )
+    if not parsed.netloc:
+        raise ValueError('--production-url must include a host')
+    if parsed.query or parsed.fragment or parsed.params:
+        raise ValueError('--production-url must be a bare origin, not a full URL')
+    return f"https://{parsed.netloc}{parsed.path.rstrip('/')}"
+
 
 def check_sync(production_url='https://discomplemented.com'):
     """Fetch the production genome status and compare with local config."""
     try:
-        url = f"{production_url}/api/genome/status"
+        url = f"{_require_https_url(production_url)}/api/genome/status"
         print(f"Fetching genome status from {url}...")
+        # nosemgrep: python.lang.security.audit.dynamic-urllib-use-detected
+        # -- scheme and host are checked by _require_https_url above.
         with urllib.request.urlopen(url, timeout=10) as response:
             data = json.loads(response.read())
 

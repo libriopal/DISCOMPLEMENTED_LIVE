@@ -27,6 +27,15 @@ OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 AUDITOR_MODEL = ""
 # FLUXYCHAT_API_KEY (secret, `wrangler secret put`) authenticates against it.
 FLUXYCHAT_WORKER_URL = "https://fluxychat.johnathanallen1998.workers.dev"
+# Slack operator alerting (lib/slack.ts). SLACK_BOT_TOKEN is a secret and is
+# set with `wrangler secret put`; the channel is only an identifier, so it
+# lives here where it is reviewable in a diff. It is a channel/DM ID, not a
+# "#name": the bot has no channels:read scope to resolve names with, and
+# granting one to read the whole workspace channel list would be a far wider
+# permission than posting to one place. D0BT9UE1UET is the DM with the
+# workspace owner (bicameral.admin) — verified live 2026-08-30, message ts
+# 1788141520.753529. Point it at a channel ID once the bot is invited to one.
+SLACK_ALERT_CHANNEL = "D0BT9UE1UET"
 # Coder-loop security gate (see pipeline/tools/security-scan-gh.ts) —
 # GITHUB_ACTIONS_TOKEN and SECURITY_GATE_WEBHOOK_SECRET are secrets, set
 # via `wrangler secret put`.
@@ -302,6 +311,15 @@ AUDITOR_MODEL = ""
 # support-chat call (lib/fluxychat.ts) fetch localhost from the edge. Same
 # deployed worker the top-level [vars] block points at.
 FLUXYCHAT_WORKER_URL = "https://fluxychat.johnathanallen1998.workers.dev"
+# Slack operator alerting (lib/slack.ts). SLACK_BOT_TOKEN is a secret and is
+# set with `wrangler secret put`; the channel is only an identifier, so it
+# lives here where it is reviewable in a diff. It is a channel/DM ID, not a
+# "#name": the bot has no channels:read scope to resolve names with, and
+# granting one to read the whole workspace channel list would be a far wider
+# permission than posting to one place. D0BT9UE1UET is the DM with the
+# workspace owner (bicameral.admin) — verified live 2026-08-30, message ts
+# 1788141520.753529. Point it at a channel ID once the bot is invited to one.
+SLACK_ALERT_CHANNEL = "D0BT9UE1UET"
 # Must match the GitHub OAuth App's registered callback exactly (www) —
 # classic OAuth Apps support only one callback URL, and GitHub matches it
 # as an exact string, not per-domain.
