@@ -50,6 +50,9 @@ const GlassEngineView = lazy(() =>
     default: m.GlassEngineView,
   }))
 );
+const StudioView = lazy(() =>
+  import('./views/StudioView.js').then((m) => ({ default: m.StudioView }))
+);
 
 const VIEWS: Record<ViewName, React.ComponentType> = {
   generation: GenerationView,
@@ -177,6 +180,24 @@ export function App() {
           setShowSignIn(true);
         }}
       />
+    );
+  }
+
+  // /studio* is the one cross-origin-isolated surface in the app (see
+  // spatial/isolation.ts). Isolation is a property of the document fetch,
+  // not of a client-side view switch, so this has to be a pathname branch
+  // rendered standalone — same shape as /legal above — rather than an entry
+  // in VIEWS: a sidebar click into a VIEWS entry never touches
+  // window.location, and a document that wasn't fetched at /studio cannot
+  // become isolated after the fact just because React decided to show it.
+  if (
+    window.location.pathname === '/studio' ||
+    window.location.pathname.startsWith('/studio/')
+  ) {
+    return (
+      <Suspense fallback={null}>
+        <StudioView />
+      </Suspense>
     );
   }
 
