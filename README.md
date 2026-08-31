@@ -42,7 +42,7 @@ apps/web/            # the deployed Worker + React SPA
 packages/shared/     # types, schemas, constants
 packages/cohere/     # Cohere + OpenAI-compatible (OpenRouter, NVIDIA) wrappers, model-router.ts
 packages/admin-stub/ # admin surface; every op throws (real impl: DISCOMPLEMENTED_ADMIN)
-migrations/          # D1 migrations, 001–024
+migrations/          # D1 migrations, 001–028 (apps/web/migrations is a symlink here)
 simulation/          # offline Monte Carlo experiments (not production code)
 ```
 
@@ -58,7 +58,7 @@ simulation/          # offline Monte Carlo experiments (not production code)
 
 ## D1 migrations
 
-`migrations/` holds **24 SQL files, numbered 001–024** (015 is used once; there is no 015b):
+`migrations/` holds **28 SQL files, numbered 001–028** (015 is used once; there is no 015b). `pnpm lint:migrations` is what checks this — it counts the files and fails on a duplicate number, so the count above is a measurement rather than a claim. The table below lists 001–024; 025–028 are `audit_and_healing`, `user_settings`, `simulation_alerts`, and `chat_session_mints`.
 
 ```
 001_init                 008_credit_ledger_ext    015_preference_matrix
@@ -173,8 +173,31 @@ Checked by running against the live Worker, not by reading code:
 5. **Cohere embeddings are not deterministic** across identical requests on the hosted API — measured twice (800-call and 5-call live checks, both non-deterministic), and `packages/cohere/src/embed.ts` adds no caching or content-addressing layer. Nothing may depend on embedding output being stable: treat an embedding as an index into a content-addressed store, not as an identity.
 6. **Non-enterprise dispatch is quota-exposed.** Every non-enterprise role routes to a self-serve, rate-limited Cohere model. (Enterprise dispatch previously did too, for a different reason: `callAgentModel` took no `tier`, so `selectModel`'s enterprise branch was unreachable and enterprise accounts silently got the pro model. The tier is now threaded through.)
 7. **Security test scaffolding** in `packages/admin/tests/security/` still needs D1 mocking to assert anything real. (The `test:security` script used to point at `tests/security/`, a directory that does not exist; vitest treated the argument as a name filter and matched the admin suite by accident.)
-8. **There is no e2e suite.** No Playwright config and no specs exist in this repo, so `pnpm test:e2e` now fails with a message saying so, and `test:all` no longer includes it. Do not cite e2e coverage.
-9. **`SCITE_API_KEY` is provisioned; `FLUXYCHAT_API_KEY` is not.** Scite was
+8. **The e2e suite exists, and it is flaky on a small host.** This entry
+   previously read "there is no e2e suite"; that is no longer true.
+   `playwright.config.ts` runs two projects (Desktop Chrome, Pixel 5) and the
+   last full run was **81 passed / 1 failed**. The failure is not stable: over
+   three consecutive gate runs a _different_ test failed each time, and every
+   one of them passes in isolation (`--workers=1`). Every failure signature is
+   a 30s timeout on `locator('html')`, `getComputedStyle(document.body)` or
+   `document.fonts.ready` — i.e. the browser never became responsive, not an
+   assertion that disagreed.
+
+   Measured cause: this host has `nproc` = 2 and 2747 MB of RAM with **no
+   swap** (~1509 MB free at rest). Playwright runs `fullyParallel`, and each
+   worker loads a client bundle whose largest chunk is 2.9 MB. The same box
+   has already produced a `tsc` OOM (exit 137) and a `[vitest-pool]: Timeout
+starting cloudflare-pool runner`. The timeouts were **not** raised to hide
+   this — raising a timeout to mask a hang is forbidden by §4C, and it would
+   have converted a loud environment limit into a slow green check.
+
+   **Required fix, not yet done: code-split the 2.9 MB client chunk.** That is
+   the lever that actually removes the memory pressure, and it is worth doing
+   for first-paint on real devices regardless of CI. Until then, treat an
+   isolated e2e timeout on a 2-core/2.7 GB runner as an environment reading,
+   and re-run the failing spec alone before believing it.
+
+9. **Scite cannot search for us; FluxyChat is now fully provisioned.** Scite was
    wired against a live key on 2026-08-25, and the exercise found that the
    module had been written entirely against an imagined API: it called
    `POST /search`, which returns **404** because no such endpoint exists, and
@@ -189,14 +212,32 @@ Checked by running against the live Worker, not by reading code:
    array of DOI strings). See `lib/scite-research.ts` for the measured
    contract; its tests use response bodies captured from the live API.
 
-   `FLUXYCHAT_API_KEY` is still unset, and the support chat is inert.
-   `lib/fluxychat.ts` fails closed: `mintChatSession` and
-   `provisionSupportAgent` throw a named error saying which secret is
+   **FluxyChat is now provisioned** (this paragraph previously said it was
+   not). A FluxyChat Worker is deployed at `FLUXYCHAT_WORKER_URL` =
+   `https://fluxychat.johnathanallen1998.workers.dev`; `/health` reports
+   `database`, `durableObjects`, `kv` and `r2` all connected, and all 223 of
+   its migrations are applied to a D1 named `fluxychat`.
+
+   There are **two** keys because there are two FluxyChat _projects_.
+   FluxyChat has no second key tier inside one project — browser access is a
+   short-lived member JWT minted with a project key — so the admin/user
+   boundary is enforced by giving each tier its own project:
+   `FLUXYCHAT_API_KEY` for `Discomplemented`, `FLUXYCHAT_USER_API_KEY` for
+   `Discomplemented User Tier`. Neither key can administer the other's
+   project. Support rooms, the support agent, and the tool-execute webhook
+   all live in the **user-tier** project — the agent has to be in the same
+   project as the rooms or it never sees a message.
+
+   Spend is capped at the boundary where it is actually spent, in FluxyChat's
+   own `project_plans` row per project (`agent_invoke_limit_monthly` = 3000
+   user tier / 200 admin), not only at our mint route. `lib/chat-quota.ts`
+   caps _session_ fan-out; it cannot count a token, because once the JWT
+   reaches the browser this Worker is off the path.
+
+   `lib/fluxychat.ts` still fails closed on a missing key: `mintChatSession`
+   and `provisionSupportAgent` throw a named error saying which secret is
    missing, `verifyToolWebhookSecret` rejects, and `POST /api/chat/token`
-   answers 503 rather than 500. Beyond the key, **no FluxyChat Worker is
-   deployed** at `FLUXYCHAT_WORKER_URL` — that host 404s — so there is no
-   upstream to authenticate against even once a key exists. `pnpm predeploy`
-   reports the unset secret as a warning on every run.
+   answers 503 rather than 500.
 
    Both keys are `?: string` in `env.ts`. They were `string`, which told
    every new call site they were guaranteed; the typechecker then found the

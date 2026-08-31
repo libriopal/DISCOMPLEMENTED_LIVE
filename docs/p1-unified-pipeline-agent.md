@@ -110,20 +110,87 @@ Rules:
   user cannot trace is one they cannot evaluate.
 - No percentage on a suggestion. See above; there is no derivation for one.
 
-## Prerequisites, honestly stated
+## Prerequisites — resolved 2026-08-31
 
-Two of these three cannot be finished today, and the reasons are external:
+Both external blockers this section previously named are now cleared. Recording
+what changed rather than deleting the entry, because the reason each was a
+blocker is the reason to distrust a future "it's fine" about the same thing.
 
-1. **FluxyChat is not deployed.** `FLUXYCHAT_WORKER_URL` points at
-   `fluxychat.johnathanallen1998.workers.dev`, and as of 2026-08-30
-   `wrangler deployments list --name fluxychat` answers `code 10007` (no such
-   Worker) and the URL 404s. Feature 2 can be written and unit-tested against
-   the SDK, but it cannot be verified end-to-end until that Worker exists.
-2. **`FLUXYCHAT_USER_API_KEY` has no issuer yet.** The tier split is in the
-   code and enforced by tests, but the value must be issued by the FluxyChat
-   deployment above. Generating a random `fc_`-shaped string locally would
-   produce a credential that authenticates against nothing while making the
-   configuration _look_ complete — the exact "green check that never ran"
-   this repo refuses.
+1. **FluxyChat is deployed.** `FLUXYCHAT_WORKER_URL` =
+   `https://fluxychat.johnathanallen1998.workers.dev` is live; `/health`
+   reports `database`, `durableObjects`, `kv` and `r2` connected, and all 223
+   of its migrations are applied to the `fluxychat` D1. Feature 2 can now be
+   verified end-to-end rather than only unit-tested against the SDK.
+2. **`FLUXYCHAT_USER_API_KEY` has a real issuer.** It was minted by
+   FluxyChat's own `POST /platform/bootstrap`, not generated locally — a
+   random `fc_`-shaped string would have authenticated against nothing while
+   making the configuration look complete. The bootstrap endpoint was
+   re-closed afterwards and verified refusing (`bootstrap_disabled`).
 
-Feature 1 and feature 3 have no external blocker.
+   One correction to the original brief, restated here so it is not lost:
+   FluxyChat has **no** native two-tier key model. The tier boundary is two
+   separate FluxyChat projects, each with its own project key. Support rooms,
+   the support agent, and the tool-execute webhook all live in the _user-tier_
+   project — an agent provisioned into the admin project would never see a
+   founder's message.
+
+Neither feature has an external blocker now.
+
+## 4. Auditor ↔ Memory Lattice, with the lattice held at arm's length
+
+Added to P1 on 2026-08-31 by explicit direction. The auditor is currently
+blind to project history, which means it re-derives context every run and
+cannot see a flaw that only exists across runs.
+
+**Wire it.** The NVIDIA Nemotron auditor receives the same Memory Lattice
+context payload the Cohere agents get.
+
+**Do not let it become ground truth.** This is the whole risk of the feature.
+The lattice is written by the previous agents in the loop; an auditor that
+trusts it will confirm whatever the last run asserted, and a compounded
+architectural error becomes permanent the moment it is written down. An
+auditor that rubber-stamps is worse than no auditor, because it produces a
+green check that never ran.
+
+**Prompt construction.** The lattice payload is sandboxed in its own clearly
+delimited section, framed as _"Developer Intent and Historical Context"_, with
+explicit instructions that it is a record of **untrusted claims made by
+previous agents**, not a statement of fact. The auditor is told to:
+
+- read it for _intent_ — what the user was trying to achieve;
+- treat every technical assertion in it as a claim to be checked against the
+  actual repository state, never as a premise;
+- hunt specifically for compounded flaws — a wrong pattern that each later
+  agent extended rather than questioned;
+- critique _how_ previous agents pursued the stated intent, not merely whether
+  the current diff compiles.
+
+Same containment rule as feature 2: the lattice is scoped to the server-known
+`userId`. A `userId` arriving inside a tool-call argument is ignored — that is
+an IDOR with a language model in front of it.
+
+**Memory pruning directive (self-healing).** Pointing at a bad memory does not
+remove it; the next run ingests it again. So when the auditor finds a
+hallucinated dependency, broken logic, or a flawed architectural pattern baked
+into the lattice, it emits a structured `lattice_correction_directive` in its
+JSON response naming the specific node and the action (`delete` or `rewrite`)
+with a reason.
+
+Bounded, per §4C and §CORRECTION 7:
+
+- a directive names **specific node ids**; there is no "clear the lattice";
+- `rewrite` carries the replacement text, so the change is reviewable as a
+  diff rather than as an instruction;
+- directives are recorded with the audit run that produced them, and a
+  rejected one stays recorded — a correction the system declined to apply is
+  exactly the thing worth being able to find later;
+- the auditor may prune the lattice. It may **not** touch production
+  configuration, and it may never resolve a finding by weakening the check
+  that produced it.
+
+Open question for implementation, flagged rather than assumed: whether
+`delete` executes unattended or queues for the same human gate the Design step
+uses. Deleting a memory node is not reversible from inside the loop, and
+§CORRECTION 7 says activation means findings surface loudly, not that output
+rewrites state unattended. Default to queuing unless the account owner says
+otherwise.

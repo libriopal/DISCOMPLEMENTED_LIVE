@@ -25,6 +25,7 @@ import {
   verifyToolWebhookSecret,
   escalateToHuman,
 } from '../lib/fluxychat.js';
+import { assertChatMintQuota, recordChatMint } from '../lib/chat-quota.js';
 
 export const chatRoutes = new Hono<{
   Bindings: Env;
@@ -42,13 +43,12 @@ chatRoutes.post('/token', async (c) => {
   // would answer 503 for a correctly configured user tier if the admin key
   // were ever rotated out. The guard has to name the credential in play.
   //
-  // No FluxyChat Worker is deployed at FLUXYCHAT_WORKER_URL yet (verified
-  // 2026-08-30: `wrangler deployments list --name fluxychat` -> code 10007,
-  // and the URL 404s), so this route's normal outcome today is
-  // "unconfigured", not "broken". Answer 503 rather than letting
-  // mintChatSession's throw surface as a 500: the widget already renders
-  // "Support chat is unavailable right now." for any !res.ok, and a 500
-  // would file every widget open as a server fault in telemetry.
+  // The Worker IS deployed as of 2026-08-31 (fluxychat.johnathanallen1998
+  // .workers.dev, /health reports database/durableObjects/kv/r2 connected), so
+  // an unset key is now a misconfiguration rather than the expected state.
+  // Still 503 and not 500: the widget already renders "Support chat is
+  // unavailable right now." for any !res.ok, and a 500 would file every widget
+  // open as a server fault in telemetry.
   if (!c.env.FLUXYCHAT_USER_API_KEY) {
     throw new BicameralError(
       'Live chat is not configured',
@@ -57,7 +57,18 @@ chatRoutes.post('/token', async (c) => {
     );
   }
 
+  // Circuit breaker, before the upstream call — see lib/chat-quota.ts. This
+  // route is the only one that presents the user-tier Fluxy credential and it
+  // is reachable by every logged-in account, so an unbounded loop here is an
+  // unbounded chat bill. Throws 429 rather than degrading.
+  await assertChatMintQuota(c.env.DB, userId);
+
   const session = await mintChatSession(c.env, userId);
+
+  // After the mint, deliberately: a FluxyChat outage should not spend a
+  // founder's allowance on sessions they never received.
+  await recordChatMint(c.env.DB, userId);
+
   return c.json(session);
 });
 

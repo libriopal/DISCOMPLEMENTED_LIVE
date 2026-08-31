@@ -247,10 +247,33 @@ describe('the Fluxy admin key is unreachable from the user path', () => {
     expect(route).not.toMatch(/!c\.env\.FLUXYCHAT_API_KEY/);
   });
 
-  it('keeps the admin key on admin-only operations', () => {
+  // This assertion was inverted on 2026-08-31, and the reason matters more
+  // than the assertion. It previously required provisionSupportAgent to use
+  // the 'admin' tier, on the assumption that provisioning is an admin
+  // operation. That assumption was wrong once the tier split became two
+  // separate FluxyChat *projects*: a FluxyChat agent belongs to the project
+  // it is created in, and every support room is created with the user-tier
+  // client. Provisioning with the admin key put the agent in a project with
+  // no rooms, where it would never see a founder's message — the widget
+  // connects, the agent exists, and nothing ever answers.
+  //
+  // Using the user-tier key is also strictly NARROWER, which is why this is a
+  // correction and not a weakened check: the admin key is now presented by no
+  // path in this Worker at all.
+  it('provisions the support agent in the same project the rooms live in', () => {
     const start = lib.indexOf('export async function provisionSupportAgent');
     expect(start).toBeGreaterThan(-1);
     const body = lib.slice(start, lib.indexOf('\n}\n', start));
-    expect(body).toContain("'admin'");
+    expect(body).toContain("'user'");
+    expect(body).not.toContain("'admin'");
+  });
+
+  it('never presents the admin key to FluxyChat', () => {
+    // tierKey is the single place the admin key may be *named*; nothing may
+    // select the admin tier. If a future admin-only FluxyChat operation
+    // genuinely needs it, this test should fail and be re-argued, not edited
+    // away — the admin key mints a JWT for any userId with any roles.
+    const selections = lib.match(/serverClient\([^)]*'admin'[^)]*\)/g) ?? [];
+    expect(selections).toEqual([]);
   });
 });

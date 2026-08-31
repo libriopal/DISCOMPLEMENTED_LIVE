@@ -43,6 +43,17 @@ jobs:
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
+      # Pre-flight before a single credit is spent. This run drives live
+      # production for up to 45 minutes against a real credit budget, and the
+      # ingest POST is the LAST thing it does — so a missing
+      # SIMULATION_INGEST_SECRET previously meant the whole spend happened and
+      # then the report 401'd on its way home, with nothing recorded and the
+      # next morning's watchdog reading it as a missing run.
+      - name: Pre-flight — required secrets
+        env:
+          SIMULATION_INGEST_SECRET: ${{ secrets.SIMULATION_INGEST_SECRET }}
+        run: bash scripts/assert-secrets.sh SIMULATION_INGEST_SECRET:32
+
       - name: Setup Python
         uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         with:

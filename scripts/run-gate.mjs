@@ -16,17 +16,30 @@
  * that stale evidence is invisible.
  *
  * Usage:
- *   node scripts/run-gate.mjs           # run the gate, write .audit/gate-evidence.json
- *   node scripts/run-gate.mjs --quick   # typecheck + unit only, marked partial
+ *   node scripts/run-gate.mjs                    # run the gate, write .audit/gate-evidence.json
+ *   node scripts/run-gate.mjs --quick            # typecheck + unit only, marked partial
+ *   node scripts/run-gate.mjs --only=test:e2e    # run named legs, merge into existing evidence
  *
  * `--quick` exists because the full gate takes about three minutes and a
  * pre-commit hook that costs three minutes gets bypassed. Evidence recorded
  * this way is flagged `partial: true`, and the auditor is told which legs did
  * not run rather than being allowed to assume they passed.
+ *
+ * `--only` exists because this host kills a process that runs longer than
+ * about ten minutes, and the full gate — e2e and build in particular — does
+ * not fit inside that. Without it the only options were an evidence file that
+ * never gets written or a claim that legs passed when nothing ran them.
+ * Segmenting costs nothing that matters, because the guarantee this script
+ * makes was never "one process": it is that every recorded leg ran to
+ * completion against *one* state of the code. So a `--only` run merges into
+ * existing evidence if and only if that evidence's identity stamp is
+ * byte-identical to the tree right now, and otherwise starts fresh and
+ * discards it. Legs still absent after a merge stay in `skippedLegs` and hold
+ * `passed` at false; nothing infers a pass from a leg that did not run.
  */
 
 import { spawnSync } from 'node:child_process';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync, readFileSync, existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -92,13 +105,59 @@ function clamp(text, limit = 24_000) {
   );
 }
 
+/**
+ * Results from a previous run that are still describing the current tree.
+ *
+ * Anything else — no file, unparseable, a different identity, or evidence
+ * written by an older schema whose fields we cannot reason about — returns
+ * nothing. Every one of those is "I do not know that these legs passed here",
+ * and the safe answer to that is to run them again, not to carry them.
+ */
+function reusableResults(identity) {
+  if (!existsSync(EVIDENCE_PATH)) return [];
+  try {
+    const prior = JSON.parse(readFileSync(EVIDENCE_PATH, 'utf8'));
+    if (prior.version !== 1) return [];
+    if (prior.identity?.tree !== identity.tree) return [];
+    if (prior.identity?.worktree !== identity.worktree) return [];
+    return Array.isArray(prior.results) ? prior.results : [];
+  } catch {
+    return [];
+  }
+}
+
 function main() {
   const quick = process.argv.includes('--quick');
-  const legs = quick ? LEGS.filter((l) => l.quick) : LEGS;
-  const skipped = quick ? LEGS.filter((l) => !l.quick).map((l) => l.name) : [];
+  const onlyArg = process.argv.find((a) => a.startsWith('--only='));
+  const only = onlyArg
+    ? onlyArg
+        .slice('--only='.length)
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean)
+    : null;
+
+  if (only) {
+    const unknown = only.filter((n) => !LEGS.some((l) => l.name === n));
+    if (unknown.length) {
+      console.error(
+        `Unknown leg(s): ${unknown.join(', ')}. Known legs: ${LEGS.map((l) => l.name).join(', ')}`
+      );
+      process.exit(2);
+    }
+  }
+
+  const legs = only
+    ? LEGS.filter((l) => only.includes(l.name))
+    : quick
+      ? LEGS.filter((l) => l.quick)
+      : LEGS;
 
   const before = treeIdentity();
-  const results = [];
+  // Carried results are re-verified against `after` below, exactly as the
+  // freshly run ones are, so a tree that moves mid-run invalidates both.
+  const carried = only ? reusableResults(before).filter((r) => !only.includes(r.leg)) : [];
+  const results = [...carried];
   const startedAt = new Date().toISOString();
 
   for (const leg of legs) {
@@ -143,15 +202,28 @@ function main() {
     process.exit(2);
   }
 
+  // Computed from what is actually in `results`, never from what this
+  // invocation intended to run. A leg missing after a merge is a leg nothing
+  // has evidence for, and it holds `passed` at false and names itself in
+  // `skippedLegs` whether it was skipped by --quick, by --only, or by an
+  // earlier failure stopping the loop.
+  const ran = new Set(results.map((r) => r.leg));
+  const skipped = LEGS.filter((l) => !ran.has(l.name)).map((l) => l.name);
+
   const evidence = {
     version: 1,
     startedAt,
     finishedAt: new Date().toISOString(),
     identity: after,
-    partial: quick,
+    partial: skipped.length > 0,
     skippedLegs: skipped,
     results,
-    passed: results.every((r) => r.exitCode === 0) && results.length === legs.length,
+    // `passed` stays relative to what this invocation set out to run, so
+    // `gate:quick` still exits 0 on two green legs. Whether the *evidence* is
+    // good enough to audit against is `partial`/`skippedLegs` above — which is
+    // what audit-diff.mjs actually gates on, and which no longer depends on
+    // this invocation's intent at all.
+    passed: results.every((r) => r.exitCode === 0) && legs.every((l) => ran.has(l.name)),
   };
 
   mkdirSync(dirname(EVIDENCE_PATH), { recursive: true });
@@ -160,8 +232,9 @@ function main() {
   const failed = results.filter((r) => r.exitCode !== 0);
   process.stderr.write(
     `\ngate evidence written to .audit/gate-evidence.json — ` +
-      `${results.length} leg(s) run, ${failed.length} failed` +
-      (quick ? `, ${skipped.length} skipped (--quick)` : '') +
+      `${results.length} leg(s) covered (${carried.length} carried from a matching tree), ` +
+      `${failed.length} failed` +
+      (skipped.length ? `, NOT RUN: ${skipped.join(', ')}` : '') +
       '\n'
   );
 

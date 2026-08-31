@@ -484,10 +484,18 @@ in the viewport without scrolling. It stubs `/api/**`, so it grades the UI
 layer and not the backend; note that Playwright matches the **last** registered
 route first, which is why the catch-all is registered before the specific ones.
 `openRun` also waits for the status region once before returning: the view
-boots a route chunk, a 2.9 MB Babel chunk and an iframe, and under load that
-has taken longer than the 5s expect timeout — which then failed whichever
-assertion came first and read as a missing gate. Assert against a mounted
-surface, not against the boot.
+boots a route chunk and an iframe, and under load that has taken longer than
+the 5s expect timeout — which then failed whichever assertion came first and
+read as a missing gate. Assert against a mounted surface, not against the
+boot.
+
+Correction to an earlier version of this note: it said the view boots "a 2.9 MB
+Babel chunk", implying Babel blocks the page. It does not. `PreviewFrame.tsx`
+loads it through a memoised dynamic `import()`, so the chunk is fetched when a
+preview is first compiled, not at boot. The 2.9 MB chunk is real and is still
+worth code-splitting further (see README known gap 8, where it contributes to
+e2e memory pressure on a 2-core host) — but it is not on the boot path, and
+attributing a boot-time timeout to it sends the next reader to the wrong file.
 
 ## Coding conventions
 

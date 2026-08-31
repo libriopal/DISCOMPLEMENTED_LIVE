@@ -16,6 +16,7 @@ import {
   checkGracePeriod,
 } from './decline-recovery.js';
 import { notifySlackBestEffort } from './slack.js';
+import { pruneChatMints } from './chat-quota.js';
 import { runNightlyPreferenceLearning } from './preference-learning.js';
 import {
   evaluateSimulationHealth,
@@ -79,7 +80,15 @@ async function handleDailyCreditReset(env: Env): Promise<void> {
     .bind(cutoff)
     .run();
 
-  console.log('Daily credit reset + audit archival complete');
+  // Chat mint rows past their retention window (lib/chat-quota.ts). Sharing
+  // the 3 AM job rather than adding a cron: the prune is one indexed DELETE,
+  // and a new schedule would need a matching case here and an entry in
+  // wrangler.toml or cron-coverage.test.ts fails.
+  const prunedMints = await pruneChatMints(env.DB);
+
+  console.log(
+    `Daily credit reset + audit archival complete (pruned ${prunedMints} chat mint rows)`
+  );
 }
 
 /**

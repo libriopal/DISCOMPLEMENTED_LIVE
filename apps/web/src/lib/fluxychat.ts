@@ -390,19 +390,30 @@ export async function escalateToHuman(
  * put` on the FluxyChat deployment, not passed through this call).
  */
 export async function provisionSupportAgent(env: Env) {
-  // Same reason as mintChatSession: without the key the SDK would send an
-  // undefined X-Fluxy-Api-Key and the admin would read FluxyChat's opaque
-  // auth error instead of "the secret is not set".
-  if (!env.FLUXYCHAT_API_KEY) {
+  // USER tier, not admin — and this is a correction, not a preference.
+  //
+  // The tier split is two separate FluxyChat *projects* (FluxyChat has no
+  // second key tier within one project; see the note on serverClient). A
+  // FluxyChat agent belongs to the project it was created in, and so does a
+  // room. mintChatSession creates every support room with the user-tier
+  // client, so every room lives in the user-tier project. Provisioning the
+  // agent with the admin key put it in the OTHER project, where it could
+  // never see a single founder's message — the widget would connect, the
+  // agent would exist, and nothing would ever answer.
+  //
+  // Using the user-tier key here is also strictly narrower, not wider: that
+  // key is the project key for the project the agent belongs in. The admin
+  // key stays unused on this path, which is the point of having two.
+  if (!env.FLUXYCHAT_USER_API_KEY) {
     throw new Error(
-      'FLUXYCHAT_API_KEY is not set — cannot provision the support agent. ' +
-        'Set it with `wrangler secret put FLUXYCHAT_API_KEY`.'
+      'FLUXYCHAT_USER_API_KEY is not set — cannot provision the support ' +
+        'agent. Set it with `wrangler secret put FLUXYCHAT_USER_API_KEY`. ' +
+        'It must be the user-tier project key, not FLUXYCHAT_API_KEY: the ' +
+        'agent has to live in the same project as the support rooms.'
     );
   }
 
-  // Admin tier: provisioning the support agent is exactly what the project
-  // key is for, and this is called only from an admin-guarded route.
-  const client = serverClient(env, 'system', 'admin');
+  const client = serverClient(env, 'system', 'user');
   return client.createAgent({
     name: 'Bicameral Support Assistant',
     handle: SUPPORT_AGENT_HANDLE,
@@ -415,9 +426,30 @@ export async function provisionSupportAgent(env: Env) {
 }
 
 /**
- * The FluxyChat Worker signs outbound tool-execute callbacks with the same
- * project API key used to mint JWTs (X-Fluxy-Api-Key), mirroring the
- * inbound POST /auth/token convention documented in the SDK README.
+ * Accepts only the user-tier key. Accepting either key would make the admin
+ * key a valid credential on a path whose entire purpose is to not need it,
+ * and the agent lives in the user-tier project (see provisionSupportAgent).
+ *
+ * **This check currently rejects every real callback, and that is a known
+ * defect, not a design.** An earlier version of this comment said FluxyChat
+ * "signs outbound tool-execute callbacks with the project API key,
+ * mirroring the inbound POST /auth/token convention". That was read off the
+ * SDK README rather than off the sending code, and it is false. Measured
+ * against FluxyChat's `executeToolCall` (apps/worker/src/lib/agent-tools.js):
+ * the outbound request carries `Content-Type`, `X-Fluxy-Project-Id`,
+ * `X-Fluxy-Tool-Name` and `X-Fluxy-Trace-Id` and nothing else, and
+ * `safeOutboundFetch` passes init through without adding headers. Every
+ * `X-Fluxy-Api-Key` in that codebase is a header it *reads*, never one it
+ * sends.
+ *
+ * So there is no shared secret on this path to compare against, and the
+ * webhook has never authenticated a single call. Switching this from the
+ * admin key to the user key was still correct — it is strictly narrower —
+ * but it did not make the path work and must not be read as having done so.
+ * The real authentication mechanism is being designed in P1 §2 together with
+ * the caller-identity problem, because the payload also carries no room or
+ * member id to scope a request to. Do not "fix" this by accepting an
+ * unauthenticated callback.
  */
 export function verifyToolWebhookSecret(
   env: Env,
@@ -425,7 +457,7 @@ export function verifyToolWebhookSecret(
 ): boolean {
   return (
     !!header &&
-    !!env.FLUXYCHAT_API_KEY &&
-    timingSafeEqual(header, env.FLUXYCHAT_API_KEY)
+    !!env.FLUXYCHAT_USER_API_KEY &&
+    timingSafeEqual(header, env.FLUXYCHAT_USER_API_KEY)
   );
 }
