@@ -22,26 +22,31 @@ command; run them individually to reproduce.
 | -------------- | ----------------------- | ------------------------------------------ | ----- |
 | Migration lint | `pnpm lint:migrations`  | pass — 27 migrations, no duplicate numbers | 1s    |
 | Types          | `pnpm typecheck`        | pass — `tsc --noEmit`, no output           | 40s   |
-| Unit           | `pnpm test:unit`        | pass — 38 files, 530 tests                 | 56s   |
-| Integration    | `pnpm test:integration` | pass — 6 files, 50 tests                   | 107s  |
-| Security       | `pnpm test:security`    | pass — 3 files, 32 tests                   | 2s    |
-| E2E            | `pnpm test:e2e`         | pass — 82 tests (41 × desktop, mobile)     | 2m30s |
+| Unit           | `pnpm test:unit`        | pass — 52 files, 761 tests                 | 67s   |
+| Integration    | `pnpm test:integration` | pass — 9 files, 77 tests                   | 402s  |
+| Security       | `pnpm test:security`    | pass — 3 files, 50 tests                   | 2s    |
+| E2E            | `pnpm test:e2e`         | pass — 82 tests (41 × desktop, mobile)     | 3m36s |
 
-`pnpm lint`: 0 errors, 75 warnings. The warnings are pre-existing (unused vars,
+`pnpm lint`: 0 errors, 57 warnings. The warnings are pre-existing (unused vars,
 `no-explicit-any`). The count fell by one this round, and the one it lost is
 worth naming: `'simulationRoutes' is defined but never used` in
 `apps/web/src/index.ts`. The router was imported and never mounted, so
 `/api/simulation/latest` and `/history` answered 404 — and that warning was the
 only thing in the repository that knew.
 
-**Totals: 694 automated assertions across 6 legs, all green, from a clean
+**Totals: 970 automated assertions across 6 legs, all green, from a clean
 checkout with no network access to any provider.**
 
 That is the honest headline, and it is a count, not a percentage. A percentage
 would need a denominator — how much of the system _could_ be covered — and no
-such denominator has been measured. 694 passing tests over the **157
+such denominator has been measured. 970 passing tests over the **172
 non-test source files** in `apps/web/src` is a real statement; "90% stable" was
 not.
+
+The integration leg's time roughly quadrupled this round and that is not the one
+new file in it: `setup.ts` accounts for 331 of the 402 seconds, applying all 27
+migrations to a fresh D1 once per test file, so the cost tracks the number of
+files rather than the number of assertions.
 
 > The file count is measured, and was wrong here before. This paragraph used to
 > read "156 source files" with no command recorded, which is the same defect the
@@ -95,6 +100,24 @@ happens:
   a real prompt is not covered at any level.
 - **No non-Chromium browser.** Both Playwright projects are Chromium (desktop
   and Pixel 5 emulation). WebKit and Firefox are untested.
+- **No WGSL is executed anywhere in this suite.** There is no WebGPU in the
+  vitest environment and no software adapter available here, so the eleven
+  shaders under `apps/web/src/spatial/wgsl/` are verified **structurally only**:
+  `gpu/shader-contract.test.ts` recomputes every struct offset from the WGSL
+  source under the spec's own alignment rules and asserts it against
+  `gpu/bindings.ts`, and it checks bindings, entry points and workgroup sizes
+  the same way. Nothing establishes that the SPH kernel is correct, that the
+  prefix sum sums, or that the MLS-MPM transfer conserves momentum. Those are
+  not passing and not failing — they are unrun, and the first real evidence
+  will come from a browser.
+- **Cross-origin isolation is proven on Chromium only, and that is the browser
+  it is least likely to be wrong on.** `apps/web/tests/integration/isolation-boundary.test.ts`
+  asks the real Worker inside Miniflare which headers it sends for `/studio` and
+  for seven unisolated paths, which is the strongest available check of the
+  boundary. It says nothing about how Safari or Firefox behave once those
+  headers arrive — and the choice of `require-corp` over `credentialless` was
+  made precisely because Safari does not implement the latter, which is a claim
+  no runner in this repo can test.
 - **Contrast is measured; the rest of accessibility is not.** This bullet
   previously read "No accessibility audit. No contrast ratio has been measured."
   That was wrong when written — `apps/web/tokens/contrast-matrix.md` had

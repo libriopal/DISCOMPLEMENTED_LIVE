@@ -47,6 +47,11 @@ import { genomeRoutes } from './routes/genome.js';
 import { glaasRoutes } from './routes/glaas.js';
 import { userEventsRoutes } from './routes/user-events.js';
 import { handleCron } from './lib/cron-handler.js';
+import {
+  BLOCKED_SUBRESOURCE_SELECTORS,
+  isIsolatedPath,
+  withIsolationHeaders,
+} from './spatial/isolation.js';
 
 const app = new Hono<{ Bindings: Env; Variables: AuthVariables }>();
 
@@ -120,9 +125,20 @@ app.notFound((c) => {
       'Cache-Control': 'no-store',
     });
   }
-  // SPA fallback — serve static assets with security headers
+  // SPA fallback — serve static assets with security headers.
+  //
+  // The studio additionally gets cross-origin isolation, and its document has
+  // the cross-origin font links stripped because `require-corp` blocks them
+  // anyway. Both are keyed on the request path rather than on the asset, since
+  // the SPA fallback hands back the same index.html for every route.
+  const pathname = new URL(c.req.url).pathname;
   const response = c.env.ASSETS.fetch(c.req.raw);
-  return response.then((r: Response) => withSecurityHeaders(r));
+  return response.then((r: Response) =>
+    withIsolationHeaders(
+      stripBlockedSubresources(withSecurityHeaders(r), pathname),
+      pathname
+    )
+  );
 });
 
 app.get('/api/healthz', (c) =>
@@ -254,6 +270,38 @@ function withSecurityHeaders(response: Response): Response {
     statusText: response.statusText,
     headers,
   });
+}
+
+/**
+ * Remove the subresources that cross-origin isolation would block, from the
+ * studio document only.
+ *
+ * Scoped three ways on purpose — isolated path, HTML content type, successful
+ * response — because this rewrites markup, and a rewrite that runs on more
+ * documents than intended is hard to see and easy to ship. Everything else is
+ * returned by identity, including the studio's own JS and CSS.
+ *
+ * See `spatial/isolation.ts` for why the links have to go rather than stay and
+ * fail.
+ */
+function stripBlockedSubresources(
+  response: Response,
+  pathname: string
+): Response {
+  if (!isIsolatedPath(pathname)) return response;
+  if (!response.ok) return response;
+  const type = response.headers.get('content-type') ?? '';
+  if (!type.includes('text/html')) return response;
+
+  let rewriter = new HTMLRewriter();
+  for (const selector of BLOCKED_SUBRESOURCE_SELECTORS) {
+    rewriter = rewriter.on(selector, {
+      element(element) {
+        element.remove();
+      },
+    });
+  }
+  return rewriter.transform(response);
 }
 
 // Direct DO trigger — workaround for Hono /:id routing issue

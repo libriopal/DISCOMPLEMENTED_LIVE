@@ -91,3 +91,32 @@ describe('content security policy', () => {
     expect(connect).toContain("'self'");
   });
 });
+
+describe('cross-origin isolation', () => {
+  // The isolation headers are the one set here that is *not* app-wide: they are
+  // route-scoped to /studio*, because COEP require-corp blocks every
+  // cross-origin subresource and iframe that does not carry CORP — Stripe,
+  // Turnstile, the preview frames. The scoping itself is tested in
+  // tests/security/isolation.test.ts (the predicate) and in
+  // apps/web/tests/integration/isolation-boundary.test.ts (the live Worker).
+  // What belongs here is the thing this file is for: that they are not quietly
+  // widened to every response.
+
+  it('does not set COOP or COEP app-wide', () => {
+    // Setting these in withSecurityHeaders would isolate the whole site and
+    // break billing, sign-in and previews at once, with no error anywhere —
+    // the iframes simply never load.
+    expect(headerLiteral('Cross-Origin-Opener-Policy')).toBeNull();
+    expect(headerLiteral('Cross-Origin-Embedder-Policy')).toBeNull();
+  });
+
+  it('routes the isolation decision through one module', () => {
+    // A second place that decides what "isolated" means is a second place that
+    // can disagree with the capability probe about whether SharedArrayBuffer
+    // should exist.
+    expect(source).toMatch(
+      /import \{[^}]*withIsolationHeaders[^}]*\} from '\.\/spatial\/isolation\.js'/
+    );
+    expect(source).toMatch(/withIsolationHeaders\(/);
+  });
+});

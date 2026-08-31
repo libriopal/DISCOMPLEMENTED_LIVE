@@ -51,6 +51,11 @@ apps/web/src/
   components/         # marketing/, LoginScreen, LegalDocScreen, IDELayout, admin/
   views/              # 10 authenticated views (Generation, Projects, Lattice, Admin, Billing, …)
   hooks/              # useAuth, usePipeline, useGenerationStream, useEsbuild, useSandboxPreview
+  spatial/            # the chrono-compiler's client half — see below
+    capabilities.ts   # what this browser can do, and what each gap costs
+    isolation.ts      # COOP/COEP scoped to /studio*, + the font strip
+    gpu/              # device, tiering, dispatch budget, solver switch, fallback
+    wgsl/             # 11 shaders: SPH, MLS-MPM, spatial hash, prefix sum, render
 migrations/           # D1 migrations, 001–027 (27 files, numbers now unique)
 packages/             # shared, cohere, admin-stub
 design/               # 7 reference HTML specs (read-only)
@@ -218,7 +223,7 @@ pnpm --filter @bicameral/web dev:all   # both
 pnpm lint                 # eslint (flat config — no --ext flag; ESLint 9 rejects it)
 pnpm format               # prettier
 pnpm lint:migrations      # unique migration numbers, no gaps
-pnpm test:unit            # vitest — 38 files, 530 tests
+pnpm test:unit            # vitest — 52 files, 761 tests
 pnpm test:integration     # vitest + Miniflare, applies real migrations to a real D1
 pnpm test:security        # tests/security/
 pnpm test:e2e             # playwright, desktop + mobile projects
@@ -548,6 +553,48 @@ worth code-splitting further (see README known gap 8, where it contributes to
 e2e memory pressure on a 2-core host) — but it is not on the boot path, and
 attributing a boot-time timeout to it sends the next reader to the wrong file.
 
+## The spatial engine (`chrono-compiler`)
+
+The studio's canvas is a GPU fluid simulation. It is called **`chrono-compiler`**
+and it is _not_ `discovery2implemented`, which remains strictly the 5-stage LLM
+pipeline described above. Two different things; one name each.
+
+Four constraints in `apps/web/src/spatial/` are load-bearing, and every one of
+them exists because the obvious version is wrong:
+
+- **Isolation is route-scoped to `/studio*`, and the scope is the point.** COOP
+  `same-origin` + COEP `require-corp` is the precondition for
+  `SharedArrayBuffer`, and it is also the most destructive header pair this app
+  can send: under `require-corp` every cross-origin iframe without CORP silently
+  fails to load, which is Stripe Checkout, the Turnstile widget, and the preview
+  frames. `isolation.ts` owns the decision; `index.ts` applies it at the SPA
+  fallback, where the pathname is the only thing separating the studio document
+  from the billing document. `isIsolatedPath` matches `/studio` exactly or a
+  `/`-delimited descendant — not `startsWith`, so a future `/studios` route
+  cannot be isolated by accident.
+- **`require-corp`, never `credentialless`.** `credentialless` is the friendlier
+  value and Safari does not implement it, with no WebKit plan to. An
+  unrecognised COEP value parses to nothing, so Safari would drop to the
+  unisolated path with no error, and no Chromium-only runner in this repo could
+  see it.
+- **Zero readback, so the sanity checks are in WGSL.** The particle buffer is
+  `STORAGE | VERTEX` and is drawn as instanced billboards; nothing maps it back.
+  That rules out a CPU worker inspecting particle state for NaNs, so
+  `common.wgsl`'s `sanitizeScalar`/`sanitizeVec3` do it on the GPU instead —
+  containment, not detection. Every write of a position, velocity, density or
+  pressure goes through one of them, and `gpu/shader-contract.test.ts` fails if a
+  new write does not.
+- **Fixed-point atomics make each addition exact; they do not make a frame
+  deterministic.** Atomic order still varies, so two GPUs converge closely and
+  never bitwise. The CRDT state is authoritative over any local solver run —
+  never write simulation output back as the document.
+
+Note `gpu/bindings.ts` is the single source of truth for the GPU layout, and it
+is written a second time in WGSL with no compiler between them. A struct field
+that moves in one and not the other renders velocity as position at full frame
+rate with no error anywhere; `shader-contract.test.ts` recomputes the offsets
+from the shader source and is the only thing that catches it.
+
 ## Coding conventions
 
 - TypeScript strict mode. `pnpm --filter @bicameral/web typecheck` must stay clean.
@@ -575,6 +622,23 @@ The designer agent reads `01`–`04` for pattern matching; the coder agent refer
 
 ## Other known gaps
 
+- **`pnpm add` is blocked repo-wide.** Any new dependency fails resolution with
+  `ERR_PNPM_TRUST_DOWNGRADE: High-risk trust downgrade for "husky@9.1.0"
+(possible package takeover)` — earlier husky versions shipped provenance
+  attestation and 9.1.0 does not. `pnpm install --frozen-lockfile` still
+  succeeds, because it skips resolution. **Do not bypass the check**; bump husky
+  to a version with provenance instead. The live consequence is that
+  `@webgpu/types` could not be installed, so `spatial/gpu/device.ts` and
+  `profile.ts` declare the handful of WebGPU members they touch as local
+  `…Like` structural interfaces. Delete those the moment the install works.
+- **The studio route loses the Google webfonts, deliberately.** COEP
+  `require-corp` blocks every cross-origin subresource without CORP, and the
+  fonts are one, so `stripBlockedSubresources` removes the `<link>`s from the
+  `/studio*` document with `HTMLRewriter` rather than letting the browser report
+  them as blocked requests. It is survivable only because `styles/tokens.css`
+  names real system faces after each webfont, which `tests/security/isolation.test.ts`
+  pins. Self-hosting the three variable fonts removes the gap and is the
+  follow-up.
 - **Staging validation is still a simulator** — a seeded PRNG in the admin repo, not the real pipeline, so no "validated in staging" claim is supportable. The admin code now refuses to launder it: the staging worker returns `simulated: true`, `bot-runner` will not aggregate a flagged run into ~2 without an explicit opt-in, and `evaluatePromotion` cannot approve on a simulated ~2.
 - ~~**The Merkle audit trail is broken by construction**~~ — fixed. The admin compiler's `merkle-verify.ts` is RFC 6962 (domain-separated `0x00`/`0x01` prefixes, positional siblings, audit-path verification over `(leaf, index, tree_size)`), the divergent duplicate in `deterministic-prng.ts` is gone, and a regression test pins that honest proofs verify and reordered traces do not. Tamper-evidence for the trace _root_ is supportable; it still says nothing about whether a trace entry's contents are true.
 - **Scite cannot search.** `POST /search` does not exist (404), and the real
