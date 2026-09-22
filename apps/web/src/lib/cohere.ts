@@ -19,7 +19,11 @@ import {
   callOpenAICompatible,
   callOpenRouter,
 } from '@bicameral/cohere/openrouter';
-import { AUDITOR_BASE_URL } from '@bicameral/cohere/auditor-model';
+import {
+  AUDITOR_BASE_URL,
+  AUDITOR_REASONING_EFFORT,
+  auditorBaseUrlFor,
+} from '@bicameral/cohere/auditor-model';
 import {
   selectModel,
   getThinkingConfig,
@@ -49,6 +53,23 @@ function isOpenRouterModel(model: string): boolean {
  */
 function isNvidiaModel(model: string): boolean {
   return model.startsWith('nvidia/');
+}
+
+/**
+ * Models served by Cloudflare Workers AI.
+ *
+ * The auditor pin moved here on 2026-09-22 (see auditor-model.ts for the
+ * re-resolution and the measurements). `@cf/...` slugs contain a "/" and would
+ * otherwise satisfy `isOpenRouterModel` and be sent to OpenRouter with a
+ * Cloudflare token — a 401 per call, recorded as "auditor unreachable", which
+ * reads as a network problem rather than a routing bug. Same reasoning as the
+ * NVIDIA branch, and ordered before OpenRouter for the same reason.
+ *
+ * Prefix rather than equality against the pin, so moving `AUDITOR_MODEL` to
+ * the escalation model via wrangler.toml does not silently disable the route.
+ */
+function isWorkersAiModel(model: string): boolean {
+  return model.startsWith('@cf/');
 }
 
 // North models 400 on `response_format: json_object` — unlike R7B/Command A,
@@ -83,6 +104,34 @@ export async function callModel(
   // Ordered before the OpenRouter branch: an `nvidia/` slug satisfies both
   // tests (it contains a "/"), and before 2026-08-30 it took the OpenRouter
   // path. The auditor now has its own account.
+  if (isWorkersAiModel(model)) {
+    // Reasoning effort is PINNED, not defaulted. glm-5.3 treats it as
+    // mandatory and defaults to 'max', at which it reasons past any sane
+    // max_tokens and returns an empty message with finish_reason 'length'.
+    // Measured: 120.6s and zero characters of answer, against 14.5s and a
+    // correct verdict at 'low'. See AUDITOR_REASONING_EFFORT.
+    const withEffort = {
+      ...fullRequest,
+      reasoningEffort: AUDITOR_REASONING_EFFORT,
+    } as ChatRequest & { reasoningEffort: string };
+    // Both halves are needed and each is reported by the name that is
+    // missing. The account id is part of the endpoint PATH, so an absent one
+    // cannot be papered over with a header — but it is NOT a secret, and
+    // conflating the two would send someone hunting for the wrong thing.
+    // An empty key falls through to callOpenAICompatible's own unset-key
+    // refusal, which is the message that already exists for this case.
+    const account = env.CF_ACCOUNT_ID ?? '';
+    return callOpenAICompatible(withEffort, {
+      label: 'Workers AI',
+      baseUrl: /^[0-9a-f]{32}$/.test(account)
+        ? auditorBaseUrlFor(account)
+        : AUDITOR_BASE_URL,
+      apiKey: env.CF_API_TOKEN ?? '',
+      keyVar: /^[0-9a-f]{32}$/.test(account) ? 'CF_API_TOKEN' : 'CF_ACCOUNT_ID',
+      codePrefix: 'WORKERS_AI',
+    });
+  }
+
   if (isNvidiaModel(model)) {
     return callOpenAICompatible(fullRequest, {
       label: 'NVIDIA',

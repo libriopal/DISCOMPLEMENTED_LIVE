@@ -21,6 +21,7 @@ import {
   evaluateSimulationHealth,
   type SimulationSnapshot,
 } from './simulation-watchdog.js';
+import { selfChecks } from '../routes/compliance.js';
 
 /**
  * Handle a scheduled cron event by routing to the correct handler.
@@ -47,6 +48,9 @@ export async function handleCron(
       break;
     case '0 6 * * *':
       await handleSimulationWatchdog(env);
+      break;
+    case '0 */6 * * *':
+      await handleComplianceDrift(env);
       break;
     default:
       // A cron in wrangler.toml with no case here fires daily and does
@@ -286,4 +290,50 @@ function safeParse<T>(value: unknown, fallback: T): T {
   } catch {
     return fallback;
   }
+}
+
+/**
+ * Every 6 hours: compliance drift.
+ *
+ * The CI workflow in the private governance repository gates every CHANGE. This
+ * catches what CI cannot: the deployed system drifting away from the artefact
+ * that was published about it, with nobody pushing anything. A green CI run on
+ * a commit from three weeks ago says nothing about what is serving traffic now.
+ *
+ * It alerts only on a FAILING or EMPTY check. A check that examined nothing is
+ * treated as a failure, not as a pass — the rule the governance package is
+ * built on, applied to the thing the package is about.
+ */
+async function handleComplianceDrift(env: Env): Promise<void> {
+  const checks = selfChecks(env);
+  const failed = checks.filter((k) => !k.ok);
+  const empty = checks.filter((k) => k.examined === 0);
+
+  if (failed.length === 0 && empty.length === 0) {
+    console.log(
+      `compliance drift: green, ${checks.length} checks, ` +
+        `${checks.reduce((n, k) => n + k.examined, 0)} things examined`
+    );
+    return;
+  }
+
+  const lines = [
+    ...failed.map((k) => `FAILED ${k.name}: ${k.detail}`),
+    ...empty.map(
+      (k) => `MEASURED NOTHING ${k.name}: 0 ${k.unit} — reported as a failure`
+    ),
+  ];
+  console.error(`compliance drift: RED\n${lines.join('\n')}`);
+  await notifySlackBestEffort(
+    env,
+    {
+      text: `:rotating_light: Compliance drift on discomplemented.com`,
+      fields: {
+        Failing: `${failed.length} of ${checks.length}`,
+        'Measured nothing': `${empty.length} of ${checks.length}`,
+        Detail: lines.join(' | ').slice(0, 900),
+      },
+    },
+    'compliance-drift'
+  );
 }

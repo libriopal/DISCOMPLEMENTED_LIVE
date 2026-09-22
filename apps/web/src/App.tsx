@@ -6,6 +6,7 @@ import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { useAuth } from './hooks/useAuth.js';
 import { LoginScreen } from './components/LoginScreen.js';
 import { MarketingSite } from './components/marketing/MarketingSite.js';
+import { ComplianceDashboard } from './components/ComplianceDashboard.js';
 import { ResetPasswordScreen } from './components/ResetPasswordScreen.js';
 import { LegalDocScreen } from './components/LegalDocScreen.js';
 import { Sidebar, type ViewName } from './components/Sidebar.js';
@@ -66,6 +67,7 @@ const VIEWS: Record<ViewName, React.ComponentType> = {
 
 /** Path the marketing CTAs hand off to, so sign-in is linkable and bookmarkable. */
 const SIGN_IN_PATH = '/signin';
+const COMPLIANCE_PATH = '/compliance';
 
 export function App() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -148,6 +150,15 @@ export function App() {
   // path still falls through to LoginScreen, so a signed-out user following a
   // deep link (e.g. /billing) is asked to sign in rather than being bounced
   // to the landing page.
+  // `/compliance` is public and deliberately outside the auth check, for both
+  // signed-in and signed-out visitors. A compliance surface only the operator
+  // can read is a compliance surface nobody can check, which is most of the
+  // point of publishing one. It serves verdicts, denominators and vendor names
+  // — never gate logic, planning documents or tripwire signatures.
+  if (window.location.pathname === COMPLIANCE_PATH) {
+    return <ComplianceDashboard />;
+  }
+
   if (!isAuthenticated) {
     // The logged-out surface used to be LoginScreen alone — one headline and a
     // signup form, with no way to learn what the product does or costs without

@@ -41,6 +41,7 @@ import { tripwiresRoutes } from './routes/tripwires.js';
 import { dunningRoutes } from './routes/dunning.js';
 import { preferencesRoutes } from './routes/preferences.js';
 import { healthRoutes } from './routes/health.js';
+import complianceRoutes from './routes/compliance.js';
 import { deployRoutes } from './routes/deploy.js';
 import { figmaRoutes } from './routes/figma.js';
 import { genomeRoutes } from './routes/genome.js';
@@ -218,6 +219,10 @@ app.route('/api/tripwires', tripwiresRoutes);
 app.route('/api/dunning', dunningRoutes);
 app.route('/api/preferences', preferencesRoutes);
 app.route('/api/health', healthRoutes);
+// Public and unauthenticated by design: a compliance surface only the operator
+// can read is a compliance surface nobody can check. It serves verdicts and
+// denominators, never gate logic, planning documents or tripwire signatures.
+app.route('/api/compliance', complianceRoutes);
 app.route('/api/glaas', glaasRoutes);
 app.route('/api/user-events', userEventsRoutes);
 

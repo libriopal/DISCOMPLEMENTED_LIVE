@@ -59,17 +59,57 @@
  */
 
 /**
- * Resolved 2026-08-29 against OpenRouter's live model list and re-resolved
- * 2026-08-30 against NVIDIA's. See the header for the comparison this came out
- * of. Do not edit from memory — re-resolve.
+ * Re-resolved 2026-09-22 against Cloudflare Workers AI's live catalogue
+ * (`GET /accounts/{id}/ai/models/search`, 31 text-generation models), and
+ * MEASURED rather than chosen from the listing. Do not edit from memory —
+ * re-resolve.
+ *
+ * The shortlist, with real prices from the catalogue and real latencies from
+ * an audit of an actual source file (~1.6K input tokens) on this account:
+ *
+ *   | model                        | ctx   | $/M in | $/M out | result          |
+ *   | @cf/zai-org/glm-5.3-flash    | 1.31M | 0.15   | 0.50    | 14.5s, valid    |
+ *   | @cf/nvidia/nemotron-3-120b   | 256K  | 0.50   | 1.50    | 16.2s, valid    |
+ *   | @cf/google/gemma-4-26b-a4b   | 256K  | 0.10   | 0.30    | 105s, NO OUTPUT |
+ *   | @cf/zai-org/glm-5.3          | 1.31M | 1.40   | 4.40    | costlier twin   |
+ *
+ * glm-5.3-flash is the pin. It has the LARGEST context window on the
+ * catalogue and a larger one than the 1M this pin previously carried — and
+ * context is the binding constraint for the 4B gate, which is handed a full
+ * staged diff plus the output of `pnpm test:all`. At $0.15/$0.50 it is also
+ * the cheapest model that clears that window by a factor of five.
+ *
+ * Gemma was the obvious cheap candidate and was REJECTED on measurement: it
+ * halves the context window, and at default reasoning effort it spent all
+ * 8,000 output tokens thinking and returned an EMPTY answer. A model that
+ * produces no verdict is not a cheap auditor, it is an unreachable one.
+ *
+ * Independence still holds, which is the entire function of this step: Z.ai
+ * weights, on Cloudflare's infrastructure, auditing a Cohere-native pipeline.
+ * Different vendor from the researcher it audits, as before.
  */
-export const AUDITOR_MODEL = 'nvidia/nemotron-3-super-120b-a12b';
+export const AUDITOR_MODEL = '@cf/zai-org/glm-5.3-flash';
 
 /**
- * The stronger, costlier Nemotron. Not the default; the documented upgrade
- * path when calibration says Super is not catching enough.
+ * The stronger, costlier sibling — same family, full-size rather than flash.
+ * Not the default; the documented upgrade path when calibration says flash is
+ * not catching enough. Same 1.31M window, roughly 9x the output price.
  */
-export const AUDITOR_MODEL_ESCALATION = 'nvidia/nemotron-3-ultra-550b-a55b';
+export const AUDITOR_MODEL_ESCALATION = '@cf/zai-org/glm-5.3';
+
+/**
+ * Reasoning effort, and why this is a PIN rather than a tuning knob.
+ *
+ * glm-5.3 carries `reasoning_effort: {mandatory: true, default_effort: 'max'}`.
+ * At 'max' the model reasons past any sane `max_tokens` and returns
+ * `finish_reason: 'length'` with an EMPTY message — measured: 120.6s and zero
+ * characters of answer on a file that 'low' audited correctly in 14.5s.
+ *
+ * So this is load-bearing. Omit it and the auditor does not merely get slower,
+ * it stops producing verdicts — and an auditor that returns nothing is the
+ * failure this whole step exists to prevent, arriving disguised as a timeout.
+ */
+export const AUDITOR_REASONING_EFFORT = 'low';
 
 /**
  * Where the auditor is called. NVIDIA's OpenAI-compatible chat-completions
@@ -79,7 +119,29 @@ export const AUDITOR_MODEL_ESCALATION = 'nvidia/nemotron-3-ultra-550b-a55b';
  * returned 83 models including both ids above, and a `POST /v1/chat/completions`
  * against AUDITOR_MODEL returned 200 with a usage block. No 402.
  */
-export const AUDITOR_BASE_URL = 'https://integrate.api.nvidia.com/v1';
+export const AUDITOR_BASE_URL = 'https://api.cloudflare.com/client/v4';
+
+/**
+ * Workers AI's OpenAI-compatible base URL for one account.
+ *
+ * The account id is part of the PATH on Cloudflare, so unlike the NVIDIA
+ * endpoint this cannot be a single constant: it is built per deployment from
+ * `CF_ACCOUNT_ID`. It is not a secret (the token is), but it is per-account,
+ * and hardcoding one account's id into a public repository would be both wrong
+ * and useless to anybody else.
+ *
+ * Verified 2026-09-22: `POST {base}/chat/completions` with the account's token
+ * returned 200 with a `usage` block and a parseable JSON verdict.
+ */
+export function auditorBaseUrlFor(accountId: string): string {
+  if (!/^[0-9a-f]{32}$/.test(accountId)) {
+    throw new Error(
+      'CF_ACCOUNT_ID is not a 32-hex Cloudflare account id, so the auditor ' +
+        'endpoint cannot be built. This is the account id, not the token id.'
+    );
+  }
+  return `${AUDITOR_BASE_URL}/accounts/${accountId}/ai/v1`;
+}
 
 /*
  * AUDITOR_MODEL_DEV_FREE was removed on 2026-08-30 and is deliberately not
@@ -97,21 +159,25 @@ export const AUDITOR_BASE_URL = 'https://integrate.api.nvidia.com/v1';
  */
 
 /**
- * What an audit costs, in dollars — and why this is `null`.
+ * What an audit costs, in dollars per million tokens.
  *
- * On OpenRouter this was $0.085/$0.40 per Mtok, listed publicly, so a run
- * could report a dollar figure that matched a line on a bill. NVIDIA Build
- * publishes no per-token list price for `integrate.api.nvidia.com`, and the
- * endpoint returns none: `POST /v1/chat/completions` gives `usage`
- * (prompt/completion/total tokens) and no rate.
+ * This was `null` for a stated reason: NVIDIA Build publishes no per-token list
+ * price for `integrate.api.nvidia.com` and the endpoint returns none, so any
+ * figure here would have been unreproducible — which this repo's ground rules
+ * forbid. The bound did not disappear, it changed denomination to tokens.
  *
- * So a dollar figure here would be a number nobody could reproduce, which is
- * exactly what the brief forbids. The bound did not go away — it changed
- * denomination. Callers budget in TOKENS (`--budget-tokens` in
- * scripts/audit-system.mjs), which the endpoint does report and which the
- * scripts can therefore both estimate before a run and measure after one.
+ * Cloudflare publishes the rate in the model catalogue itself, so the figure is
+ * reproducible again by anyone with an account:
+ *
+ *   GET /accounts/{id}/ai/models/search  ->  @cf/zai-org/glm-5.3-flash
+ *                                            $0.15 / M input, $0.50 / M output
+ *
+ * Read on 2026-09-22. It is a list price from the provider's own API, not an
+ * estimate, and a run's `usage` block multiplies straight through it. Callers
+ * still budget in tokens; this lets the ledger also report a dollar figure that
+ * matches a line on a bill.
  */
-export const AUDITOR_PRICING_USD_PER_MTOK = null;
+export const AUDITOR_PRICING_USD_PER_MTOK = { input: 0.15, output: 0.5 };
 
 /**
  * The auditor's model for this deployment.

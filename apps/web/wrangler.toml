@@ -212,6 +212,9 @@ max_instances = 20
 # Cron Workers
 [triggers]
 crons = [
+  "0 */6 * * *",   # Every 6h: compliance drift — what CI cannot catch,
+                   # namely the deployed system drifting from the artefact
+                   # published about it with nobody pushing anything.
   "0 3 * * *",     # Daily at 3 AM UTC: credit reset + audit log archival
   "*/15 * * * *",  # Every 15 min: tripwire engine (evaluate, execute remedies, retries)
   "0 * * * *",     # Hourly: dunning worker (decline recovery, retry scheduling)
@@ -270,6 +273,9 @@ bindings = [
 
 [env.production.triggers]
 crons = [
+  "0 */6 * * *",   # Every 6h: compliance drift — what CI cannot catch,
+                   # namely the deployed system drifting from the artefact
+                   # published about it with nobody pushing anything.
   "0 3 * * *",
   "*/15 * * * *",
   "0 * * * *",
@@ -395,6 +401,9 @@ custom_domain = true
 
 [env.staging.triggers]
 crons = [
+  "0 */6 * * *",   # Every 6h: compliance drift — what CI cannot catch,
+                   # namely the deployed system drifting from the artefact
+                   # published about it with nobody pushing anything.
   "0 3 * * *",
   "*/15 * * * *",
   "0 * * * *",

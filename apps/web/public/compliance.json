@@ -1,0 +1,350 @@
+{
+  "audit_ladder": {
+    "author_vendor": "anthropic",
+    "cross_vendor_rounds": 3,
+    "rounds": [
+      {
+        "id": "1",
+        "vendor": "anthropic",
+        "verdict": "VETO"
+      },
+      {
+        "id": "2",
+        "vendor": "anthropic",
+        "verdict": "APPROVE"
+      },
+      {
+        "id": "B1",
+        "vendor": "anthropic",
+        "verdict": "CUT"
+      },
+      {
+        "id": "B2",
+        "vendor": "anthropic",
+        "verdict": "APPROVE"
+      },
+      {
+        "id": "S1",
+        "vendor": "anthropic",
+        "verdict": "VETO"
+      },
+      {
+        "id": "G1",
+        "vendor": "anthropic",
+        "verdict": "APPROVE"
+      },
+      {
+        "id": "X1",
+        "vendor": "cloudflare-google-gemma",
+        "verdict": "VETO"
+      },
+      {
+        "id": "X2",
+        "vendor": "cloudflare-google-gemma",
+        "verdict": "VETO"
+      },
+      {
+        "id": "BS1",
+        "vendor": "anthropic",
+        "verdict": "VETO"
+      },
+      {
+        "id": "BS2",
+        "vendor": "anthropic",
+        "verdict": "APPROVE"
+      },
+      {
+        "id": "X3",
+        "vendor": "google",
+        "verdict": "VETO"
+      }
+    ],
+    "total_rounds": 11
+  },
+  "boundary": {
+    "deny_patterns_checked": 8,
+    "detail_withheld_for": [
+      "approval",
+      "charter",
+      "parent_sync",
+      "supersede",
+      "tripwire"
+    ],
+    "fields_considered": 252,
+    "note": "Published by an allowlist. A field absent here was not excluded by hand -- it was never named for publication."
+  },
+  "execution": {
+    "note": "A carried plan is not a running one. This number is asserted by an instrument, not by prose.",
+    "parent_candidates_executed": 0
+  },
+  "gates": [
+    {
+      "count": 1,
+      "gate": "approval",
+      "ok": true,
+      "skipped": false,
+      "unit": "checks"
+    },
+    {
+      "count": 16,
+      "detail": "",
+      "gate": "banner",
+      "ok": true,
+      "skipped": false,
+      "unit": "md files scanned"
+    },
+    {
+      "count": 1053,
+      "detail": "",
+      "gate": "budget",
+      "ok": true,
+      "skipped": false,
+      "unit": "words (budget 4000)"
+    },
+    {
+      "count": 6,
+      "gate": "charter",
+      "ok": true,
+      "skipped": false,
+      "unit": "directives present"
+    },
+    {
+      "count": 74,
+      "detail": "8 of 74 resolve no path (marker asserted as '\u00b7', nothing located)",
+      "gate": "citation",
+      "ok": true,
+      "skipped": false,
+      "unit": "rows checked"
+    },
+    {
+      "count": 688,
+      "detail": "684 active / 688 drafted, 0 executed, round-trip exact",
+      "gate": "corpus",
+      "ok": true,
+      "skipped": false,
+      "unit": "candidate rows"
+    },
+    {
+      "count": 4,
+      "detail": "74 active / 80 drafted",
+      "gate": "counts",
+      "ok": true,
+      "skipped": false,
+      "unit": "totals checked"
+    },
+    {
+      "count": 413,
+      "detail": "every branch declared",
+      "gate": "declared",
+      "ok": true,
+      "skipped": false,
+      "unit": "branches counted"
+    },
+    {
+      "count": 74,
+      "detail": "71/74 delivered; pending: B-008, B-052, B-065",
+      "gate": "delivery",
+      "ok": true,
+      "skipped": false,
+      "unit": "candidates with targets"
+    },
+    {
+      "count": 9,
+      "detail": "6 evaluable pre-release, 3 after",
+      "gate": "done",
+      "ok": true,
+      "skipped": false,
+      "unit": "criteria typed"
+    },
+    {
+      "count": 12,
+      "detail": "0 of 684 DONE; C-001 startable: False (no Tier-1 approval record for the parent plan)",
+      "gate": "driver",
+      "ok": true,
+      "skipped": false,
+      "unit": "protocol steps"
+    },
+    {
+      "count": 28,
+      "detail": "",
+      "gate": "glyph",
+      "ok": true,
+      "skipped": false,
+      "unit": "md files scanned"
+    },
+    {
+      "count": 7,
+      "detail": "all escalate to Tier 1",
+      "gate": "hardstop",
+      "ok": true,
+      "skipped": false,
+      "unit": "hard stops armed"
+    },
+    {
+      "count": 9,
+      "detail": "",
+      "gate": "headers",
+      "ok": true,
+      "skipped": false,
+      "unit": "table headers"
+    },
+    {
+      "count": 23,
+      "detail": "6 contracts",
+      "gate": "instruction",
+      "ok": true,
+      "skipped": false,
+      "unit": "cited names resolved"
+    },
+    {
+      "count": 11,
+      "detail": "3 cross-vendor of 11; author vendor = anthropic; 5 phase gate(s) not yet attempted",
+      "gate": "ladder",
+      "ok": true,
+      "skipped": false,
+      "unit": "audit rounds recorded"
+    },
+    {
+      "count": 201,
+      "detail": "201 mutants: 145 killed, 48 survived, 8 NOT TESTED (gate skipped in the workspace). 72% of mutants generated; 44% of 324 declared decision points, 123 of which yield no mutant. 56 survivors ratcheted with a reason  [CACHED from 2026-09-21T2",
+      "gate": "mutate",
+      "ok": true,
+      "skipped": false,
+      "unit": "mutants generated and killed"
+    },
+    {
+      "count": 12,
+      "gate": "parent_sync",
+      "ok": true,
+      "skipped": false,
+      "unit": "revisions compared"
+    },
+    {
+      "count": 21,
+      "detail": "21 phases, 0 cycles, all unlocks resolve",
+      "gate": "phases",
+      "ok": true,
+      "skipped": false,
+      "unit": "phases validated"
+    },
+    {
+      "count": 49,
+      "detail": "",
+      "gate": "portability",
+      "ok": true,
+      "skipped": false,
+      "unit": "files scanned"
+    },
+    {
+      "count": 3,
+      "detail": "python3 3.11, sh, sha256sum",
+      "gate": "preflight",
+      "ok": true,
+      "skipped": false,
+      "unit": "tools found"
+    },
+    {
+      "count": 27,
+      "detail": "6 registers",
+      "gate": "register",
+      "ok": true,
+      "skipped": false,
+      "unit": "register rows"
+    },
+    {
+      "count": 0,
+      "detail": "0 of 684 parent candidates executed -- no report lines yet",
+      "gate": "report",
+      "ok": true,
+      "skipped": false,
+      "unit": "lines parsed"
+    },
+    {
+      "count": 6,
+      "gate": "supersede",
+      "ok": true,
+      "skipped": false,
+      "unit": "revisions checked"
+    },
+    {
+      "count": 7,
+      "detail": "7 of 7 verified; ADMIN pinned by PATH EXISTENCE not SHA and not by content (contains this package -- see citation gate)",
+      "gate": "trees",
+      "ok": true,
+      "skipped": false,
+      "unit": "trees verified"
+    },
+    {
+      "count": 16,
+      "gate": "tripwire",
+      "ok": true,
+      "skipped": false,
+      "unit": "paths examined"
+    },
+    {
+      "count": 26,
+      "detail": "every gate reports a declared denominator",
+      "gate": "denominator",
+      "ok": true,
+      "skipped": false,
+      "unit": "gates examined"
+    },
+    {
+      "count": 2,
+      "detail": "wall clock (SOURCE_DATE_EPOCH unset)",
+      "gate": "determinism",
+      "ok": true,
+      "skipped": false,
+      "unit": "invariants checked"
+    },
+    {
+      "count": 28,
+      "detail": "record dated 2026-09-21T21:52:44Z",
+      "gate": "evidence",
+      "ok": true,
+      "skipped": false,
+      "unit": "gates recorded"
+    },
+    {
+      "count": 76,
+      "detail": "1 build artefact(s) excluded by name: tests/.mutate-cache.json",
+      "gate": "manifest",
+      "ok": true,
+      "skipped": false,
+      "unit": "entries (both directions)"
+    },
+    {
+      "count": 8,
+      "detail": "outward gates skip in an isolated copy and run in place",
+      "gate": "standalone",
+      "ok": true,
+      "skipped": false,
+      "unit": "outward gates compared"
+    },
+    {
+      "count": 32,
+      "detail": "every declared gate imports, exposes run(), and ran here",
+      "gate": "selftest",
+      "ok": true,
+      "skipped": false,
+      "unit": "gates exercised"
+    }
+  ],
+  "generated_at": "2026-09-22T21:49:47Z",
+  "mutation": {
+    "generated": 201,
+    "killed": 145,
+    "not_tested": 8,
+    "ratcheted": 56,
+    "survived": 48
+  },
+  "schema": "discomplemented.compliance/1",
+  "verify": {
+    "at": "2026-09-21T21:52:44Z",
+    "failed": [],
+    "gates_declared": 32,
+    "gates_run": 32,
+    "skipped": [],
+    "verdict": "green"
+  }
+}

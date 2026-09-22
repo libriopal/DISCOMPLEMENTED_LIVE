@@ -117,6 +117,15 @@ export interface Env {
   // dev, where lib/analytics-engine.ts degrades to an empty result set.
   CF_ACCOUNT_ID?: string;
   CF_ANALYTICS_API_TOKEN?: string;
+  // Workers AI, for the independent auditor. The auditor pin moved to
+  // `@cf/zai-org/glm-5.3-flash` on 2026-09-22 (see
+  // packages/cohere/src/auditor-model.ts for the re-resolution and the
+  // measurements behind it). CF_ACCOUNT_ID above is reused — it is part of the
+  // endpoint PATH on Cloudflare, not a header — and the token is a secret with
+  // Workers AI scope only. Optional here, and unset means the auditor is
+  // UNREACHABLE rather than skipped: a step that cannot run must not report
+  // the same green as one that ran.
+  CF_API_TOKEN?: string;
 
   // Coder-loop security gate (GitHub Actions — see
   // pipeline/tools/security-scan-gh.ts). GITHUB_ACTIONS_TOKEN is a PAT with

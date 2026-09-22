@@ -22,6 +22,8 @@ import {
   AUDITOR_MODEL,
   AUDITOR_MODEL_ESCALATION,
   AUDITOR_PRICING_USD_PER_MTOK,
+  AUDITOR_REASONING_EFFORT,
+  auditorBaseUrlFor,
   resolveAuditorModel,
 } from './auditor-model.js';
 
@@ -118,32 +120,72 @@ describe('the provider is NVIDIA, directly', () => {
   // the endpoint has to be NVIDIA's, and a stale `:free` override has to fail
   // at config time rather than 404 per call.
 
-  it('points at NVIDIA and not at a router', () => {
-    expect(AUDITOR_BASE_URL).toBe('https://integrate.api.nvidia.com/v1');
+  it('points at Workers AI and not at a router', () => {
+    // Re-pinned 2026-09-22 to @cf/zai-org/glm-5.3-flash. The assertion that
+    // matters is unchanged in kind: the auditor is reached DIRECTLY, at a
+    // named provider, and never through a router that could silently serve it
+    // from the same family as the researcher.
+    expect(AUDITOR_BASE_URL).toBe('https://api.cloudflare.com/client/v4');
     expect(AUDITOR_BASE_URL).not.toContain('openrouter');
     // `apps/web/src/lib/cohere.ts` routes on the vendor prefix, so a pin that
-    // stopped carrying it would silently go back out over OpenRouter's key.
-    expect(AUDITOR_MODEL.startsWith('nvidia/')).toBe(true);
-    expect(AUDITOR_MODEL_ESCALATION.startsWith('nvidia/')).toBe(true);
+    // stopped carrying it would silently go back out over OpenRouter's key —
+    // an `@cf/` slug contains a "/" and satisfies the OpenRouter test too.
+    expect(AUDITOR_MODEL.startsWith('@cf/')).toBe(true);
+    expect(AUDITOR_MODEL_ESCALATION.startsWith('@cf/')).toBe(true);
+    // Still not Cohere, which is the property this whole file protects.
+    expect(AUDITOR_MODEL).not.toContain('command');
+    expect(AUDITOR_MODEL).not.toContain('north');
+  });
+
+  it('pins a reasoning effort, because omitting it returns nothing', () => {
+    // Not a preference. glm-5.3 treats reasoning_effort as mandatory and
+    // defaults to 'max', at which it exhausts max_tokens reasoning and
+    // returns an EMPTY message with finish_reason 'length'. Measured on this
+    // account: 120.6s / 0 characters at the default, against 14.5s and a
+    // correct verdict at 'low'. An auditor that returns nothing is the exact
+    // failure this file exists to prevent, wearing a timeout as a disguise.
+    expect(AUDITOR_REASONING_EFFORT).toBeTruthy();
+    expect(['low', 'high', 'max']).toContain(AUDITOR_REASONING_EFFORT);
+  });
+
+  it('builds a per-account endpoint and refuses a malformed account id', () => {
+    // The account id is part of the PATH on Cloudflare, so it cannot be a
+    // constant in a public repo, and a wrong one must fail loudly rather than
+    // producing a URL that 404s per call.
+    expect(auditorBaseUrlFor('0'.repeat(32))).toBe(
+      `${AUDITOR_BASE_URL}/accounts/${'0'.repeat(32)}/ai/v1`
+    );
+    expect(() => auditorBaseUrlFor('not-an-account')).toThrow(/32-hex/i);
+    expect(() => auditorBaseUrlFor('')).toThrow(/32-hex/i);
   });
 
   it('refuses a leftover :free override rather than 404ing per call', () => {
-    // NVIDIA does not serve `:free`. Left alone the call fails per chunk and
-    // the audit scripts record each one as "unreachable" — an audit that
-    // reports itself incomplete for what reads as a network fault.
+    // Neither NVIDIA nor Workers AI serves `:free`; it is an OpenRouter-ism.
+    // Left alone the call fails per chunk and the audit scripts record each
+    // one as "unreachable" — an audit that reports itself incomplete for what
+    // reads as a network fault.
     expect(() =>
       resolveAuditorModel({ AUDITOR_MODEL: `${AUDITOR_MODEL}:free` })
     ).toThrow(/:free|NVIDIA/i);
   });
 });
 
-describe('audit cost is not asserted, because it is not published', () => {
-  it('reports no per-token price rather than an invented one', () => {
-    // OpenRouter listed $0.085 / $0.40 per Mtok, so a run could report a
-    // figure that matched a line on a bill. NVIDIA Build publishes none and
-    // the API returns none. Ground rule 2: no number in this repo that has no
-    // reproducible derivation in this repo. The budget moved to tokens, which
-    // the endpoint does report — see scripts/auditor-provider.mjs.
-    expect(AUDITOR_PRICING_USD_PER_MTOK).toBeNull();
+describe('audit cost is asserted only because it is published', () => {
+  it('carries the provider-published rate, not an estimate', () => {
+    // This was `null` for a good reason and is a number for the same reason.
+    // NVIDIA Build publishes no per-token list price and its API returns none,
+    // so any figure would have been unreproducible — ground rule 2. Cloudflare
+    // publishes the rate in its own model catalogue
+    // (GET /accounts/{id}/ai/models/search), so the figure is derivable by
+    // anyone with an account, which is what the rule actually asks for.
+    expect(AUDITOR_PRICING_USD_PER_MTOK).toEqual({ input: 0.15, output: 0.5 });
+  });
+
+  it('prices the escalation model as strictly costlier, or it is not an escalation', () => {
+    // A documented upgrade path that is cheaper than the default would mean
+    // the default was the wrong pin. Recorded as a relationship rather than a
+    // second hardcoded number.
+    expect(AUDITOR_MODEL_ESCALATION).not.toBe(AUDITOR_MODEL);
+    expect(AUDITOR_MODEL_ESCALATION.startsWith('@cf/zai-org/')).toBe(true);
   });
 });

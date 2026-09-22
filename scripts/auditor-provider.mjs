@@ -31,6 +31,55 @@ const SOURCE = resolve(ROOT, 'packages', 'cohere', 'src', 'auditor-model.ts');
 export const AUDITOR_KEY_VAR = 'NVIDIA_API_KEY';
 
 /**
+ * The auditor now lives on Cloudflare Workers AI, so this is not a fallback —
+ * it is how the pinned model is reached. `AUDITOR_MODEL` in auditor-model.ts
+ * is `@cf/zai-org/glm-5.3-flash`; see that file for the re-resolution and the
+ * measurements it came out of.
+ *
+ * NVIDIA is kept as an override rather than deleted: an environment that still
+ * sets `NVIDIA_API_KEY` keeps the auditor it was calibrated against, because
+ * findings from two different models are not comparable and a gate whose
+ * provider moves without anyone choosing it produces exactly that.
+ *
+ * Gemma was tried here first and REMOVED on measurement: at default reasoning
+ * effort it spent its entire output budget thinking and returned nothing, so a
+ * real §4B audit hung until it was killed rather than producing a verdict.
+ */
+function cfCredentials() {
+  const token = (process.env.CF_API_TOKEN || '').trim();
+  const account = (process.env.CF_ACCOUNT_ID || '').trim();
+  return token && /^[0-9a-f]{32}$/.test(account) ? { token, account } : null;
+}
+
+/**
+ * Which provider this run will use, decided once so every caller agrees.
+ *
+ * Order is deliberate: an explicitly configured NVIDIA key always wins, so
+ * adding this fallback cannot silently move an existing setup onto a different
+ * auditor. Findings from two different models are not comparable, and a gate
+ * whose provider changes without anyone choosing it produces exactly that.
+ */
+export function activeProvider() {
+  if (process.env[AUDITOR_KEY_VAR]?.trim()) return 'nvidia';
+  return cfCredentials() ? 'cloudflare-workers-ai' : null;
+}
+
+/**
+ * The reasoning-effort value this run must send, or `null` when the provider
+ * takes none. Load-bearing for glm-5.3, which treats it as mandatory and
+ * defaults to 'max' — at which it returns an empty message. Read from the pin
+ * rather than repeated, for the same reason the model id is.
+ */
+export function auditorReasoningEffort() {
+  if (activeProvider() !== 'cloudflare-workers-ai') return null;
+  try {
+    return readPin('AUDITOR_REASONING_EFFORT');
+  } catch {
+    return 'low';
+  }
+}
+
+/**
  * Read one `export const NAME = '...'` out of auditor-model.ts.
  *
  * Throws rather than defaulting. An auditor that runs against a guessed model
@@ -56,6 +105,12 @@ export function auditorModel() {
 
 /** Origin + version prefix, no trailing slash. */
 export function auditorBaseUrl() {
+  const cf = cfCredentials();
+  if (activeProvider() === 'cloudflare-workers-ai' && cf) {
+    // The account id is part of the PATH on Cloudflare, so the base URL is
+    // per-deployment and cannot be a constant in the pin file.
+    return `${readPin('AUDITOR_BASE_URL')}/accounts/${cf.account}/ai/v1`;
+  }
   return readPin('AUDITOR_BASE_URL');
 }
 
@@ -74,7 +129,11 @@ export function auditorEndpoint() {
  */
 export function auditorKey() {
   const key = process.env[AUDITOR_KEY_VAR];
-  return key && key.trim() ? key.trim() : null;
+  if (key && key.trim()) return key.trim();
+  // Only when NVIDIA is absent. See activeProvider(): an explicitly configured
+  // key always wins, so this cannot move an existing setup onto another model.
+  const cf = cfCredentials();
+  return cf ? cf.token : null;
 }
 
 /**
@@ -173,6 +232,15 @@ export async function postChatCompletion({
         temperature,
         max_tokens: maxTokens,
         stream: true,
+        // Load-bearing, not a tuning knob. glm-5.3 treats reasoning_effort as
+        // mandatory and defaults to 'max', at which it reasons past max_tokens
+        // and returns an EMPTY message with finish_reason 'length'. Measured:
+        // 120.6s and zero characters of answer, against 14.5s and a correct
+        // verdict at 'low'. Spread rather than set unconditionally so the
+        // NVIDIA override, which takes no such field, sends none.
+        ...(auditorReasoningEffort()
+          ? { reasoning_effort: auditorReasoningEffort() }
+          : {}),
         // Without this the usage block never arrives on a streamed response
         // and every audit records 0 tokens in / 0 out — which is also what a
         // call that never happened records. The budget is denominated in
