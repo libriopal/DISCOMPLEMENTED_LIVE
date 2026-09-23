@@ -40,6 +40,10 @@
 import { Hono } from 'hono';
 import type { Env } from '../env.js';
 import type { AuthVariables } from '../lib/require-auth.js';
+import {
+  INTERNAL_DELEGATION_HEADER,
+  INTERNAL_DELEGATION_NONCE,
+} from '../lib/require-auth.js';
 
 /**
  * The two members of `ExecutionContext` this file ever touches — which is none.
@@ -335,6 +339,25 @@ export async function dispatch(
   const cookie = req.headers.get('cookie');
   if (cookie) headers.set('cookie', cookie);
   headers.set('accept', 'application/json');
+  /*
+   * "Rate limits apply unchanged" was FALSE when this file first shipped, and
+   * the independent auditor found it on that commit.
+   *
+   * `requireAuth` runs once at /mcp and again on this delegated request, and
+   * `checkRateLimit` increments a counter, so one tool call consumed TWO tokens
+   * from the caller's hourly budget. A tier documented at N requests per hour
+   * gave N/2 tool calls, and the `entitlements` tool cheerfully reported the
+   * number that was not true. The 20 tests did not catch it: they measure the
+   * request that goes out, and this is a property of that request going out
+   * twice.
+   *
+   * The nonce is generated per isolate and imported rather than passed, so a
+   * client cannot supply a matching one and this is not a rate-limit bypass for
+   * anyone who reads the file. Authentication still runs on the delegated
+   * request — the key is resolved, a banned account refused. Only the second
+   * increment is suppressed.
+   */
+  headers.set(INTERNAL_DELEGATION_HEADER, INTERNAL_DELEGATION_NONCE);
 
   let body: string | undefined;
   if (tool.method === 'POST') {
@@ -458,12 +481,35 @@ async function handle(
   fetcher: McpFetcher
 ): Promise<unknown | null> {
   const id = rpc?.id;
-  const isNotification = id === undefined || id === null;
+  /*
+   * A NOTIFICATION HAS NO `id` FIELD. It does not have `id: null`.
+   *
+   * This treated both as notifications, and the `initialize` case never
+   * consulted the flag — so `{id: null, method: 'initialize'}` returned a
+   * result while `{id: null, method: 'tools/list'}` returned 202 and silence,
+   * and a client waiting on the second hangs until it times out. The
+   * independent auditor found the split. A hang is the worst way to be wrong,
+   * because it looks like a dead server rather than a rejected request.
+   *
+   * MCP forbids a null id outright, so the consistent answer is one error for
+   * every method. `id: null` in the RESPONSE is the JSON-RPC convention for
+   * "the request carried no usable id", which is exactly the case.
+   */
+  const isNotification = id === undefined;
 
   if (rpc?.jsonrpc !== '2.0' || typeof rpc.method !== 'string') {
     return isNotification
       ? null
       : rpcError(id, INVALID_REQUEST, 'Not a JSON-RPC 2.0 request');
+  }
+
+  if (id === null) {
+    return rpcError(
+      null,
+      INVALID_REQUEST,
+      'MCP forbids a null request id. Omit `id` entirely for a notification, ' +
+        'or send a string or number when a response is expected.'
+    );
   }
 
   switch (rpc.method) {

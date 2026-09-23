@@ -16,6 +16,38 @@ export interface AuthVariables {
   tier: SubscriptionTier;
 }
 
+/**
+ * Marks a request this Worker made to itself, so its rate limit is charged once.
+ *
+ * WHY THIS EXISTS. `routes/mcp.ts` runs each MCP tool by handing a Request back
+ * to this same app, which means `requireAuth` runs TWICE for one tool call —
+ * once at `/mcp` and once on the delegated `/api` route. `checkRateLimit` is
+ * consumptive (`request_count = request_count + 1`), so every MCP tool call was
+ * burning two tokens against a key's hourly limit. A tier documented at N
+ * requests per hour delivered N/2 tool calls, and `entitlements` reported the
+ * number that was not true.
+ *
+ * Found by the independent auditor on the commit that introduced it, not by the
+ * author, and not by the 20 tests either — they measured the request that goes
+ * out, and this is a property of the request going out TWICE.
+ *
+ * WHY A NONCE AND NOT A FIXED HEADER NAME. A constant marker would be a
+ * rate-limit bypass for anyone who read this file: set the header, skip the
+ * limit, on any route. The value is generated once per isolate and never
+ * leaves it — `routes/mcp.ts` imports it rather than being told it — so a
+ * client cannot supply a matching one. `dispatch()` builds the delegated
+ * headers from scratch (authorization, cookie, accept) so a client-supplied
+ * copy cannot ride along either; the nonce closes the case where some future
+ * caller forwards headers wholesale.
+ *
+ * WHAT IS NOT SKIPPED: authentication. The delegated request still resolves the
+ * key, and still refuses a banned account, an expired trial or an invalid key.
+ * Only the counter increment is suppressed, because the outer pass already
+ * charged it.
+ */
+export const INTERNAL_DELEGATION_HEADER = 'x-bicameral-internal-delegation';
+export const INTERNAL_DELEGATION_NONCE = crypto.randomUUID();
+
 export const requireAuth = createMiddleware<{
   Bindings: Env;
   Variables: AuthVariables;
@@ -31,8 +63,16 @@ export const requireAuth = createMiddleware<{
     if (lookup.trialExpired)
       throw new AuthError('Trial expired', 'TRIAL_EXPIRED');
 
+    // Already charged by the outer pass of a self-delegated request. See
+    // INTERNAL_DELEGATION_HEADER above — authentication still happened; only the
+    // second increment is suppressed.
+    const delegated =
+      c.req.header(INTERNAL_DELEGATION_HEADER) === INTERNAL_DELEGATION_NONCE;
+
     const hashed = await sha256Hex(rawKey);
-    const rateLimit = await checkRateLimit(c.env.DB, hashed, lookup.tier);
+    const rateLimit = delegated
+      ? { allowed: true, remaining: -1, retryAfterSeconds: 0 }
+      : await checkRateLimit(c.env.DB, hashed, lookup.tier);
     if (!rateLimit.allowed) {
       throw new RateLimitError('Rate limit exceeded', {
         retryAfterSeconds: rateLimit.retryAfterSeconds,

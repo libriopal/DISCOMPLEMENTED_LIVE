@@ -20,6 +20,10 @@
 import { describe, it, expect } from 'vitest';
 import { Hono } from 'hono';
 import {
+  INTERNAL_DELEGATION_HEADER,
+  INTERNAL_DELEGATION_NONCE,
+} from '../lib/require-auth.js';
+import {
   createMcpRoutes,
   MCP_TOOLS,
   MCP_REACHABLE,
@@ -316,5 +320,113 @@ describe('JSON-RPC, as clients actually speak it', () => {
     // Three in, two out: the notification is correctly unanswered.
     expect(json).toHaveLength(2);
     expect(json.map((r: any) => r.id)).toEqual([1, 2]);
+  });
+});
+
+describe('the rate limit is charged once per tool call, not twice', () => {
+  /*
+   * The defect the independent auditor found on the commit that introduced this
+   * file, and that the original 20 tests could not have found: they measure the
+   * request that goes out, and this is a property of that request going out
+   * TWICE. `requireAuth` runs at /mcp and again on the delegated route, and
+   * `checkRateLimit` does `request_count = request_count + 1`, so a tier
+   * documented at N requests per hour delivered N/2 tool calls.
+   */
+  it('marks the delegated request so requireAuth does not re-charge it', async () => {
+    const { seen, fetcher } = recorder();
+    await rpc(server(fetcher), call('list_projects'), {
+      authorization: 'Bearer vk_test_key',
+    });
+    expect(seen[0].headers.get(INTERNAL_DELEGATION_HEADER)).toBe(
+      INTERNAL_DELEGATION_NONCE
+    );
+  });
+
+  it('NEGATIVE CONTROL: the marker is not a constant anyone can guess', () => {
+    /*
+     * A fixed header value would be a rate-limit bypass for every route in the
+     * Worker, available to anyone who read the source. The nonce is generated
+     * per isolate; this asserts it is not the header name, not empty, and not a
+     * short literal — the three shapes a hand-written constant takes.
+     */
+    expect(INTERNAL_DELEGATION_NONCE).not.toBe(INTERNAL_DELEGATION_HEADER);
+    expect(INTERNAL_DELEGATION_NONCE.length).toBeGreaterThan(20);
+    expect(INTERNAL_DELEGATION_NONCE).toMatch(/^[0-9a-f-]{36}$/);
+  });
+
+  it('NEGATIVE CONTROL: a client-supplied marker never reaches the route', async () => {
+    /*
+     * The attack the nonce defends against, tested rather than argued. A caller
+     * sets the header on the JSON-RPC request itself; `dispatch()` builds the
+     * delegated headers from scratch, so what arrives is the real nonce and not
+     * the attacker's value — and if `dispatch` ever started forwarding headers
+     * wholesale, this is the test that goes red.
+     */
+    const { seen, fetcher } = recorder();
+    await rpc(server(fetcher), call('list_projects'), {
+      [INTERNAL_DELEGATION_HEADER]: 'forged-by-the-client',
+    });
+    expect(seen[0].headers.get(INTERNAL_DELEGATION_HEADER)).not.toBe(
+      'forged-by-the-client'
+    );
+  });
+});
+
+describe('id: null is one consistent rejection, not a split', () => {
+  /*
+   * Also the auditor's. `initialize` with `id: null` returned a result while
+   * `tools/list` with `id: null` returned 202 and silence — so a client waiting
+   * on the second hangs, and a hang looks like a dead server rather than a
+   * rejected request. MCP forbids a null id; the answer is the same error for
+   * every method.
+   */
+  for (const method of ['initialize', 'tools/list', 'ping']) {
+    it(`${method} with id:null is rejected, not answered and not ignored`, async () => {
+      const { json } = await rpc(server(recorder().fetcher), {
+        jsonrpc: '2.0',
+        id: null,
+        method,
+      });
+      expect(json).not.toBeNull();
+      expect(json.error.code).toBe(-32600);
+      expect(json.result).toBeUndefined();
+    });
+  }
+
+  it('a MALFORMED request with id:null is still an error, not silence', async () => {
+    /*
+     * Added because a mutation survived. Reverting `isNotification` to
+     * `id === undefined || id === null` left every other test green: the
+     * explicit `id === null` guard sits AFTER the jsonrpc-validity check, so it
+     * covers well-formed requests only. A malformed one with `id: null` went
+     * back to silence, and silence is the hang this whole section exists to
+     * remove. The mutant was equivalent for the inputs the suite had; it is not
+     * equivalent for this one.
+     */
+    const { json } = await rpc(server(recorder().fetcher), {
+      jsonrpc: 'not-2.0',
+      id: null,
+      method: 'tools/list',
+    });
+    expect(json).not.toBeNull();
+    expect(json.error.code).toBe(-32600);
+  });
+
+  it('NEGATIVE CONTROL: a real notification (no id field) is still silent', async () => {
+    /*
+     * The property the fix must not break. A notification has NO `id` key —
+     * that is what distinguishes it from `id: null` — and answering one makes
+     * strict clients error on a response they never asked for.
+     */
+    const res = await server(recorder().fetcher).request('/mcp', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        method: 'notifications/initialized',
+      }),
+    });
+    expect(res.status).toBe(202);
+    expect(await res.text()).toBe('');
   });
 });
