@@ -22,7 +22,10 @@ import {
   type SimulationSnapshot,
 } from './simulation-watchdog.js';
 import { selfChecks } from '../routes/compliance.js';
-import { TIER_LIMITS } from '@bicameral/shared/constants';
+import {
+  TIER_LIMITS,
+  TIER_SUBSCRIPTION_PRICES,
+} from '@bicameral/shared/constants';
 
 /**
  * Handle a scheduled cron event by routing to the correct handler.
@@ -66,60 +69,208 @@ export async function handleCron(
 /**
  * Daily at 3 AM UTC: credit reset + audit log archival.
  */
-async function handleDailyCreditReset(env: Env): Promise<void> {
-  // THE GRANT IS DERIVED, NEVER RESTATED.
-  //
-  // This is the code that actually issues credits, and it was the one thing
-  // the pricing fix did not touch. TIER_LIMITS was cut to solvent numbers
-  // (pro 50,000 -> 1,000) while this statement went on paying the old ones
-  // out of three hardcoded literals. The independent auditor caught it on the
-  // commit that claimed to have fixed the revenue, and it was right: a Pro
-  // subscriber would have been granted 50,000 credits on the next cycle —
-  // 2,000 apps, $570 of delivery cost against $29 of revenue — which is
-  // exactly the insolvency the change was written to close.
-  //
-  // pricing-solvency.test.ts did not catch it, because it re-derived from
-  // TIER_LIMITS.creditsPerMonth and asserted that the constant was
-  // affordable. The constant was. Nothing paid it out. A test that measures
-  // the number instead of the payout reports the same green either way, so
-  // the payout is now BUILT from the same constant the test reads: there is
-  // one number, and this is the only place it becomes SQL.
-  //
-  // The tier list is derived for the same reason. `tier IN ('pro','team',
-  // 'enterprise')` silently excluded nonprofit, so a granted nonprofit
-  // account would never have been topped up at all.
-  const grantedTiers = (
-    Object.keys(TIER_LIMITS) as (keyof typeof TIER_LIMITS)[]
-  ).filter((t) => t !== 'free');
+/**
+ * The credit-grant statements, as pure functions.
+ *
+ * EXPORTED so the tests can execute THE SHIPPED STATEMENT rather than a copy
+ * of it. `grant-schedule.test.ts` originally rebuilt this SQL itself, and the
+ * copy promptly diverged from the original the first time the guard changed —
+ * the test would have gone on proving that a string in a test file behaves
+ * correctly while the product shipped something else. That is the same
+ * measure-the-wrong-thing failure the §4B audit has now found three times in
+ * this area, so the copy is deleted rather than guarded.
+ *
+ * Tiers and figures are derived from TIER_LIMITS, never restated: the pricing
+ * fix moved the constants while three hardcoded literals here went on paying
+ * the old grants.
+ */
+export function grantedTiers(): (keyof typeof TIER_LIMITS)[] {
+  return (Object.keys(TIER_LIMITS) as (keyof typeof TIER_LIMITS)[]).filter(
+    (t) => t !== 'free'
+  );
+}
 
-  const cases = grantedTiers
-    .map((t) => `WHEN tier = '${t}' THEN ${TIER_LIMITS[t].creditsPerMonth}`)
-    .join('\n      ');
-  const tierList = grantedTiers.map((t) => `'${t}'`).join(', ');
+/** `CASE WHEN <col> = 'pro' THEN 1000 ... END` — a tier column to its grant. */
+function grantOf(col: string): string {
+  return `CASE ${grantedTiers()
+    .map((t) => `WHEN ${col} = '${t}' THEN ${TIER_LIMITS[t].creditsPerMonth}`)
+    .join(' ')} ELSE 0 END`;
+}
 
-  // RECONCILE GRANTED TIERS BEFORE PAYING THEM.
-  //
-  // `users.tier = 'nonprofit'` is a cache of a row in `nonprofit_grants`, and
-  // a cache nobody refreshes is how a withdrawn grant keeps paying out. The
-  // independent §4B audit found the revocation path modelled and consumed by
-  // nothing: `grantIsActive()` existed, was called from nowhere, and an
-  // operator recording revoked_at changed no behaviour at all — the tier
-  // column still said 'nonprofit', this loop still topped it up, and
-  // entitlements.ts still answered "has this user paid?" with yes.
-  //
-  // So the demotion runs FIRST, on the same schedule as the payment. The
-  // conditions mirror grantIsActive(): revoked, or no named grantor, or no
-  // grant row at all.
-  const demoted = await env.DB.prepare(
-    `UPDATE users SET tier = 'free'
+/**
+ * Demote nonprofit accounts whose grant is no longer in force, and CLAMP THE
+ * BALANCE as well as the tier.
+ *
+ * Demoting alone left credits_remaining at the nonprofit grant, and the grant
+ * statement excludes 'free', so nothing ever reduced it: a revoked account
+ * went on spending team-volume credits indefinitely, which is the loss the
+ * revocation exists to stop. MIN() so revocation cannot top an account UP.
+ *
+ * The conditions mirror `grantIsActive()`: revoked, unattributed, or no row.
+ */
+export function demoteRevokedGrantsSql(): string {
+  return `UPDATE users
+        SET tier = 'free',
+            credits_remaining = MIN(credits_remaining, ${TIER_LIMITS.free.creditsPerMonth}),
+            credits_granted_tier = 'free'
      WHERE tier = 'nonprofit'
        AND id NOT IN (
          SELECT user_id FROM nonprofit_grants
          WHERE revoked_at IS NULL
            AND granted_by IS NOT NULL
            AND trim(granted_by) <> ''
-       )`
-  ).run();
+       )`;
+}
+
+/**
+ * Pay the monthly grant, at most once per calendar month per entitlement.
+ *
+ * Takes the period (YYYY-MM, UTC) as ?1.
+ *
+ * A MONTHLY grant was being paid by a DAILY cron: this handler runs on
+ * "0 3 * * *" and set credits_remaining to the monthly figure every morning,
+ * so a Pro subscriber who spent each refill drew 30 x 1,000 = 30,000 credits a
+ * month — 1,200 apps, $342 of delivery against $29 of revenue.
+ * pricing-solvency.test.ts could not see it: every assertion there reasons
+ * about TIER_LIMITS, and this lived in the SCHEDULE, which no test read.
+ *
+ * Guarded on a recorded date rather than a monthly cron, because a missed
+ * monthly run would cost a subscriber their whole month and a double run would
+ * pay twice. Keyed on (month, TIER GRANTED) rather than month alone: keyed on
+ * the month alone it punished a paying customer, refusing to grant to a Pro
+ * subscriber who downgraded on the 5th and resubscribed on the 10th until
+ * October.
+ *
+ * A NEW MONTH RESETS; a same-month upgrade TOPS UP THE DIFFERENCE. That
+ * distinction keeps the grant a monthly allowance rather than a rolling
+ * balance — rollover would quietly stop the grant being the per-month ceiling
+ * the pricing is derived against — and it is what makes reopening the guard
+ * safe: free -> pro -> free -> pro cannot farm grants, because the second
+ * upgrade finds credits_granted_tier already 'pro' for the month and the
+ * difference is zero.
+ */
+/**
+ * Tiers that are SOLD, derived from TIER_SUBSCRIPTION_PRICES.
+ *
+ * A sold tier must have an active subscription behind it to be granted; a
+ * PROVISIONED tier (nonprofit grant, enterprise contract) has no subscription
+ * by design. Derived rather than listed, so a new paid tier is covered the day
+ * it gains a price.
+ */
+function soldTiers(): string[] {
+  return Object.keys(TIER_SUBSCRIPTION_PRICES).filter((t) => t !== 'free');
+}
+
+/**
+ * The billing reference a grant is keyed to.
+ *
+ * Keyed on the calendar month alone, the guard produced two requirements that
+ * could not both hold — a resubscriber who paid again must be granted, and a
+ * tier-cycler must not be — and no rule over (month, tier) satisfies both. The
+ * distinguishing fact is which BILLING PERIOD was paid for.
+ *
+ * For a sold tier that is `<period>:<subscription id>:<current_period_end>`.
+ * The period end is part of it because Stripe PRESERVES the subscription id
+ * across cancel-and-reactivate: keyed on the id alone, a subscriber who
+ * cancelled mid-month, spent down, then reactivated and paid on the 15th would
+ * compute the same reference and receive nothing for the rest of the month —
+ * the very failure this keying was introduced to fix, surviving in a variant
+ * the first test suite did not cover. The §4B audit found it.
+ *
+ * For a provisioned tier it is `<period>:-`, i.e. plain calendar month. The
+ * fallback is a CONSTANT, never the tier name: a downgrade would otherwise
+ * fabricate a new reference and reset the balance, and a downgrade is not a
+ * billing event. `migrations/032` backfills using this same constant, and
+ * `grant-schedule.test.ts` asserts the two agree — they did not, and the
+ * mismatch made every backfilled row look unpaid and double-granted.
+ */
+export const PROVISIONED_REF_FALLBACK = '-';
+
+function grantRefExpr(): string {
+  return `?1 || ':' || COALESCE(
+         (SELECT s.stripe_subscription_id || ':' || COALESCE(s.current_period_end, '')
+            FROM subscriptions s
+           WHERE s.user_id = users.id
+             AND s.status = 'active'
+        ORDER BY s.created_date DESC
+           LIMIT 1),
+         '${PROVISIONED_REF_FALLBACK}'
+       )`;
+}
+
+/**
+ * A sold tier with no active subscription is not granted.
+ *
+ * Without this the keying leaked: an account left at tier='pro' after its
+ * subscription was cancelled — a webhook failure, a manual edit — computed a
+ * stable reference and collected a full Pro grant every month with no billing
+ * event behind it, indefinitely. That is the unbounded loss the billing-event
+ * keying exists to prevent, reintroduced by the keying itself. Found by the
+ * §4B audit.
+ */
+function hasActiveSubscriptionExpr(): string {
+  return `EXISTS (
+         SELECT 1 FROM subscriptions s
+          WHERE s.user_id = users.id AND s.status = 'active'
+       )`;
+}
+
+/**
+ * Pay the monthly grant, at most once per billing reference. Period (YYYY-MM,
+ * UTC) as ?1.
+ *
+ * A MONTHLY grant was being paid by a DAILY cron: this handler runs on
+ * "0 3 * * *" and set credits_remaining to the monthly figure every morning,
+ * so a Pro subscriber who spent each refill drew 30 x 1,000 = 30,000 credits a
+ * month — 1,200 apps, $342 of delivery against $29 of revenue.
+ * pricing-solvency.test.ts could not see it: every assertion there reasons
+ * about TIER_LIMITS, and this lived in the SCHEDULE, which no test read.
+ *
+ * A NEW REFERENCE RESETS; a same-reference upgrade TOPS UP THE DIFFERENCE.
+ * The reset keeps the grant a monthly allowance rather than a rolling balance
+ * — rollover would quietly stop the grant being the per-month ceiling the
+ * pricing is derived against.
+ */
+export function monthlyGrantSql(): string {
+  const tierList = grantedTiers()
+    .map((t) => `'${t}'`)
+    .join(', ');
+  const soldList = soldTiers()
+    .map((t) => `'${t}'`)
+    .join(', ');
+  const ref = grantRefExpr();
+  return `UPDATE users SET credits_remaining =
+       CASE
+         WHEN credits_granted_ref IS NULL OR credits_granted_ref <> (${ref})
+         THEN ${grantOf('tier')}
+         ELSE credits_remaining
+              + (${grantOf('tier')} - ${grantOf('credits_granted_tier')})
+       END,
+       credits_granted_at = ?1,
+       credits_granted_tier = tier,
+       credits_granted_ref = (${ref})
+     WHERE tier IN (${tierList})
+       AND (tier NOT IN (${soldList}) OR ${hasActiveSubscriptionExpr()})
+       AND (
+         credits_granted_ref IS NULL
+         OR credits_granted_ref <> (${ref})
+         OR ${grantOf('tier')} > ${grantOf('credits_granted_tier')}
+       )`;
+}
+
+/**
+ * The grant period: YYYY-MM in UTC.
+ *
+ * toISOString() is UTC per spec, independent of the host, and Cloudflare
+ * evaluates cron triggers in UTC. Both halves matter — the month boundary is
+ * stable only while the schedule and the stamp agree on a timezone.
+ */
+export function grantPeriod(now: Date = new Date()): string {
+  return now.toISOString().slice(0, 7);
+}
+
+async function handleDailyCreditReset(env: Env): Promise<void> {
+  const demoted = await env.DB.prepare(demoteRevokedGrantsSql()).run();
   if ((demoted.meta?.changes ?? 0) > 0) {
     console.log(
       `Nonprofit reconcile: ${demoted.meta?.changes} account(s) demoted to free ` +
@@ -127,35 +278,8 @@ async function handleDailyCreditReset(env: Env): Promise<void> {
     );
   }
 
-  // A MONTHLY grant, paid by a DAILY cron. That mismatch was the real ceiling
-  // failure: this handler runs on "0 3 * * *" and set credits_remaining to the
-  // monthly figure every morning, so a Pro subscriber who spent each refill
-  // drew 30 x 1,000 = 30,000 credits a month — 1,200 apps, $342 of delivery
-  // against $29 of revenue. Before the pricing fix, 30 x 50,000.
-  //
-  // pricing-solvency.test.ts could not see it. Every assertion there reasons
-  // about TIER_LIMITS and "full grant consumption"; this defect lived in the
-  // SCHEDULE, which no test read. Fixing the grant figures did not fix it, and
-  // the commit that fixed them claimed the grant was "the single ceiling on
-  // loss" while this made that false.
-  //
-  // The guard is a recorded date, not a monthly cron: a missed monthly run
-  // would cost a subscriber their whole month, and a double run would pay
-  // twice. Keyed on calendar month, so the first run of a month grants and
-  // every later run that month is a no-op, however often this fires.
-  const period = new Date().toISOString().slice(0, 7); // YYYY-MM
-  const granted = await env.DB.prepare(
-    `UPDATE users SET credits_remaining = CASE
-      ${cases}
-      ELSE credits_remaining
-    END,
-    credits_granted_at = ?1
-    WHERE tier IN (${tierList})
-      AND (credits_granted_at IS NULL OR substr(credits_granted_at, 1, 7) < ?1)`
-  )
-    .bind(period)
-    .run();
-
+  const period = grantPeriod();
+  const granted = await env.DB.prepare(monthlyGrantSql()).bind(period).run();
   console.log(
     `Monthly grant: ${granted.meta?.changes ?? 0} account(s) topped up for ${period}`
   );
