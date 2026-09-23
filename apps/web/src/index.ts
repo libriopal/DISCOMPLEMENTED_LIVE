@@ -35,6 +35,7 @@ import { eiccaRoutes, eiccaWebhookRoutes } from './routes/eicca.js';
 import { glassEngineRoutes } from './routes/glass-engine.js';
 import { vdrRoutes } from './routes/vdr.js';
 import { simulationIngestRoutes } from './routes/simulation-ingest.js';
+import { createMcpRoutes } from './routes/mcp.js';
 import { simulationRoutes } from './routes/simulation.js';
 import { entitlementsRoutes } from './routes/entitlements.js';
 import { tripwiresRoutes } from './routes/tripwires.js';
@@ -181,6 +182,42 @@ app.get('/api/figma/callback', async (c) => {
   const { handleFigmaCallback } = await import('./routes/figma.js');
   return handleFigmaCallback(c as any);
 });
+
+/*
+ * The MCP server — mounted at /mcp, which is NOT under /api, so the wildcard
+ * below does not cover it and it gets `requireAuth` of its own.
+ *
+ * That is the whole security story and it is worth being explicit about,
+ * because the failure mode is silent: `app.use('/api/*', requireAuth)` is the
+ * only thing standing between the world and every route in this file, and a
+ * route mounted one character outside that glob is public. `/mcp` is one
+ * character outside it. An MCP endpoint is a remote-procedure surface over the
+ * entire product; unauthenticated it would be the largest hole this Worker
+ * could have.
+ *
+ * `routes/mcp.ts` re-enters this same app to run each tool, so the tool call
+ * passes through `requireAuth` a SECOND time on the delegated request. That is
+ * not redundant — it is what makes tier, credits and rate limits apply to a
+ * tool exactly as they apply to the HTTP route, rather than being re-asserted
+ * by a parallel implementation that can drift out of step.
+ *
+ * `app.fetch` is passed in rather than imported by routes/mcp.ts: this module
+ * imports that one, so importing back would be a cycle, and a cycle in a
+ * Workers bundle surfaces as `undefined is not a function` on the first
+ * request rather than as a build failure.
+ */
+app.use('/mcp', requireAuth);
+app.route(
+  '/mcp',
+  createMcpRoutes((req, env, ctx) =>
+    // The one cast. `ExecutionContext` from workers-types is generic and Hono's
+    // `c.executionCtx` is a different instantiation of it; neither is assignable
+    // to the other and a union of the two collapses. routes/mcp.ts types the
+    // context by the surface it uses (nothing), so the mismatch is resolved once,
+    // here, in sight of the call it belongs to.
+    app.fetch(req, env, ctx as ExecutionContext)
+  )
+);
 
 app.use('/api/*', requireAuth);
 
