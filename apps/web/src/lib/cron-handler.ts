@@ -97,13 +97,68 @@ async function handleDailyCreditReset(env: Env): Promise<void> {
     .join('\n      ');
   const tierList = grantedTiers.map((t) => `'${t}'`).join(', ');
 
-  await env.DB.prepare(
+  // RECONCILE GRANTED TIERS BEFORE PAYING THEM.
+  //
+  // `users.tier = 'nonprofit'` is a cache of a row in `nonprofit_grants`, and
+  // a cache nobody refreshes is how a withdrawn grant keeps paying out. The
+  // independent §4B audit found the revocation path modelled and consumed by
+  // nothing: `grantIsActive()` existed, was called from nowhere, and an
+  // operator recording revoked_at changed no behaviour at all — the tier
+  // column still said 'nonprofit', this loop still topped it up, and
+  // entitlements.ts still answered "has this user paid?" with yes.
+  //
+  // So the demotion runs FIRST, on the same schedule as the payment. The
+  // conditions mirror grantIsActive(): revoked, or no named grantor, or no
+  // grant row at all.
+  const demoted = await env.DB.prepare(
+    `UPDATE users SET tier = 'free'
+     WHERE tier = 'nonprofit'
+       AND id NOT IN (
+         SELECT user_id FROM nonprofit_grants
+         WHERE revoked_at IS NULL
+           AND granted_by IS NOT NULL
+           AND trim(granted_by) <> ''
+       )`
+  ).run();
+  if ((demoted.meta?.changes ?? 0) > 0) {
+    console.log(
+      `Nonprofit reconcile: ${demoted.meta?.changes} account(s) demoted to free ` +
+        '(grant revoked, unattributed, or missing)'
+    );
+  }
+
+  // A MONTHLY grant, paid by a DAILY cron. That mismatch was the real ceiling
+  // failure: this handler runs on "0 3 * * *" and set credits_remaining to the
+  // monthly figure every morning, so a Pro subscriber who spent each refill
+  // drew 30 x 1,000 = 30,000 credits a month — 1,200 apps, $342 of delivery
+  // against $29 of revenue. Before the pricing fix, 30 x 50,000.
+  //
+  // pricing-solvency.test.ts could not see it. Every assertion there reasons
+  // about TIER_LIMITS and "full grant consumption"; this defect lived in the
+  // SCHEDULE, which no test read. Fixing the grant figures did not fix it, and
+  // the commit that fixed them claimed the grant was "the single ceiling on
+  // loss" while this made that false.
+  //
+  // The guard is a recorded date, not a monthly cron: a missed monthly run
+  // would cost a subscriber their whole month, and a double run would pay
+  // twice. Keyed on calendar month, so the first run of a month grants and
+  // every later run that month is a no-op, however often this fires.
+  const period = new Date().toISOString().slice(0, 7); // YYYY-MM
+  const granted = await env.DB.prepare(
     `UPDATE users SET credits_remaining = CASE
       ${cases}
       ELSE credits_remaining
-    END
-    WHERE tier IN (${tierList})`
-  ).run();
+    END,
+    credits_granted_at = ?1
+    WHERE tier IN (${tierList})
+      AND (credits_granted_at IS NULL OR substr(credits_granted_at, 1, 7) < ?1)`
+  )
+    .bind(period)
+    .run();
+
+  console.log(
+    `Monthly grant: ${granted.meta?.changes ?? 0} account(s) topped up for ${period}`
+  );
 
   // Archive old audit logs (older than 90 days)
   const cutoff = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString();

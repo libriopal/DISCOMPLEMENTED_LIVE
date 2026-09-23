@@ -225,11 +225,25 @@ describe('links', () => {
     // Two kinds of link now. An in-page anchor must have a section to land on;
     // a route (`/compliance`) must not be checked for one, and conflating them
     // would either fail a valid link or stop checking the anchors at all.
+    // The route branch ASSERTS THE ROUTE EXISTS, not merely that the string is
+    // shaped like one. Its first version checked only /^\/[a-z0-9-]+$/, which
+    // the independent §4B audit correctly called a weakened check under
+    // constraint 6: `href: '/complience'` would have passed, and so would a
+    // link to a route somebody later deleted. The old anchor-only test would
+    // have failed on a dangling target; the replacement accepted any
+    // well-shaped string — a dead nav link to the compliance surface, which is
+    // precisely the "surface nobody can find" the link exists to prevent.
+    const APP_TSX = readFileSync(resolve(HERE, '../../App.tsx'), 'utf8');
     for (const link of NAV_LINKS) {
       if (link.href.startsWith('#')) {
         expect(MARKETING_TSX).toContain(`id="${link.href.slice(1)}"`);
       } else {
-        expect(link.href).toMatch(/^\/[a-z0-9-]+$/);
+        expect(
+          APP_TSX,
+          `NAV_LINKS points at ${link.href}, which App.tsx does not route. A ` +
+            'nav link to a route that does not exist is a dead link, and ' +
+            'checking only its shape cannot tell the two apart.'
+        ).toContain(`'${link.href}'`);
       }
     }
   });
