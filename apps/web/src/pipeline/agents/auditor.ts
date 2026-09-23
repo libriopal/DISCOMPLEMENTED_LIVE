@@ -20,7 +20,11 @@
  */
 import { z } from 'zod';
 import { GenerationError } from '@bicameral/shared/errors';
-import type { ProjectBrief, ResearchFindings } from '@bicameral/shared/types';
+import type {
+  ProjectBrief,
+  ResearchFindings,
+  SubscriptionTier,
+} from '@bicameral/shared';
 import type { ChatMessage } from '@bicameral/cohere/chat';
 import { callAgentModel, selectModel } from '../../lib/cohere.js';
 import { findSimilarPatterns } from '../lattice-enrich.js';
@@ -108,7 +112,7 @@ export async function runAuditor(
   env: Env,
   feedback?: string | null,
   projectId?: string | null,
-  tier?: 'free' | 'pro' | 'team' | 'enterprise'
+  tier?: SubscriptionTier
 ): Promise<{
   audit: AuditResult;
   tokensIn: number;

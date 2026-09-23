@@ -30,7 +30,7 @@ import {
   type PipelineComplexity,
 } from '@bicameral/cohere/model-router';
 import type { CohereResponse } from '@bicameral/cohere';
-import type { AgentRole } from '@bicameral/shared/types';
+import type { AgentRole, SubscriptionTier } from '@bicameral/shared';
 import type { Env } from '../env.js';
 
 export { selectModel, getThinkingConfig };
@@ -176,7 +176,7 @@ export async function callAgentModel(
   complexity: PipelineComplexity,
   request: Omit<ChatRequest, 'model'>,
   env: Env,
-  tier?: 'free' | 'pro' | 'team' | 'enterprise'
+  tier?: SubscriptionTier
 ): Promise<CohereResponse<ChatResponse>> {
   // `env` is passed so the auditor's AUDITOR_MODEL override is honoured at the
   // point of dispatch. Every site that *records* which model ran must pass it

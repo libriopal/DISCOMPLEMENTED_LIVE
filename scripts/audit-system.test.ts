@@ -12,6 +12,8 @@ import {
   seamExtract,
   keepSpecific,
 } from './audit-system.mjs';
+// @ts-expect-error — plain .mjs script, no type declarations, deliberately.
+import { AUDITOR_ENV_VARS, disabledEnv } from './auditor-provider.mjs';
 
 /**
  * The claim this script makes is "whole-system". That claim is the thing to
@@ -24,17 +26,138 @@ import {
 
 const ROOT = resolve(__dirname, '..');
 
+/**
+ * The one environment every child in this file runs under.
+ *
+ * The budget and pass guards return before any network call, so no key is
+ * needed and none is passed — the absence of a credential is the backstop if a
+ * guard ever regresses into running first.
+ *
+ * That backstop was `NVIDIA_API_KEY: ''` written inline, and it silently
+ * stopped being one. When the auditor gained a Cloudflare provider, a shell
+ * with CF_API_TOKEN exported left the env fully credentialed: the "refuses to
+ * start without a key" test launched a real 3,000,000-token audit that ran 854
+ * seconds before it was killed. The assertion never changed and never failed —
+ * it had simply stopped being able to.
+ *
+ * It is a FUNCTION, and the single source for both `runCli` and the probe in
+ * `the disabling still disables`, for a reason that was itself caught by a
+ * negative control: while the probe built its own `disabledEnv()` spread, it
+ * asserted that *its own literal* disabled the provider and would have kept
+ * passing with this harness reverted to the broken `NVIDIA_API_KEY: ''`. A
+ * check on an env nobody runs under measures nothing.
+ */
+function cliEnv(): NodeJS.ProcessEnv {
+  return { ...process.env, ...disabledEnv() };
+}
+
 function runCli(args: string[]) {
   return spawnSync('node', [resolve(__dirname, 'audit-system.mjs'), ...args], {
     cwd: ROOT,
     encoding: 'utf8',
-    // The budget and pass guards both return before any network call, so no
-    // key is needed and none is passed — if a guard ever regressed into
-    // running first, this would spend real money and the absence of a key is
-    // the backstop.
-    env: { ...process.env, NVIDIA_API_KEY: '' },
+    env: cliEnv(),
   });
 }
+
+describe('the disabling still disables', () => {
+  // The rule this enforces: a check must assert its own denominator. A test
+  // that disables the network by blanking a variable reports exactly the same
+  // green whether it blanked the right variable or the wrong one, so the
+  // coverage of the blanking is the thing to pin.
+  it('blanks every credential the provider can actually read', () => {
+    const provider = readFileSync(
+      resolve(__dirname, 'auditor-provider.mjs'),
+      'utf8'
+    );
+    // Every credential the provider reads must be in the list runCli blanks.
+    // A new provider added without extending AUDITOR_ENV_VARS fails here —
+    // loudly, at the point of the omission — instead of quietly re-enabling
+    // paid calls inside the test suite.
+    //
+    // The first version of this matched only `process.env.X`, which the
+    // independent audit correctly called a latent gap: a destructured read, or
+    // a computed key other than AUDITOR_KEY_VAR, slipped past it and the check
+    // stayed green. Each escape route below is therefore matched explicitly,
+    // and the unknown-computed case FAILS rather than being ignored, because a
+    // form this test cannot resolve is exactly the form that would hide the
+    // next live credential.
+    const read = new Set<string>();
+
+    // 1. Direct: process.env.CF_API_TOKEN
+    for (const m of provider.matchAll(/process\.env\.([A-Z0-9_]+)/g)) {
+      read.add(m[1]);
+    }
+    // 2. String-literal subscript: process.env['CF_API_TOKEN']
+    for (const m of provider.matchAll(
+      /process\.env\[\s*['"`]([A-Z0-9_]+)['"`]\s*\]/g
+    )) {
+      read.add(m[1]);
+    }
+    // 3. Destructured: const { CF_API_TOKEN, CF_ACCOUNT_ID } = process.env
+    for (const m of provider.matchAll(/\{([^{}]*)\}\s*=\s*process\.env/g)) {
+      for (const part of m[1].split(',')) {
+        const name = part.split(':')[0].trim();
+        if (/^[A-Z0-9_]+$/.test(name)) read.add(name);
+      }
+    }
+    // 4. Computed subscript through an identifier: process.env[SOME_CONST].
+    //    AUDITOR_KEY_VAR is the one we can resolve, because it is exported and
+    //    imported here. Any OTHER identifier is unresolvable from source, so
+    //    it is reported as a failure rather than skipped — silence here is how
+    //    the original hole stayed open.
+    const computed = new Set<string>();
+    for (const m of provider.matchAll(
+      /process\.env\[\s*([A-Za-z_$][\w$]*)\s*\]/g
+    )) {
+      if (m[1] === 'AUDITOR_KEY_VAR') read.add('NVIDIA_API_KEY');
+      else computed.add(m[1]);
+    }
+    expect(
+      [...computed],
+      'auditor-provider.mjs reads process.env through identifier(s) this ' +
+        'check cannot resolve. Export the name and account for it here, or ' +
+        'the credential it hides will not be blanked in tests.'
+    ).toEqual([]);
+
+    // The denominator, stated: this must have found the credentials we know
+    // are there, or the patterns above have stopped matching and "no missed
+    // credentials" would mean "nothing was examined".
+    expect(
+      read.size,
+      'no process.env reads found in auditor-provider.mjs at all — the ' +
+        'patterns in this test have gone stale, so it is measuring nothing'
+    ).toBeGreaterThanOrEqual(AUDITOR_ENV_VARS.length);
+
+    const missed = [...read].filter((k) => !AUDITOR_ENV_VARS.includes(k));
+    expect(
+      missed,
+      `auditor-provider.mjs reads ${missed.join(', ')}, which runCli does not ` +
+        'blank. A test that leaves a live credential reachable is not testing ' +
+        'a refusal; it is making a paid call and asserting nothing.'
+    ).toEqual([]);
+  });
+
+  it('leaves no provider active under the env runCli actually passes', () => {
+    // The end-to-end version of the above: run the provider in a child under
+    // `cliEnv()` — the SAME env runCli passes, not a re-spelling of it — and
+    // ask it what it would do. This is the assertion that would have failed on
+    // the day the Cloudflare provider landed.
+    const probe = spawnSync(
+      'node',
+      [
+        '-e',
+        "import('./scripts/auditor-provider.mjs')" +
+          '.then((m) => console.log(String(m.activeProvider())))',
+      ],
+      {
+        cwd: ROOT,
+        encoding: 'utf8',
+        env: cliEnv(),
+      }
+    );
+    expect(probe.stdout.trim()).toBe('null');
+  });
+});
 
 describe('importing the module does not run an audit', () => {
   it('guards main() behind a direct-execution check', () => {
@@ -211,12 +334,44 @@ describe('the bounds are enforced, not documented', () => {
 
 describe('sending our source to a third party is stated, every run', () => {
   it('names what is sent and what is not', () => {
+    // runCli deliberately leaves NO provider configured, so the honest form of
+    // this notice here is that nothing would be sent at all. Asserting the
+    // named-recipient string under this env is what pinned the notice to
+    // "NVIDIA" while the auditor was in fact on Cloudflare: the test could
+    // only ever see the no-credential path, so it never noticed the recipient
+    // had changed on the path that actually sends data.
     const r = runCli(['--dry-run']);
     expect(r.status).toBe(0);
-    // A person choosing to ship this repository's source to NVIDIA should see
-    // it as they choose, not find it in a comment later.
-    expect(r.stdout).toContain("repository's own source to NVIDIA");
+    expect(r.stdout).toContain('would send this');
+    expect(r.stdout).toContain("never sends any user's generated code");
+  });
+
+  it('names the ACTUAL recipient when a provider is configured', () => {
+    // The case the assertion above structurally cannot reach. Run the notice
+    // with a provider active and require that the company named is the one
+    // the provider resolves to — no credential is spent, because --dry-run
+    // returns before any request.
+    //
+    // A fake-but-well-formed Cloudflare account id (32 hex) is enough to
+    // activate the provider; nothing is sent, so it is never authenticated.
+    // Built on cliEnv() so it starts from the same known-disabled baseline and
+    // re-enables exactly one provider deliberately, rather than inheriting
+    // whatever credentials the developer's shell happens to export.
+    const env = {
+      ...cliEnv(),
+      CF_API_TOKEN: 'not-a-real-token',
+      CF_ACCOUNT_ID: '0'.repeat(32),
+    };
+    const r = spawnSync(
+      'node',
+      [resolve(__dirname, 'audit-system.mjs'), '--dry-run'],
+      { cwd: ROOT, encoding: 'utf8', env }
+    );
+    expect(r.status).toBe(0);
+    expect(r.stdout).toContain("repository's own source to Cloudflare");
     expect(r.stdout).toContain("does NOT send any user's generated code");
+    // And it must not still be claiming the old recipient.
+    expect(r.stdout).not.toContain('source to NVIDIA');
   });
 
   it('has no free tier left to advertise', () => {
@@ -351,7 +506,11 @@ describe('an incomplete run cannot read as a clean one', () => {
     // reason unrelated to the code. Honest late is still late.
     const r = runCli(['--budget-tokens', '3000000']);
     expect(r.status).toBe(2);
-    expect(r.stderr).toContain('NVIDIA_API_KEY is not set');
+    // Every credential is named, not just the first provider's. The old
+    // assertion was `'NVIDIA_API_KEY is not set'`, which a Cloudflare-only
+    // operator could satisfy only by setting a key for a provider this run
+    // would not have used.
+    for (const v of AUDITOR_ENV_VARS) expect(r.stderr).toContain(v);
     expect(r.stderr).toContain('Refusing to start');
   });
 

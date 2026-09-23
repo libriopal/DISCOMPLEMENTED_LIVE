@@ -157,6 +157,14 @@ export function MarketingSite({ onSignIn }: MarketingSiteProps) {
                   <h3 className="mkt-tier__name">{tier.name}</h3>
                   <p className="mkt-tier__price">{tier.price}</p>
                   <p className="mkt-card__body">{tier.body}</p>
+                  {/* Derived from TIER_LIMITS and CREDIT_COSTS, never typed.
+                      "More builds, more credits" used to sit beside a constant
+                      that said exactly how many; now the page says the number
+                      and moves when the constant does. */}
+                  <p className="mkt-tier__limits">
+                    <strong>{tier.appsPerMonth.toLocaleString()}</strong> apps a
+                    month · up to {tier.perDay} a day
+                  </p>
                 </article>
               ))}
             </div>

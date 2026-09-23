@@ -1,7 +1,7 @@
 {
   "audit_ladder": {
     "author_vendor": "anthropic",
-    "cross_vendor_rounds": 3,
+    "cross_vendor_rounds": 9,
     "rounds": [
       {
         "id": "1",
@@ -57,9 +57,39 @@
         "id": "X3",
         "vendor": "google",
         "verdict": "VETO"
+      },
+      {
+        "id": "X4",
+        "vendor": "zai-org",
+        "verdict": "VETO"
+      },
+      {
+        "id": "X5",
+        "vendor": "zai-org",
+        "verdict": "VETO"
+      },
+      {
+        "id": "X6",
+        "vendor": "zai-org",
+        "verdict": "VETO"
+      },
+      {
+        "id": "X7",
+        "vendor": "zai-org",
+        "verdict": "VETO"
+      },
+      {
+        "id": "X8",
+        "vendor": "zai-org",
+        "verdict": "VETO"
+      },
+      {
+        "id": "X9",
+        "vendor": "zai-org",
+        "verdict": "VETO"
       }
     ],
-    "total_rounds": 11
+    "total_rounds": 17
   },
   "boundary": {
     "deny_patterns_checked": 8,
@@ -70,7 +100,7 @@
       "supersede",
       "tripwire"
     ],
-    "fields_considered": 252,
+    "fields_considered": 282,
     "note": "Published by an allowlist. A field absent here was not excluded by hand -- it was never named for publication."
   },
   "execution": {
@@ -109,8 +139,8 @@
       "unit": "directives present"
     },
     {
-      "count": 74,
-      "detail": "8 of 74 resolve no path (marker asserted as '\u00b7', nothing located)",
+      "count": 91,
+      "detail": "8 of 91 resolve no path (marker asserted as '\u00b7', nothing located)",
       "gate": "citation",
       "ok": true,
       "skipped": false,
@@ -125,15 +155,15 @@
       "unit": "candidate rows"
     },
     {
-      "count": 4,
-      "detail": "74 active / 80 drafted",
+      "count": 3,
+      "detail": "91 active / 99 drafted",
       "gate": "counts",
       "ok": true,
       "skipped": false,
       "unit": "totals checked"
     },
     {
-      "count": 413,
+      "count": 415,
       "detail": "every branch declared",
       "gate": "declared",
       "ok": true,
@@ -141,8 +171,8 @@
       "unit": "branches counted"
     },
     {
-      "count": 74,
-      "detail": "71/74 delivered; pending: B-008, B-052, B-065",
+      "count": 91,
+      "detail": "88/91 delivered; pending: B-008, B-052, B-065",
       "gate": "delivery",
       "ok": true,
       "skipped": false,
@@ -181,7 +211,7 @@
       "unit": "hard stops armed"
     },
     {
-      "count": 9,
+      "count": 10,
       "detail": "",
       "gate": "headers",
       "ok": true,
@@ -197,16 +227,16 @@
       "unit": "cited names resolved"
     },
     {
-      "count": 11,
-      "detail": "3 cross-vendor of 11; author vendor = anthropic; 5 phase gate(s) not yet attempted",
+      "count": 17,
+      "detail": "9 cross-vendor of 17; author vendor = anthropic; 0 phase gate(s) not yet attempted",
       "gate": "ladder",
       "ok": true,
       "skipped": false,
       "unit": "audit rounds recorded"
     },
     {
-      "count": 201,
-      "detail": "201 mutants: 145 killed, 48 survived, 8 NOT TESTED (gate skipped in the workspace). 72% of mutants generated; 44% of 324 declared decision points, 123 of which yield no mutant. 56 survivors ratcheted with a reason  [CACHED from 2026-09-21T2",
+      "count": 203,
+      "detail": "203 mutants: 146 killed, 49 survived, 8 NOT TESTED (gate skipped in the workspace). 71% of mutants generated; 44% of 326 declared decision points, 123 of which yield no mutant. 57 survivors ratcheted with a reason  [CACHED from 2026-09-22T2",
       "gate": "mutate",
       "ok": true,
       "skipped": false,
@@ -299,7 +329,7 @@
     },
     {
       "count": 28,
-      "detail": "record dated 2026-09-21T21:52:44Z",
+      "detail": "record dated 2026-09-23T03:49:00Z",
       "gate": "evidence",
       "ok": true,
       "skipped": false,
@@ -330,17 +360,17 @@
       "unit": "gates exercised"
     }
   ],
-  "generated_at": "2026-09-22T21:49:47Z",
+  "generated_at": "2026-09-23T03:49:28Z",
   "mutation": {
-    "generated": 201,
-    "killed": 145,
+    "generated": 203,
+    "killed": 146,
     "not_tested": 8,
-    "ratcheted": 56,
-    "survived": 48
+    "ratcheted": 57,
+    "survived": 49
   },
   "schema": "discomplemented.compliance/1",
   "verify": {
-    "at": "2026-09-21T21:52:44Z",
+    "at": "2026-09-23T03:49:00Z",
     "failed": [],
     "gates_declared": 32,
     "gates_run": 32,

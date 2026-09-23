@@ -11,7 +11,11 @@
 import { z } from 'zod';
 import { GenerationError } from '@bicameral/shared/errors';
 import { PIPELINE_DEFAULTS } from '@bicameral/shared/constants';
-import type { ProjectFile, SystemBlueprint } from '@bicameral/shared/types';
+import type {
+  ProjectFile,
+  SystemBlueprint,
+  SubscriptionTier,
+} from '@bicameral/shared';
 import type { ChatMessage } from '@bicameral/cohere/chat';
 import {
   callAgentModel,
@@ -162,7 +166,7 @@ export interface CoderOptions {
   bucket: R2Bucket;
   pipelineRunId: string;
   projectId?: string | null;
-  tier?: 'free' | 'pro' | 'team' | 'enterprise';
+  tier?: SubscriptionTier;
   onIteration?: (result: CoderIterationResult) => Promise<void> | void;
   /** Findings fed back from a prior GitHub Actions security-gate scan (see
    * pipeline/tools/security-scan-gh.ts and GenerationOrchestrator's

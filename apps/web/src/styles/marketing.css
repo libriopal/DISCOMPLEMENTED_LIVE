@@ -478,6 +478,22 @@ body:has(.mkt) {
   font-variant-numeric: tabular-nums;
 }
 
+/* The derived limits line: what the tier actually delivers, from the
+   constants that govern it. Recessive against the price above it — it is
+   substantiation, not the headline. */
+.mkt-tier__limits {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--mkt-fg-dim);
+  margin: calc(var(--space-2) * -1) 0 var(--space-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.mkt-tier__limits strong {
+  color: var(--mkt-fg);
+  font-weight: 600;
+}
+
 /* ---------------------------------------------------------------- trust */
 .mkt-trust {
   text-align: center;

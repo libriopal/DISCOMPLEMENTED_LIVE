@@ -7,8 +7,8 @@ import type { AgentRole, CohereModelMap, SubscriptionTier } from './types.js';
 // ============ SUBSCRIPTION TIERS ============
 export const TIER_LIMITS = {
   free: {
-    generationsPerDay: 5,
-    creditsPerMonth: 1000, // matches free starting balance (cron doesn't reset free)
+    generationsPerDay: 2,
+    creditsPerMonth: 50, // 2 apps/mo = $0.57 acquisition cost, sized not rounded
     maxTokensPerRequest: 4096,
     latticeNodes: 50,
     researchQueries: 0,
@@ -17,8 +17,8 @@ export const TIER_LIMITS = {
     exportCode: false,
   },
   pro: {
-    generationsPerDay: 50,
-    creditsPerMonth: 50000, // matches cron-handler.ts monthly grant
+    generationsPerDay: 5, // bursting allowed; the 1,000-credit grant is the ceiling
+    creditsPerMonth: 1000, // 40 apps/mo at 25cr = $11.40 cost against $29
     maxTokensPerRequest: 16384,
     latticeNodes: 500,
     researchQueries: 20,
@@ -27,8 +27,30 @@ export const TIER_LIMITS = {
     exportCode: true,
   },
   team: {
-    generationsPerDay: 200,
-    creditsPerMonth: 200000, // matches cron-handler.ts monthly grant
+    generationsPerDay: 20, // bursting allowed; the 3,450-credit grant is the ceiling
+    // 138 apps/mo at 25cr = $39.33 cost against $99 = 60.3% margin.
+    // NOT 3,500: that is $39.90 and 59.7%, under the stated 60% target. It
+    // passed only because the solvency test allowed a 5-point slack that was
+    // never documented as covering rounding, so the published target and the
+    // actual worst case disagreed by half a point with nothing to say so.
+    // Sized to the target rather than rounded to a tidy number.
+    creditsPerMonth: 3450,
+    maxTokensPerRequest: 32768,
+    latticeNodes: 5000,
+    researchQueries: 200,
+    modelAccess: ['free', 'pro', 'team'] as const,
+    webPreview: true,
+    exportCode: true,
+  },
+  // Granted, not sold. Limits mirror `team` exactly: the whole point of the
+  // grant is that a nonprofit gets the team product without paying for it, so
+  // deriving these from `team` rather than retyping them means the two cannot
+  // drift. Its cost is an acquisition/mission cost, sized and visible:
+  // 3,450 credits = 138 apps/mo = $39.33, the same as a Team seat's delivery
+  // cost, borne deliberately.
+  nonprofit: {
+    generationsPerDay: 20,
+    creditsPerMonth: 3450,
     maxTokensPerRequest: 32768,
     latticeNodes: 5000,
     researchQueries: 200,
@@ -37,8 +59,12 @@ export const TIER_LIMITS = {
     exportCode: true,
   },
   enterprise: {
-    generationsPerDay: Infinity,
-    creditsPerMonth: 1000000, // matches cron-handler.ts monthly grant
+    // Infinity was the only unbounded-loss path in the product. A quote-only
+    // tier still needs a number, or there is nothing to quote AGAINST.
+    generationsPerDay: 200,
+    creditsPerMonth: 50000, // 2,000 apps/mo at 25cr = $570 all-in cost, so the
+    // contract floor is $1,425/mo at the same 60% margin. See
+    // ENTERPRISE_CONTRACT_FLOOR_USD_CENTS below; a quote under it loses money.
     maxTokensPerRequest: 32768,
     latticeNodes: Infinity,
     researchQueries: Infinity,
@@ -68,6 +94,9 @@ export const COHERE_MODELS: CohereModelMap = {
   free: 'command-r7b-12-2024',
   pro: 'command-a-03-2025',
   team: 'command-a-03-2025',
+  // A nonprofit is granted the TEAM experience, so it gets the team model.
+  // The grant is about who pays, not about giving them a worse product.
+  nonprofit: 'command-a-03-2025',
   enterprise: 'command-a-plus-05-2026',
   reasoning: 'command-a-reasoning-08-2025',
   embed: 'embed-v4.0',
@@ -131,13 +160,60 @@ export const RATE_LIMITS = {
   free: { requestsPerMinute: 5, requestsPerHour: 50 },
   pro: { requestsPerMinute: 30, requestsPerHour: 500 },
   team: { requestsPerMinute: 120, requestsPerHour: 2000 },
+  // Same as team: a granted nonprofit gets the team product, not a throttled
+  // one. Widening SubscriptionTier surfaced this table via the compiler --
+  // exactly the blast radius round X9 named before any of it was written.
+  nonprofit: { requestsPerMinute: 120, requestsPerHour: 2000 },
   enterprise: { requestsPerMinute: 500, requestsPerHour: 10000 },
 } as const;
 
 // ============ CREDIT COSTS ============
+// ============ THE REVENUE FIX (2026-09-22) ============
+//
+// docs/cohere-unit-economics.md measured this product selling at a loss and
+// ended "pricing is Johnathan's call". The call was made; these are the applied
+// edits, and every number below is derived from the measured figures in that
+// document rather than chosen.
+//
+// THE MEASURED INPUT — one number, from the doc's own tally:
+//
+//     all-in cost per DELIVERED app = $0.285
+//
+// It is the all-in figure deliberately, not the $0.077 Cohere-only average:
+// it already carries the failed-run overhead (26 of 37 runs errored, and those
+// errors were 54% of all Cohere spend), Embed/Rerank, and Cloudflare. Pricing
+// against the Cohere-only number is how the old grants looked survivable.
+//
+// THE TARGET — 60% gross margin at FULL grant consumption. Worst case, not
+// typical case: a subscriber who spends every credit they were granted must
+// still be profitable. The old grants inverted this. A Pro subscriber went
+// underwater after spending 7.5% of their grant, and the daily cap that was
+// supposed to bound the loss still allowed $116 of spend against $29.
+//
+// THE DERIVATION, reproducible from the two numbers above:
+//
+//   affordable cost = price x (1 - 0.60)
+//   apps per month  = affordable cost / $0.285
+//   credit grant    = apps per month x CREDIT_COSTS.generation
+//
+//   free  $0   ->  $0.00 ->    2 apps  ->     50 credits   (acquisition cost,
+//                                              $0.57/mo, sized not rounded)
+//   pro   $29  -> $11.60 ->   40 apps  ->  1,000 credits
+//   team  $99  -> $39.60 ->  138 apps  ->  3,450 credits -> 3,500
+//   ent.  quote-> per contract, floor stated below
+//
+// AND THE DAILY CAP IS MADE CONSISTENT WITH THE GRANT. Previously the two
+// disagreed -- 50/day x 30 was 1,500 runs against a grant of 5,000, so the cap
+// was not the bound anyone thought it was. Each cap below allows bursting
+// within a month but cannot outrun the grant, so the GRANT is the ceiling on
+// loss and there is exactly one ceiling.
 export const CREDIT_COSTS = {
-  // Per-operation credit deductions
-  generation: 10, // per app generation
+  // Per-operation credit deductions.
+  // 10 -> 25: at 10 credits the largest pack was already negative on an
+  // AVERAGE run ($0.070 revenue vs $0.077 cost) before any failure overhead.
+  // At 25 every pack clears its all-in cost: 500cr/$5 = 20 apps = $5.70... see
+  // the pack table below, which was re-derived rather than left alone.
+  generation: 25, // per app generation
   research: 5, // per CERL research query
   embedding: 1, // per 1K tokens embedded
   rerank: 1, // per rerank call
@@ -164,18 +240,36 @@ export const CREDIT_COSTS = {
 // they're deliberately defined via Stripe's inline `price_data` rather
 // than dashboard-created Price IDs, so changing them needs no Stripe
 // dashboard access, just an edit here.
+// Re-derived at CREDIT_COSTS.generation = 25 against the same $0.285 all-in
+// cost per delivered app. Each pack's apps = credits / 25, cost = apps x 0.285,
+// and every margin below is (price - cost) / price -- computed, not asserted:
+//
+//   test    100cr ->   4 apps -> $1.14 cost vs  $1  ->  -14%  (deliberate: a
+//                                                       $1 smoke test of the
+//                                                       purchase path, sold at
+//                                                       a small loss ON PURPOSE
+//                                                       and labelled as such)
+//   small   500cr ->  20 apps -> $5.70 cost vs  $5  ->  -14%  -> repriced to $9
+//   medium 2500cr -> 100 apps -> $28.50    vs $20   ->  -43%  -> repriced to $49
+//   large 10000cr -> 400 apps -> $114.00   vs $70   ->  -63%  -> repriced to $199
+//
+// At 10 credits/run the doc found the LARGEST pack already negative on an
+// average run. At 25 credits/run the old prices are negative on ALL of them,
+// because the credit now buys less. So the packs are repriced rather than the
+// credit cost softened: a credit that does not cover its own delivery is the
+// defect, and hiding it in a bigger pack is how it stayed unnoticed.
 export const CREDIT_PACKAGES = {
   test: { credits: 100, priceUsdCents: 100, label: '100 credits — $1 (test)' },
-  small: { credits: 500, priceUsdCents: 500, label: '500 credits — $5' },
+  small: { credits: 500, priceUsdCents: 900, label: '500 credits — $9' },
   medium: {
     credits: 2500,
-    priceUsdCents: 2000,
-    label: '2,500 credits — $20',
+    priceUsdCents: 4900,
+    label: '2,500 credits — $49',
   },
   large: {
     credits: 10000,
-    priceUsdCents: 7000,
-    label: '10,000 credits — $70',
+    priceUsdCents: 19900,
+    label: '10,000 credits — $199',
   },
 } as const;
 export type CreditPackageId = keyof typeof CREDIT_PACKAGES;
@@ -185,6 +279,36 @@ export const TIER_SUBSCRIPTION_PRICES = {
   team: { priceUsdCents: 9900, label: 'Team — $99/mo' },
 } as const;
 export type PurchasableTier = keyof typeof TIER_SUBSCRIPTION_PRICES;
+
+/**
+ * The floor a bespoke enterprise contract may not go under.
+ *
+ * Enterprise is quote-only -- it has no Stripe price object, because an
+ * enterprise price is negotiated per customer and publishing one would post a
+ * number nobody is actually charged. But quote-only is not the same as
+ * price-free: without a floor, a quote can be written below cost by anyone in
+ * a hurry, and the unit-economics doc found enterprise was "the only
+ * unbounded-loss path in the product".
+ *
+ * Derived on the same basis as every tier above: the enterprise grant is
+ * 50,000 credits = 2,000 delivered apps at 25 credits each = $570 all-in, so
+ * a 60% margin puts the floor at $1,425/mo.
+ */
+export const ENTERPRISE_CONTRACT_FLOOR_USD_CENTS = 142500;
+
+/**
+ * What one delivered app costs, all in. The single measured input every price
+ * above is derived from, exported so a test can re-derive them rather than
+ * trusting a comment.
+ *
+ * Source: docs/cohere-unit-economics.md. It carries the failed-run overhead,
+ * Embed/Rerank and Cloudflare -- not the $0.077 Cohere-only average, which is
+ * the number that made the old grants look survivable.
+ */
+export const ALL_IN_COST_PER_APP_USD = 0.285;
+
+/** The gross margin every price above targets at FULL grant consumption. */
+export const TARGET_GROSS_MARGIN = 0.6;
 
 // ============ GOVERNANCE ============
 export const AUTONOMY_DEFAULTS = {

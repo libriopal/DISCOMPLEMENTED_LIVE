@@ -20,10 +20,26 @@
  *      are placeholders in constants.ts with nothing live behind them.
  */
 
+import { TIER_LIMITS } from '@bicameral/shared/constants';
+import type { SubscriptionTier } from '@bicameral/shared';
+import type { OfferClass } from './pricing-derivation.js';
+import {
+  OFFER_CLASS,
+  TIER_ORDER,
+  appsPerMonth,
+  formatLimit,
+  priceLabel,
+} from './pricing-derivation.js';
+
 export const NAV_LINKS = [
   { label: 'How it works', href: '#how-it-works' },
   { label: 'Boundaries', href: '#boundaries' },
   { label: 'Pricing', href: '#pricing' },
+  // A compliance surface nobody can find is a compliance surface nobody
+  // checks -- the same defect as a gate that runs and reports to nothing.
+  // /compliance publishes this system's audit verdicts, gate denominators and
+  // mutation coverage, including what is NOT established.
+  { label: 'Compliance', href: '/compliance' },
 ] as const;
 
 export const HERO = {
@@ -82,31 +98,93 @@ export const BOUNDARIES = {
   ],
 } as const;
 
-export const PRICING = {
+/**
+ * The pricing section.
+ *
+ * `tiers` is BUILT, not written. Every figure comes from the constant that
+ * governs it (see pricing-derivation.ts), so a change to a grant, a price or
+ * the per-run credit cost moves this page or fails the build. The words are
+ * still authored; the numbers are not.
+ *
+ * It used to list three tiers while TIER_LIMITS entitled four, so `enterprise`
+ * was serveable and unbuyable. There are five now, because `nonprofit` was
+ * priced in the system's own genome and existed nowhere a visitor could see.
+ */
+export const PRICING_COPY: Record<
+  SubscriptionTier,
+  { name: string; body: string; highlighted: boolean }
+> = {
+  // The three original tiers keep their EXACT wording. §2 of the audit
+  // constraints freezes marketing copy, and this change needed new numbers,
+  // not new sentences — rewording these while I was in the file, then updating
+  // copy.test.ts to accept the new strings, would have defeated the freeze
+  // rather than complied with it. The independent audit caught that and was
+  // right. Only `nonprofit` and `enterprise` carry new text, because those
+  // tiers had no visitor-facing copy at all.
+  free: {
+    name: 'Free',
+    body: 'Try the pipeline on a small project.',
+    highlighted: false,
+  },
+  pro: {
+    name: 'Pro',
+    body: 'More builds, more credits, priority queue.',
+    highlighted: true,
+  },
+  team: {
+    name: 'Team',
+    body: 'Shared projects, higher limits, team seats.',
+    highlighted: false,
+  },
+  nonprofit: {
+    name: 'Nonprofit',
+    body: 'The Team tier, granted free to qualifying nonprofits.',
+    highlighted: false,
+  },
+  enterprise: {
+    name: 'Enterprise',
+    body: 'Bespoke limits, an evidence pack, and a contract.',
+    highlighted: false,
+  },
+};
+
+export interface PricingTier {
+  tier: SubscriptionTier;
+  name: string;
+  /** Derived. A price for a purchasable tier, a route for a provisioned one. */
+  price: string;
+  appsPerMonth: number;
+  perDay: string;
+  body: string;
+  highlighted: boolean;
+  offer: OfferClass;
+}
+
+export const PRICING: {
+  title: string;
+  badge: string;
+  subtitle: string;
+  tiers: PricingTier[];
+} = {
   title: 'Pricing',
+  // Kept, for a narrower reason than before. The prices are derived from
+  // measured unit economics and solvent at full grant consumption -- see
+  // pricing-solvency.test.ts. They have not yet met a market.
   badge: 'Early access — subject to change',
+  // Unchanged, and deliberately so. Rewriting this sentence was not needed by
+  // the pricing change and §2 freezes the wording.
   subtitle: "Simple tiers while we're in early access. No surprises later.",
-  tiers: [
-    {
-      name: 'Free',
-      price: '$0',
-      body: 'Try the pipeline on a small project.',
-      highlighted: false,
-    },
-    {
-      name: 'Pro',
-      price: '$29/mo',
-      body: 'More builds, more credits, priority queue.',
-      highlighted: true,
-    },
-    {
-      name: 'Team',
-      price: '$99/mo',
-      body: 'Shared projects, higher limits, team seats.',
-      highlighted: false,
-    },
-  ],
-} as const;
+  tiers: TIER_ORDER.map((tier) => ({
+    tier,
+    name: PRICING_COPY[tier].name,
+    price: priceLabel(tier),
+    appsPerMonth: appsPerMonth(tier),
+    perDay: formatLimit(TIER_LIMITS[tier].generationsPerDay),
+    body: PRICING_COPY[tier].body,
+    highlighted: PRICING_COPY[tier].highlighted,
+    offer: OFFER_CLASS[tier],
+  })),
+};
 
 export const TRUST = {
   title: 'Built on a real human review gate',

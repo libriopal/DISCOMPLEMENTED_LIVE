@@ -31,6 +31,41 @@ const SOURCE = resolve(ROOT, 'packages', 'cohere', 'src', 'auditor-model.ts');
 export const AUDITOR_KEY_VAR = 'NVIDIA_API_KEY';
 
 /**
+ * EVERY environment variable that can put this module into a live, paid state.
+ *
+ * This exists because the test suite disables the auditor by blanking its
+ * credential, and that technique silently stopped working the moment a second
+ * provider was added. `audit-system.test.ts` passed `NVIDIA_API_KEY: ''` and
+ * spread the rest of `process.env` through, so a shell with `CF_API_TOKEN`
+ * exported turned the "refuses to start without a key" test into a real
+ * 3,000,000-token audit against Cloudflare. It ran for 854 seconds before it
+ * was killed, and it would have reported a pass.
+ *
+ * That is a vacuous control: the test still asserted a refusal, but nothing in
+ * it was any longer capable of causing one. The list is exported so the
+ * disabling is derived from the provider rather than re-guessed by each
+ * caller, and `tests/…` asserts that this list covers every credential read in
+ * this file — so a third provider fails the assertion instead of quietly
+ * going live again.
+ */
+export const AUDITOR_ENV_VARS = Object.freeze([
+  AUDITOR_KEY_VAR,
+  'CF_API_TOKEN',
+  'CF_ACCOUNT_ID',
+]);
+
+/**
+ * An env patch that provably leaves no provider reachable.
+ *
+ * Spread over a child's `env` AFTER `...process.env`. Returns `''` rather than
+ * deleting, so the child sees the variable as explicitly empty regardless of
+ * what the parent shell exported.
+ */
+export function disabledEnv() {
+  return Object.fromEntries(AUDITOR_ENV_VARS.map((k) => [k, '']));
+}
+
+/**
  * The auditor now lives on Cloudflare Workers AI, so this is not a fallback —
  * it is how the pinned model is reached. `AUDITOR_MODEL` in auditor-model.ts
  * is `@cf/zai-org/glm-5.3-flash`; see that file for the re-resolution and the
@@ -62,6 +97,38 @@ function cfCredentials() {
 export function activeProvider() {
   if (process.env[AUDITOR_KEY_VAR]?.trim()) return 'nvidia';
   return cfCredentials() ? 'cloudflare-workers-ai' : null;
+}
+
+/**
+ * The company this run's source is actually sent to.
+ *
+ * `audit-system.mjs` prints a disclosure before every run — "this sends this
+ * repository's own source to X" — because sending source to a third party is
+ * a decision the person running it should be making knowingly. That line had
+ * `NVIDIA` hardcoded in it, so after the auditor moved to Cloudflare it named
+ * the wrong recipient: a consent notice that is wrong about who receives the
+ * data is worse than no notice, because it is relied upon.
+ *
+ * Derived from `activeProvider()` for that reason, and it throws on an
+ * unmapped provider rather than returning a placeholder. "the auditor" would
+ * let the notice keep printing while saying nothing.
+ */
+const RECIPIENTS = {
+  nvidia: 'NVIDIA',
+  'cloudflare-workers-ai': 'Cloudflare (Workers AI)',
+};
+
+export function auditorRecipient() {
+  const p = activeProvider();
+  if (!p) return null;
+  const name = RECIPIENTS[p];
+  if (!name) {
+    throw new Error(
+      `No disclosure recipient is mapped for provider '${p}'. The run notice ` +
+        'must name who receives this source; it will not print a guess.'
+    );
+  }
+  return name;
 }
 
 /**
@@ -252,7 +319,12 @@ export async function postChatCompletion({
 
     if (!response.ok) {
       const bodyText = (await response.text()).slice(0, 400);
-      return { ok: false, status: response.status, headers: response.headers, bodyText };
+      return {
+        ok: false,
+        status: response.status,
+        headers: response.headers,
+        bodyText,
+      };
     }
 
     let content = '';

@@ -42,6 +42,7 @@
  * Enterprise pipeline: full subconscious + consciousness + reasoning on all agents
  * Free/Pro pipeline: lattice access only (Layers 1-2), no rerank or intuition
  */
+import type { SubscriptionTier } from '@bicameral/shared';
 import { rerank } from '@bicameral/cohere/rerank';
 import { COHERE_MODELS, SIM_EVOLVED } from '@bicameral/shared/constants';
 import type { SimilarPattern } from './lattice-enrich.js';
@@ -64,7 +65,7 @@ export interface SubconsciousInput {
   /** Agent role — determines which brain regions to activate */
   agentRole: 'researcher' | 'auditor' | 'verifier' | 'designer' | 'coder';
   /** Subscription tier — enterprise gets full subconscious, others get rerank-only */
-  tier: 'free' | 'pro' | 'team' | 'enterprise';
+  tier: SubscriptionTier;
   /** Project ID for cloud topology seed */
   projectId?: string | null;
   /** Task complexity for cloud topology */

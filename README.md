@@ -90,9 +90,38 @@ research → audit → verify → design → [HUMAN APPROVES BLUEPRINT] → code
 
 An earlier `architect` role is retired; the researcher now produces the brief. The enum value survives in `AgentRole` for stored historical records, but it is not a current agent and should not appear in product copy.
 
-## Pricing is provisional
+## Pricing is priced, and Stripe is live
 
-`packages/shared/src/constants.ts` marks the $29 Pro / $99 Team tiers as **placeholder prices — no live Stripe account exists yet**. The marketing site therefore carries a mandatory "Early access — subject to change" badge. Remove the badge only when real Stripe pricing exists.
+Two statements in this repository contradicted each other for a while: this
+section said no live Stripe account existed, while `apps/web/src/lib/stripe.ts`
+said _"LIVE as of Aug 21, 2026: STRIPE*SECRET_KEY (rk_live*\*) … all functions
+below make real requests to api.stripe.com in live mode."_ Both were current and
+they could not both be true. A cross-vendor audit round surfaced it; the
+repository owner settled it on 2026-09-22: **Stripe is live.** `stripe.ts` was
+right and this section was stale.
+
+**Prices are no longer placeholders.** `docs/cohere-unit-economics.md` measured
+the product selling at a loss — a Pro subscriber went underwater after spending
+7.5% of their grant, and the daily cap that was meant to bound the loss still
+allowed $116 of Cohere spend against $29 of revenue. Enterprise had no cap at
+all. Its recommendations were not applied at the time because pricing was the
+owner's call; that call was made on 2026-09-22 and the edits are in
+`packages/shared/src/constants.ts`.
+
+Every price is now DERIVED from one measured number — `ALL_IN_COST_PER_APP_USD`
+= $0.285, the all-in cost of a delivered app including failure overhead — at a
+stated `TARGET_GROSS_MARGIN` of 60%, **at full grant consumption**. Grants and
+daily caps were re-derived together so the grant is the single ceiling on loss;
+previously they disagreed, so neither was the bound.
+
+`packages/shared/src/pricing-solvency.test.ts` re-derives all of it on every
+build and fails with the figures if any price, grant or cap stops covering what
+it delivers. Restoring the old Pro grant makes it read: _"pro earns -1865.5%
+margin at full grant ($29 revenue, $570.00 cost)"_. The loss is a build failure
+now, not a document.
+
+The "Early access — subject to change" badge stays, for a narrower reason than
+before: the prices are derived and solvent, but they have not yet met a market.
 
 ## Simulation results are simulations
 

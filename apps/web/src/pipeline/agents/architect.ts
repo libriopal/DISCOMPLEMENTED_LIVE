@@ -5,7 +5,7 @@
  */
 import { GenerationError } from '@bicameral/shared/errors';
 import { projectBriefSchema } from '@bicameral/shared/schemas';
-import type { ProjectBrief } from '@bicameral/shared/types';
+import type { ProjectBrief, SubscriptionTier } from '@bicameral/shared';
 import { callAgentModel, selectModel } from '../../lib/cohere.js';
 import {
   findSimilarPatterns,
@@ -39,7 +39,7 @@ export async function runArchitect(
   feedback?: string | null,
   // Optional and last, so existing callers are unaffected. Without it this
   // step could never reach the enterprise model — see callAgentModel.
-  tier?: 'free' | 'pro' | 'team' | 'enterprise'
+  tier?: SubscriptionTier
 ): Promise<{
   brief: ProjectBrief;
   tokensIn: number;

@@ -32,7 +32,8 @@ import type {
   ResearchFindings,
   SystemBlueprint,
   AgentRole,
-} from '@bicameral/shared/types';
+  SubscriptionTier,
+} from '@bicameral/shared';
 import { normalizeExecutionMode } from '@bicameral/shared/types';
 import { PIPELINE_DEFAULTS } from '@bicameral/shared/constants';
 // Step records store the model that ran. Resolve it from the router instead
@@ -84,7 +85,7 @@ interface PipelineRunRow {
 }
 
 interface UserTierRow {
-  tier: 'free' | 'pro' | 'team' | 'enterprise';
+  tier: SubscriptionTier;
 }
 
 export class GenerationOrchestrator extends DurableObject<Env> {

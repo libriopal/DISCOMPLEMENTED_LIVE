@@ -19,7 +19,11 @@
  */
 import { z } from 'zod';
 import { GenerationError } from '@bicameral/shared/errors';
-import type { ProjectBrief, ResearchFindings } from '@bicameral/shared/types';
+import type {
+  ProjectBrief,
+  ResearchFindings,
+  SubscriptionTier,
+} from '@bicameral/shared';
 import type { ChatMessage } from '@bicameral/cohere/chat';
 import { callAgentModel, selectModel } from '../../lib/cohere.js';
 import { verifyDependency } from '../../lib/youcom-research.js';
@@ -111,7 +115,7 @@ export async function runVerifier(
   env: Env,
   feedback?: string | null,
   projectId?: string | null,
-  tier?: 'free' | 'pro' | 'team' | 'enterprise'
+  tier?: SubscriptionTier
 ): Promise<{
   verification: VerificationResult;
   tokensIn: number;

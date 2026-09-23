@@ -56,14 +56,22 @@
  */
 
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  realpathSync,
+  writeFileSync,
+} from 'node:fs';
 import { resolve, dirname, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   auditorEndpoint,
   auditorKey,
   auditorModel,
+  auditorRecipient,
   postChatCompletion,
+  AUDITOR_ENV_VARS,
   AUDITOR_KEY_VAR,
   COST_USD,
 } from './auditor-provider.mjs';
@@ -362,7 +370,11 @@ Respond with JSON only:
 Empty findings array is a valid and expected answer.
 `.trim();
 
-async function callAuditor({ model, userPrompt, maxTokens = MAX_OUTPUT_TOKENS }) {
+async function callAuditor({
+  model,
+  userPrompt,
+  maxTokens = MAX_OUTPUT_TOKENS,
+}) {
   let progressDots = 0;
   const key = auditorKey();
   if (!key) {
@@ -523,7 +535,12 @@ async function callAuditor({ model, userPrompt, maxTokens = MAX_OUTPUT_TOKENS })
     };
   }
 
-  return { outcome: 'completed', parsed, durationMs: Date.now() - started, usage };
+  return {
+    outcome: 'completed',
+    parsed,
+    durationMs: Date.now() - started,
+    usage,
+  };
 }
 
 /**
@@ -667,9 +684,23 @@ async function main() {
   // choosing to send this repository's source to a third party, and that
   // choice should be in front of them at the moment they make it rather than
   // in a comment they read a month ago.
+  //
+  // The recipient is READ FROM THE ACTIVE PROVIDER, never written here. This
+  // line said "to NVIDIA" for the whole period after the auditor moved to
+  // Cloudflare, so the one sentence whose entire job is to tell the operator
+  // who receives their source was naming a company that received none of it.
+  //
+  // With no provider configured there is no recipient to name, and this line
+  // runs before the credential refusal below (and before --dry-run returns).
+  // Interpolating a null would print "to null" — so the no-provider case says
+  // what is actually true instead: nothing will be sent anywhere.
+  const recipient = auditorRecipient();
   console.log(
-    '\nThis run sends this repository\'s own source to NVIDIA, which is ours\n' +
-      'to disclose. It does NOT send any user\'s generated code.'
+    recipient
+      ? `\nThis run sends this repository's own source to ${recipient}, ` +
+          "which is ours\nto disclose. It does NOT send any user's generated code."
+      : '\nNo auditor credential is configured, so this run would send this ' +
+          "repository's\nsource nowhere. It never sends any user's generated code."
   );
 
   console.log(`\nmodel      ${model}`);
@@ -714,8 +745,14 @@ async function main() {
   // finding count sees zero. A precondition that is only enforced at the point
   // of use is a precondition that gets discovered late.
   if (!auditorKey()) {
+    // Names every credential that COULD have satisfied this, not just the
+    // historical one. When the auditor moved to Cloudflare this message still
+    // said only `NVIDIA_API_KEY is not set`, which sends someone setting a key
+    // to the wrong provider — and told a reader with CF_API_TOKEN exported
+    // that the refusal they were expecting had not happened at all.
     console.error(
-      `\n${AUDITOR_KEY_VAR} is not set. Refusing to start: every chunk would ` +
+      `\nNo auditor credential is set (${AUDITOR_ENV_VARS.join(', ')}). ` +
+        'Refusing to start: every chunk would ' +
         'record as unreachable and the report would contain zero findings for ' +
         'a reason that has nothing to do with the code.\n'
     );
@@ -774,9 +811,7 @@ async function main() {
     (prior?.findings ?? []).map((f) => `${f.file}:${f.summary}`)
   );
   const rank = { high: 0, medium: 1, low: 2 };
-  findings.sort(
-    (a, b) => (rank[a.severity] ?? 3) - (rank[b.severity] ?? 3)
-  );
+  findings.sort((a, b) => (rank[a.severity] ?? 3) - (rank[b.severity] ?? 3));
   for (const f of findings) f.repeat = priorKeys.has(`${f.file}:${f.summary}`);
 
   const report = {
@@ -803,7 +838,10 @@ async function main() {
   };
 
   mkdirSync(OUT_DIR, { recursive: true });
-  const outPath = resolve(OUT_DIR, `system-${sha.slice(0, 12)}-p${passNum}.json`);
+  const outPath = resolve(
+    OUT_DIR,
+    `system-${sha.slice(0, 12)}-p${passNum}.json`
+  );
   writeFileSync(outPath, JSON.stringify(report, null, 2));
 
   const bySeverity = (s) => findings.filter((f) => f.severity === s).length;
@@ -857,7 +895,10 @@ async function main() {
 // exports (partition, seamExtract, keepSpecific); an unconditional main() call
 // meant importing it started a paid audit inside the test process. That was
 // live before the key precondition made it visible.
-if (process.argv[1] && realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (
+  process.argv[1] &&
+  realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)
+) {
   main().catch((err) => {
     console.error(err);
     process.exit(1);

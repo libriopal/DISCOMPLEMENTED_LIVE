@@ -17,7 +17,15 @@ export interface User {
 }
 
 export type UserRole = 'user' | 'admin' | 'owner';
-export type SubscriptionTier = 'free' | 'pro' | 'team' | 'enterprise';
+// `nonprofit` is provisioned by GRANT, never sold. See NONPROFIT in
+// constants.ts for why it is a grant and not a discount, and
+// packages/shared/src/nonprofit.ts for eligibility.
+export type SubscriptionTier =
+  | 'free'
+  | 'pro'
+  | 'team'
+  | 'nonprofit'
+  | 'enterprise';
 
 // ============ ADMIN ============
 // Stored on users.admin_level (nullable — null means no admin access).
@@ -110,6 +118,12 @@ export interface CohereModelMap {
   free: string;
   pro: string;
   team: string;
+  // Required, not optional. generate.ts does `COHERE_MODELS[tier]`, so an
+  // absent key is `undefined` passed to the model router on a nonprofit
+  // user's FIRST generation -- a failure at the moment of first use rather
+  // than at a billing edge. Round X9 found this omission in the plan before
+  // it reached code.
+  nonprofit: string;
   enterprise: string;
   reasoning: string;
   embed: string;

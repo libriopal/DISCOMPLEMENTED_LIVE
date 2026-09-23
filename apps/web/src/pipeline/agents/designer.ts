@@ -16,7 +16,8 @@ import type {
   ProjectBrief,
   ResearchFindings,
   SystemBlueprint,
-} from '@bicameral/shared/types';
+  SubscriptionTier,
+} from '@bicameral/shared';
 import { callAgentModel, selectModel } from '../../lib/cohere.js';
 import type { ChatMessage } from '@bicameral/cohere/chat';
 import {
@@ -52,7 +53,7 @@ export async function runDesigner(
   feedback?: string | null,
   verificationConstraints?: string[] | null,
   projectId?: string | null,
-  tier?: 'free' | 'pro' | 'team' | 'enterprise'
+  tier?: SubscriptionTier
 ): Promise<{
   blueprint: SystemBlueprint;
   tokensIn: number;

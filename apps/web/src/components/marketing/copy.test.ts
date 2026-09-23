@@ -1,3 +1,4 @@
+import { TIER_SUBSCRIPTION_PRICES } from '@bicameral/shared/constants';
 import { describe, it, expect } from 'vitest';
 import { readFileSync, readdirSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
@@ -7,6 +8,7 @@ import {
   HOW_IT_WORKS,
   BOUNDARIES,
   PRICING,
+  PRICING_COPY,
   TRUST,
   FOOTER,
   NAV_LINKS,
@@ -71,6 +73,29 @@ describe('verbatim copy', () => {
       "We're building toward measured, real-world quality metrics — we'd rather show nothing than a number we can't stand behind."
     );
   });
+
+  it('pricing wording is frozen, tier by tier', () => {
+    // §2 of the audit constraints says marketing wording may not change and is
+    // "enforced by copy.test.ts". It was not: hero and how-it-works were
+    // pinned word-for-word here, pricing never was. So the pricing subtitle
+    // and tier bodies could be rewritten freely, and were — during the change
+    // that re-derived the prices, with this file edited to accept the new
+    // strings. The independent audit flagged it: any future wording change
+    // could be landed the same way, because nothing held the old words.
+    //
+    // Now something does. The NUMBERS on this section are derived and must
+    // move when the constants move; the WORDS are frozen and must not.
+    expect(PRICING.subtitle).toBe(
+      "Simple tiers while we're in early access. No surprises later."
+    );
+    expect(PRICING_COPY.free.body).toBe('Try the pipeline on a small project.');
+    expect(PRICING_COPY.pro.body).toBe(
+      'More builds, more credits, priority queue.'
+    );
+    expect(PRICING_COPY.team.body).toBe(
+      'Shared projects, higher limits, team seats.'
+    );
+  });
 });
 
 describe('no quality percentage anywhere', () => {
@@ -128,11 +153,18 @@ describe('pricing is presented as provisional', () => {
     expect(MARKETING_TSX).toContain('mkt-badge');
   });
 
-  it('lists the three tiers at the specified prices', () => {
+  it('lists every entitled tier, at prices derived from the constants', () => {
+    // Was three tiers, hardcoded. TIER_LIMITS entitled four, so `enterprise`
+    // was serveable and unbuyable; `nonprofit` was priced in the genome and
+    // existed nowhere a visitor could see. Five now, and the prices are
+    // asserted against the governing constants rather than retyped here --
+    // a test that hardcodes the number it checks is a second copy of it.
     expect(PRICING.tiers.map((t) => [t.name, t.price])).toEqual([
       ['Free', '$0'],
-      ['Pro', '$29/mo'],
-      ['Team', '$99/mo'],
+      ['Pro', `$${TIER_SUBSCRIPTION_PRICES.pro.priceUsdCents / 100}/mo`],
+      ['Team', `$${TIER_SUBSCRIPTION_PRICES.team.priceUsdCents / 100}/mo`],
+      ['Nonprofit', 'Free, by grant'],
+      ['Enterprise', 'Talk to us'],
     ]);
   });
 
@@ -189,9 +221,16 @@ describe('links', () => {
     }
   });
 
-  it('anchors every nav link to a section that exists', () => {
+  it('anchors every nav link to a section that exists, or routes it', () => {
+    // Two kinds of link now. An in-page anchor must have a section to land on;
+    // a route (`/compliance`) must not be checked for one, and conflating them
+    // would either fail a valid link or stop checking the anchors at all.
     for (const link of NAV_LINKS) {
-      expect(MARKETING_TSX).toContain(`id="${link.href.slice(1)}"`);
+      if (link.href.startsWith('#')) {
+        expect(MARKETING_TSX).toContain(`id="${link.href.slice(1)}"`);
+      } else {
+        expect(link.href).toMatch(/^\/[a-z0-9-]+$/);
+      }
     }
   });
 });

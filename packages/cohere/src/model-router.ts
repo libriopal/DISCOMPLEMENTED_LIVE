@@ -56,7 +56,7 @@
  * R7B (command-r7b-12-2024, 7B params) is NEVER assigned to the Coder — it
  * produces 25-byte stub files instead of real code.
  */
-import type { AgentRole } from '@bicameral/shared';
+import type { AgentRole, SubscriptionTier } from '@bicameral/shared';
 import { resolveAuditorModel } from './auditor-model.js';
 
 export type PipelineComplexity = 'simple' | 'moderate' | 'complex';
@@ -123,7 +123,7 @@ export function quotaFallbackModel(model: string): string | null {
 export function selectModel(
   step: AgentRole,
   complexity: PipelineComplexity = 'simple',
-  tier?: 'free' | 'pro' | 'team' | 'enterprise',
+  tier?: SubscriptionTier,
   env?: AuditorModelEnv
 ): string {
   // The auditor is resolved before the tier branch, not inside it. Enterprise
@@ -200,7 +200,7 @@ function selectModelInner(
  */
 export function getThinkingConfig(
   role: string,
-  tier: 'free' | 'pro' | 'team' | 'enterprise' = 'free',
+  tier: SubscriptionTier = 'free',
   model: string = WORKHORSE_MODEL
 ): { type: 'enabled'; tokenBudget: number } | { type: 'disabled' } | undefined {
   if (!REASONING_MODELS.has(model)) return undefined;

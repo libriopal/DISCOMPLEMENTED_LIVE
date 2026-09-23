@@ -23,7 +23,12 @@ export interface EntitlementCheck {
   level: number;
 }
 
-const PAID_TIERS = ['pro', 'team', 'enterprise'];
+// `nonprofit` is ENTITLED like a paid tier and BILLED like nothing. It is
+// granted, not sold, so it never appears in TIER_SUBSCRIPTION_PRICES -- but a
+// granted nonprofit must get the team product, which means every entitlement
+// check that asks "has this user paid?" has to answer yes for them. Omitting
+// it here would have silently degraded granted accounts to free-tier limits.
+const PAID_TIERS = ['pro', 'team', 'nonprofit', 'enterprise'];
 
 /**
  * Check entitlement for a user+feature using 6-level precedence:
@@ -46,7 +51,8 @@ export async function checkEntitlement(
     .first<{ is_banned: number; tier: string }>();
 
   if (!user) return { access: 'deny', reason: 'user_not_found', level: 1 };
-  if (user.is_banned) return { access: 'deny', reason: 'ACCOUNT_HARD_BLOCK', level: 1 };
+  if (user.is_banned)
+    return { access: 'deny', reason: 'ACCOUNT_HARD_BLOCK', level: 1 };
 
   // Levels 2-4: Check explicit entitlement
   const ent = await db
@@ -114,7 +120,17 @@ export async function setEntitlement(
         `INSERT INTO entitlements (id, user_id, feature, access, reason, actor_type, actor_id, created_date, updated_date)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
       )
-      .bind(crypto.randomUUID(), userId, feature, access, reason, actorType, actorId, now, now)
+      .bind(
+        crypto.randomUUID(),
+        userId,
+        feature,
+        access,
+        reason,
+        actorType,
+        actorId,
+        now,
+        now
+      )
       .run();
   }
 }
@@ -150,7 +166,15 @@ export async function autoGrantIfEligible(
 
   if (check.level === 5 && check.access === 'allow') {
     // Already allowed by tier policy — grant explicit entitlement
-    await setEntitlement(db, userId, feature, 'allow', 'tier_policy', 'system', 'auto_grant');
+    await setEntitlement(
+      db,
+      userId,
+      feature,
+      'allow',
+      'tier_policy',
+      'system',
+      'auto_grant'
+    );
     return true;
   }
 

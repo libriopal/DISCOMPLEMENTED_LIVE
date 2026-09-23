@@ -22,6 +22,7 @@ import {
   type SimulationSnapshot,
 } from './simulation-watchdog.js';
 import { selfChecks } from '../routes/compliance.js';
+import { TIER_LIMITS } from '@bicameral/shared/constants';
 
 /**
  * Handle a scheduled cron event by routing to the correct handler.
@@ -66,15 +67,42 @@ export async function handleCron(
  * Daily at 3 AM UTC: credit reset + audit log archival.
  */
 async function handleDailyCreditReset(env: Env): Promise<void> {
-  // Reset monthly credits for paying users
+  // THE GRANT IS DERIVED, NEVER RESTATED.
+  //
+  // This is the code that actually issues credits, and it was the one thing
+  // the pricing fix did not touch. TIER_LIMITS was cut to solvent numbers
+  // (pro 50,000 -> 1,000) while this statement went on paying the old ones
+  // out of three hardcoded literals. The independent auditor caught it on the
+  // commit that claimed to have fixed the revenue, and it was right: a Pro
+  // subscriber would have been granted 50,000 credits on the next cycle —
+  // 2,000 apps, $570 of delivery cost against $29 of revenue — which is
+  // exactly the insolvency the change was written to close.
+  //
+  // pricing-solvency.test.ts did not catch it, because it re-derived from
+  // TIER_LIMITS.creditsPerMonth and asserted that the constant was
+  // affordable. The constant was. Nothing paid it out. A test that measures
+  // the number instead of the payout reports the same green either way, so
+  // the payout is now BUILT from the same constant the test reads: there is
+  // one number, and this is the only place it becomes SQL.
+  //
+  // The tier list is derived for the same reason. `tier IN ('pro','team',
+  // 'enterprise')` silently excluded nonprofit, so a granted nonprofit
+  // account would never have been topped up at all.
+  const grantedTiers = (
+    Object.keys(TIER_LIMITS) as (keyof typeof TIER_LIMITS)[]
+  ).filter((t) => t !== 'free');
+
+  const cases = grantedTiers
+    .map((t) => `WHEN tier = '${t}' THEN ${TIER_LIMITS[t].creditsPerMonth}`)
+    .join('\n      ');
+  const tierList = grantedTiers.map((t) => `'${t}'`).join(', ');
+
   await env.DB.prepare(
     `UPDATE users SET credits_remaining = CASE
-      WHEN tier = 'pro' THEN 50000
-      WHEN tier = 'team' THEN 200000
-      WHEN tier = 'enterprise' THEN 1000000
+      ${cases}
       ELSE credits_remaining
     END
-    WHERE tier IN ('pro', 'team', 'enterprise')`
+    WHERE tier IN (${tierList})`
   ).run();
 
   // Archive old audit logs (older than 90 days)
