@@ -46,6 +46,23 @@ export interface AuthVariables {
  * charged it.
  */
 export const INTERNAL_DELEGATION_HEADER = 'x-bicameral-internal-delegation';
+
+/**
+ * Set on the RESPONSE when, and only when, the marker above was honoured.
+ *
+ * The MCP dispatcher needs to know whether its delegation actually took effect
+ * — a per-isolate nonce that failed to match means the caller just paid twice.
+ * The first version inferred it from `X-Rate-Limit-Remaining` being `-1`, and
+ * the independent auditor pointed out that this is sound only while the bearer
+ * path is the exclusive setter of that header. Nothing enforced that, and the
+ * natural future change (rate-limiting cookie sessions too) would have turned
+ * the detector into a false alarm on every session-authenticated tool call.
+ *
+ * So the acknowledgement is its own header and carries no other meaning. The
+ * question "was my marker honoured" is now answered by a header that exists for
+ * no other reason, instead of being inferred from one that does other work.
+ */
+export const DELEGATION_ACK_HEADER = 'x-bicameral-delegation-honored';
 export const INTERNAL_DELEGATION_NONCE = crypto.randomUUID();
 
 export const requireAuth = createMiddleware<{
@@ -80,6 +97,7 @@ export const requireAuth = createMiddleware<{
     }
 
     c.header('X-Rate-Limit-Remaining', String(rateLimit.remaining));
+    if (delegated) c.header(DELEGATION_ACK_HEADER, '1');
     c.header('X-Credits-Remaining', String(lookup.creditsRemaining));
     c.set('userId', lookup.userId);
     c.set('tier', lookup.tier);

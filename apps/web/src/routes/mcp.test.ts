@@ -20,6 +20,7 @@
 import { describe, it, expect } from 'vitest';
 import { Hono } from 'hono';
 import {
+  DELEGATION_ACK_HEADER,
   INTERNAL_DELEGATION_HEADER,
   INTERNAL_DELEGATION_NONCE,
 } from '../lib/require-auth.js';
@@ -434,48 +435,79 @@ describe('id: null is one consistent rejection, not a split', () => {
 
 describe('a double charge is detected, not assumed away', () => {
   /*
-   * The guard that replaced one that could not fail. An earlier commit branded
-   * the fetcher with a `unique symbol` and claimed a cross-isolate fetcher
-   * "fails to compile"; the independent auditor pointed out that the branding
-   * function was an identity cast which would brand `env.SELF.fetch` just as
-   * happily. A guard that cannot return a negative result is decoration, so it
-   * was deleted and replaced with this, which observes the delegated response.
+   * The guard that replaced two that could not do the job. v1 was a type brand
+   * the auditor showed was an identity cast; v2 inferred the answer from
+   * `X-Rate-Limit-Remaining`, which the auditor showed was sound only while the
+   * bearer path was that header's exclusive setter — an unverified claim about
+   * another file. v3 asks a question with one source of truth: a header
+   * `requireAuth` sets for no other reason.
    */
-  const withHeader = (value: string | null) => ({
-    headers: { get: () => value },
+  const ack = (present: boolean) => ({
+    headers: {
+      get: (n: string) => (n === DELEGATION_ACK_HEADER && present ? '1' : null),
+    },
   });
 
-  it('no fault when the skip took effect', () => {
-    expect(assertChargedOnce(withHeader('-1'))).toBeNull();
+  it('no fault when the delegation was acknowledged', () => {
+    expect(assertChargedOnce(ack(true), true)).toBeNull();
   });
 
-  it('no fault when requireAuth did not run at all', () => {
-    // A public route such as /api/healthz sets no such header. Asserting here
-    // would be the vacuous control — perturbing something the system ignores.
-    expect(assertChargedOnce(withHeader(null))).toBeNull();
+  it('no fault on an unauthenticated call, where nothing was charged', () => {
+    // A public route such as /api/healthz never reaches the bearer path. Firing
+    // here would be the vacuous control — perturbing something the system
+    // correctly ignores, and warning a caller about a charge that never happened.
+    expect(assertChargedOnce(ack(false), false)).toBeNull();
   });
 
-  it('NEGATIVE CONTROL: a real remaining count IS the double charge', () => {
+  it('NEGATIVE CONTROL: authenticated with no acknowledgement IS the fault', () => {
     /*
-     * The case the whole mechanism exists for. `X-Rate-Limit-Remaining: 499`
-     * means `checkRateLimit` ran on the delegated request, which means the
-     * marker did not reach it, which means this tool call cost two tokens.
+     * The case the mechanism exists for: the marker did not reach the
+     * middleware, so `checkRateLimit` ran on the delegated request too and the
+     * caller paid twice for one tool call.
      */
-    const fault = assertChargedOnce(withHeader('499'));
+    const fault = assertChargedOnce(ack(false), true);
     expect(fault).toContain('CHARGED TWICE');
     expect(fault).toContain('different isolate');
   });
 
+  it('NEGATIVE CONTROL: no other header can stand in for the acknowledgement', () => {
+    /*
+     * v2's defect, pinned so it cannot come back. A response carrying a real
+     * rate-limit count and no acknowledgement is still a fault; a response
+     * carrying the acknowledgement is still fine whatever else it says. The
+     * detector must read one header and only one.
+     */
+    const withRateLimitOnly = {
+      headers: {
+        get: (n: string) => (n === 'X-Rate-Limit-Remaining' ? '499' : null),
+      },
+    };
+    expect(assertChargedOnce(withRateLimitOnly, true)).toContain(
+      'CHARGED TWICE'
+    );
+
+    const withBoth = {
+      headers: {
+        get: (n: string) =>
+          n === DELEGATION_ACK_HEADER
+            ? '1'
+            : n === 'X-Rate-Limit-Remaining'
+              ? '499'
+              : null,
+      },
+    };
+    expect(assertChargedOnce(withBoth, true)).toBeNull();
+  });
+
   it('the fault reaches the caller, not just the log', async () => {
-    const seen: Request[] = [];
-    const fetcher: McpFetcher = async (req) => {
-      seen.push(req);
-      return new Response('{}', {
+    const fetcher: McpFetcher = async () =>
+      new Response('{}', {
         status: 200,
         headers: { 'X-Rate-Limit-Remaining': '499' },
       });
-    };
-    const { json } = await rpc(server(fetcher), call('site_health'));
+    const { json } = await rpc(server(fetcher), call('site_health'), {
+      authorization: 'Bearer vk_test_key',
+    });
     const texts = json.result.content.map((c: any) => c.text).join(' ');
     expect(texts).toContain('CHARGED TWICE');
     // The tool call still succeeded. An over-charge is not a reason to throw

@@ -41,6 +41,7 @@ import { Hono } from 'hono';
 import type { Env } from '../env.js';
 import type { AuthVariables } from '../lib/require-auth.js';
 import {
+  DELEGATION_ACK_HEADER,
   INTERNAL_DELEGATION_HEADER,
   INTERNAL_DELEGATION_NONCE,
 } from '../lib/require-auth.js';
@@ -392,7 +393,7 @@ export async function dispatch(
   return {
     status: res.status,
     text: await res.text(),
-    fault: assertChargedOnce(res),
+    fault: assertChargedOnce(res, auth !== null),
   };
 }
 
@@ -426,41 +427,51 @@ function safeCtx(c: {
 /**
  * Did the delegated request actually skip the rate-limit charge?
  *
- * THIS IS THE REPLACEMENT FOR A GUARD THAT COULD NOT FAIL. The rate-limit
- * marker in `lib/require-auth.ts` is a per-isolate nonce, so if the delegated
- * request were ever served by a DIFFERENT isolate — a networked self-fetch, a
- * service binding — the nonce would not match, `checkRateLimit` would run a
- * second time, and one tool call would silently cost two tokens again.
+ * THIS IS THE THIRD VERSION AND THE FIRST ONE THAT RESTS ON NOTHING.
  *
- * `requireAuth` sets `X-Rate-Limit-Remaining` on every bearer-authenticated
- * response, and sets it to `-1` exactly when it honoured the marker. So the
- * question "did the skip take effect" has an observable answer in the response
- * itself, and it does not depend on trusting anything about the caller:
+ * v1 was a `sameIsolate()` type brand. The auditor showed it was an identity
+ * cast that would brand `env.SELF.fetch` just as happily — a guard that cannot
+ * return a negative result is decoration.
  *
- *   header absent      → requireAuth's bearer path did not run (a public route
- *                        such as /api/healthz, or a cookie session). Nothing to
- *                        check, and asserting here would be the vacuous control.
- *   header === '-1'    → the marker was honoured. Charged once. Correct.
- *   anything else      → the marker did NOT reach the middleware that matters.
- *                        The caller has just been charged twice for one tool
- *                        call, and this is the only place that can notice.
+ * v2 read `X-Rate-Limit-Remaining` and treated "present and not -1" as proof of
+ * a double charge. The auditor showed that this is sound only while the bearer
+ * path is the EXCLUSIVE setter of that header, which nothing enforced: rate-
+ * limiting cookie sessions later — the natural change — would have produced a
+ * `console.error` and a spurious "your budget is burning twice as fast" warning
+ * on every session-authenticated tool call. The detector's only defence was an
+ * unverified claim about code outside its own file.
+ *
+ * v3 asks a question with exactly one possible source of truth.
+ * `requireAuth` sets `DELEGATION_ACK_HEADER` when, and only when, it honoured
+ * the marker; the header exists for no other purpose and no other code path
+ * sets it. So:
+ *
+ *   ack present  → the marker was honoured. Charged once. Correct.
+ *   ack absent   → either the marker never reached the middleware (a different
+ *                  isolate: the caller has paid twice) or the delegated route
+ *                  is public and `requireAuth` never ran (nothing was charged
+ *                  at all). Those are distinguished by whether the outgoing
+ *                  request was authenticated, which is the caller's own header
+ *                  and is known here.
  *
  * Returns the fault, or null. It does not throw: the tool CALL succeeded and its
  * result is real, so discarding it would turn an over-charge into a total
  * failure. The fault is reported alongside the result instead.
  */
-export function assertChargedOnce(res: {
-  headers: { get(name: string): string | null };
-}): string | null {
-  const remaining = res.headers.get('X-Rate-Limit-Remaining');
-  if (remaining === null || remaining === '-1') return null;
+export function assertChargedOnce(
+  res: { headers: { get(name: string): string | null } },
+  wasAuthenticated: boolean
+): string | null {
+  if (!wasAuthenticated) return null;
+  if (res.headers.get(DELEGATION_ACK_HEADER) !== null) return null;
   return (
-    'RATE LIMIT CHARGED TWICE. The delegated request did not carry an ' +
-    'effective delegation marker, which means it was served by a different ' +
-    'isolate than the one that handled /mcp. Every MCP tool call is now ' +
-    "costing two tokens from the caller's hourly budget. See " +
-    'INTERNAL_DELEGATION_NONCE in lib/require-auth.ts — the fetcher passed to ' +
-    'createMcpRoutes must run in this isolate.'
+    'RATE LIMIT MAY HAVE BEEN CHARGED TWICE. The delegated request came back ' +
+    'without a delegation acknowledgement, which means the per-isolate marker ' +
+    'did not reach the auth middleware — most likely because the delegated ' +
+    'request was served by a different isolate than the one handling /mcp. If ' +
+    "so, every MCP tool call is costing two tokens from the caller's hourly " +
+    'budget. See INTERNAL_DELEGATION_NONCE in lib/require-auth.ts: the fetcher ' +
+    'passed to createMcpRoutes must run in this isolate.'
   );
 }
 

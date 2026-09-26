@@ -20,6 +20,7 @@ import {
   requireAuth,
   INTERNAL_DELEGATION_HEADER,
   INTERNAL_DELEGATION_NONCE,
+  DELEGATION_ACK_HEADER,
   type AuthVariables,
 } from './require-auth.js';
 
@@ -142,5 +143,41 @@ describe('rate limiting is charged once per caller request', () => {
       [INTERNAL_DELEGATION_HEADER]: INTERNAL_DELEGATION_NONCE,
     });
     expect(res.status).toBeGreaterThanOrEqual(400);
+  });
+});
+
+describe('the delegation acknowledgement is set only when it is true', () => {
+  /*
+   * Added because two mutants survived. `routes/mcp.test.ts` asserts the
+   * DETECTOR reads this header correctly; nothing asserted that `requireAuth`
+   * SETS it correctly, so deleting the line — or setting it unconditionally —
+   * left all 38 tests green. Both mutations break the detector completely: with
+   * the header never set, every authenticated tool call warns about a double
+   * charge that is not happening; set unconditionally, a real double charge goes
+   * unreported forever. The detector is only as good as this one line, and this
+   * is the test of that line.
+   */
+  it('a delegated request comes back acknowledged', async () => {
+    const res = await app(db().stub)({
+      ...KEY,
+      [INTERNAL_DELEGATION_HEADER]: INTERNAL_DELEGATION_NONCE,
+    });
+    expect(res.headers.get(DELEGATION_ACK_HEADER)).toBe('1');
+  });
+
+  it('NEGATIVE CONTROL: an ordinary request does NOT come back acknowledged', async () => {
+    // The half that matters more. An acknowledgement on a request that WAS
+    // charged tells the dispatcher everything is fine while the caller pays
+    // twice -- the failure the whole mechanism exists to notice, made invisible.
+    const res = await app(db().stub)(KEY);
+    expect(res.headers.get(DELEGATION_ACK_HEADER)).toBeNull();
+  });
+
+  it('NEGATIVE CONTROL: a forged marker is not acknowledged either', async () => {
+    const res = await app(db().stub)({
+      ...KEY,
+      [INTERNAL_DELEGATION_HEADER]: 'guessed',
+    });
+    expect(res.headers.get(DELEGATION_ACK_HEADER)).toBeNull();
   });
 });
