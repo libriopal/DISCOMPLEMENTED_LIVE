@@ -28,30 +28,21 @@ import {
   MCP_TOOLS,
   MCP_REACHABLE,
   MCP_PROTOCOL_VERSION,
-  sameIsolate,
+  assertChargedOnce,
   type McpFetcher,
-  type McpFetcherFn,
 } from './mcp.js';
 
 /** A fetcher that records what was asked of it and answers with a sentinel. */
 function recorder(body: unknown = { ok: true }, status = 200) {
   const seen: Request[] = [];
-  /*
-   * `sameIsolate` is the brand the mount point must apply, and applying it here
-   * is honest: this fetcher IS an in-process call. The brand exists so that a
-   * future cross-isolate fetcher — `env.SELF.fetch`, a service binding — cannot
-   * be passed without deleting this call, which would show in a diff. A test
-   * fetcher is same-isolate by construction, which is exactly why the brand
-   * cannot be checked here and has to be checked at the mount.
-   */
-  const fn: McpFetcherFn = async (req) => {
+  const fn: McpFetcher = async (req) => {
     seen.push(req);
     return new Response(JSON.stringify(body), {
       status,
       headers: { 'content-type': 'application/json' },
     });
   };
-  return { seen, fetcher: sameIsolate(fn) };
+  return { seen, fetcher: fn };
 }
 
 function server(fetcher: McpFetcher) {
@@ -438,5 +429,57 @@ describe('id: null is one consistent rejection, not a split', () => {
     });
     expect(res.status).toBe(202);
     expect(await res.text()).toBe('');
+  });
+});
+
+describe('a double charge is detected, not assumed away', () => {
+  /*
+   * The guard that replaced one that could not fail. An earlier commit branded
+   * the fetcher with a `unique symbol` and claimed a cross-isolate fetcher
+   * "fails to compile"; the independent auditor pointed out that the branding
+   * function was an identity cast which would brand `env.SELF.fetch` just as
+   * happily. A guard that cannot return a negative result is decoration, so it
+   * was deleted and replaced with this, which observes the delegated response.
+   */
+  const withHeader = (value: string | null) => ({
+    headers: { get: () => value },
+  });
+
+  it('no fault when the skip took effect', () => {
+    expect(assertChargedOnce(withHeader('-1'))).toBeNull();
+  });
+
+  it('no fault when requireAuth did not run at all', () => {
+    // A public route such as /api/healthz sets no such header. Asserting here
+    // would be the vacuous control — perturbing something the system ignores.
+    expect(assertChargedOnce(withHeader(null))).toBeNull();
+  });
+
+  it('NEGATIVE CONTROL: a real remaining count IS the double charge', () => {
+    /*
+     * The case the whole mechanism exists for. `X-Rate-Limit-Remaining: 499`
+     * means `checkRateLimit` ran on the delegated request, which means the
+     * marker did not reach it, which means this tool call cost two tokens.
+     */
+    const fault = assertChargedOnce(withHeader('499'));
+    expect(fault).toContain('CHARGED TWICE');
+    expect(fault).toContain('different isolate');
+  });
+
+  it('the fault reaches the caller, not just the log', async () => {
+    const seen: Request[] = [];
+    const fetcher: McpFetcher = async (req) => {
+      seen.push(req);
+      return new Response('{}', {
+        status: 200,
+        headers: { 'X-Rate-Limit-Remaining': '499' },
+      });
+    };
+    const { json } = await rpc(server(fetcher), call('site_health'));
+    const texts = json.result.content.map((c: any) => c.text).join(' ');
+    expect(texts).toContain('CHARGED TWICE');
+    // The tool call still succeeded. An over-charge is not a reason to throw
+    // away a result the caller has already paid for -- twice.
+    expect(json.result.isError).toBe(false);
   });
 });

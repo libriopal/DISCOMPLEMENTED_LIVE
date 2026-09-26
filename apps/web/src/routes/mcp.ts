@@ -62,48 +62,28 @@ export interface McpExecutionContext {
 }
 
 /**
- * A brand that can only be applied by calling `sameIsolate()`.
+ * WHY THERE IS NO `sameIsolate()` BRAND HERE ANY MORE.
  *
- * WHY A BRAND AND NOT A COMMENT. The independent auditor's finding on the
- * rate-limit fix: `INTERNAL_DELEGATION_NONCE` is generated once per isolate, so
- * if the delegated request were ever served by a DIFFERENT isolate — a real
- * network self-fetch, `env.SELF.fetch`, a service binding — the marker would not
- * match, `checkRateLimit` would run again, and one tool call would cost two
- * tokens exactly as it did before the fix. With no error, no log, and no test
- * failing, because the test fetcher is same-isolate by construction.
+ * There was one, for exactly one commit. `McpFetcher` carried a `unique symbol`
+ * that only `sameIsolate()` could apply, and the commit claimed that swapping in
+ * a cross-isolate fetcher "fails to compile until the brand is removed
+ * deliberately". The independent auditor read it and said, correctly, that the
+ * claim was false: `sameIsolate()` was an exported identity cast that brands
+ * ANY function, so `sameIsolate((req, env) => env.SELF.fetch(req))` typechecks
+ * cleanly and the silent regression it existed to prevent survived untouched.
+ * It relocated a human decision from "delete this call" to "wrap in this call",
+ * both equally invisible in a diff.
  *
- * The failure is fail-CLOSED — the worst case is the old double charge, never a
- * bypass — so this is a correctness fragility rather than a security hole. What
- * makes it worth a type is that it would be SILENT, and silent regression of a
- * fix is the thing this codebase keeps being bitten by.
- *
- * So the fetcher must be branded, and the brand can only be obtained from
- * `sameIsolate()`, whose whole body is a comment saying what the caller is
- * promising. Switching to a cross-isolate fetcher now means deleting that call,
- * which shows up in a diff and fails to compile until someone does it
- * deliberately.
+ * A guard that cannot fail is decoration. It was deleted rather than
+ * strengthened, and replaced with something that can actually return a negative
+ * result: `assertChargedOnce()` below, which OBSERVES the delegated response
+ * rather than asking the type system to promise something about the caller.
  */
-declare const SAME_ISOLATE: unique symbol;
-
-/**
- * Assert that this fetcher runs the delegated request IN THIS ISOLATE.
- *
- * The caller is promising that the function is an in-process call — `app.fetch`
- * is a plain function, so handing it here is true today. It is NOT true for
- * `fetch()`, `env.SELF.fetch()` or a service binding, and passing one of those
- * would silently restore the double-charge this brand exists to protect.
- */
-export function sameIsolate(f: McpFetcherFn): McpFetcher {
-  return f as McpFetcher;
-}
-
-export type McpFetcherFn = (
+export type McpFetcher = (
   req: Request,
   env: Env,
   ctx: McpExecutionContext
 ) => Response | Promise<Response>;
-
-export type McpFetcher = McpFetcherFn & { readonly [SAME_ISOLATE]: true };
 
 /** JSON-RPC 2.0, the subset this server speaks. */
 interface RpcRequest {
@@ -345,7 +325,7 @@ export async function dispatch(
   env: Env,
   ctx: McpExecutionContext,
   fetcher: McpFetcher
-): Promise<{ status: number; text: string }> {
+): Promise<{ status: number; text: string; fault: string | null }> {
   const path = tool.path(args);
 
   if (!REACHABLE.some((p) => path === p || path.startsWith(p + '/'))) {
@@ -354,6 +334,7 @@ export async function dispatch(
     // that looks like a missing route.
     return {
       status: 403,
+      fault: null,
       text: JSON.stringify({
         error:
           `tool '${tool.name}' resolved to ${path}, which is outside the ` +
@@ -408,7 +389,11 @@ export async function dispatch(
     env,
     ctx
   );
-  return { status: res.status, text: await res.text() };
+  return {
+    status: res.status,
+    text: await res.text(),
+    fault: assertChargedOnce(res),
+  };
 }
 
 /**
@@ -436,6 +421,47 @@ function safeCtx(c: {
   } catch {
     return { waitUntil() {}, passThroughOnException() {} };
   }
+}
+
+/**
+ * Did the delegated request actually skip the rate-limit charge?
+ *
+ * THIS IS THE REPLACEMENT FOR A GUARD THAT COULD NOT FAIL. The rate-limit
+ * marker in `lib/require-auth.ts` is a per-isolate nonce, so if the delegated
+ * request were ever served by a DIFFERENT isolate — a networked self-fetch, a
+ * service binding — the nonce would not match, `checkRateLimit` would run a
+ * second time, and one tool call would silently cost two tokens again.
+ *
+ * `requireAuth` sets `X-Rate-Limit-Remaining` on every bearer-authenticated
+ * response, and sets it to `-1` exactly when it honoured the marker. So the
+ * question "did the skip take effect" has an observable answer in the response
+ * itself, and it does not depend on trusting anything about the caller:
+ *
+ *   header absent      → requireAuth's bearer path did not run (a public route
+ *                        such as /api/healthz, or a cookie session). Nothing to
+ *                        check, and asserting here would be the vacuous control.
+ *   header === '-1'    → the marker was honoured. Charged once. Correct.
+ *   anything else      → the marker did NOT reach the middleware that matters.
+ *                        The caller has just been charged twice for one tool
+ *                        call, and this is the only place that can notice.
+ *
+ * Returns the fault, or null. It does not throw: the tool CALL succeeded and its
+ * result is real, so discarding it would turn an over-charge into a total
+ * failure. The fault is reported alongside the result instead.
+ */
+export function assertChargedOnce(res: {
+  headers: { get(name: string): string | null };
+}): string | null {
+  const remaining = res.headers.get('X-Rate-Limit-Remaining');
+  if (remaining === null || remaining === '-1') return null;
+  return (
+    'RATE LIMIT CHARGED TWICE. The delegated request did not carry an ' +
+    'effective delegation marker, which means it was served by a different ' +
+    'isolate than the one that handled /mcp. Every MCP tool call is now ' +
+    "costing two tokens from the caller's hourly budget. See " +
+    'INTERNAL_DELEGATION_NONCE in lib/require-auth.ts — the fetcher passed to ' +
+    'createMcpRoutes must run in this isolate.'
+  );
 }
 
 function rpcError(id: RpcRequest['id'], code: number, message: string) {
@@ -620,7 +646,7 @@ async function handle(
       }
 
       try {
-        const { status, text } = await dispatch(
+        const { status, text, fault } = await dispatch(
           tool,
           args,
           req,
@@ -628,6 +654,13 @@ async function handle(
           ctx,
           fetcher
         );
+        if (fault) {
+          // Loud, in two directions at once. `console.error` reaches the Worker
+          // log where an operator sees it; the extra content block reaches the
+          // model, which can stop spending a budget it is burning twice as fast
+          // as anything told it.
+          console.error(`[mcp] ${fault}`);
+        }
         /*
          * A FAILING ROUTE IS A TOOL RESULT, NOT A PROTOCOL ERROR.
          *
@@ -638,7 +671,12 @@ async function handle(
          * a client retries an unpayable generation until the rate limit bites.
          */
         return rpcResult(id, {
-          content: [{ type: 'text', text }],
+          content: fault
+            ? [
+                { type: 'text', text },
+                { type: 'text', text: `WARNING: ${fault}` },
+              ]
+            : [{ type: 'text', text }],
           isError: status >= 400,
         });
       } catch (err) {

@@ -35,7 +35,7 @@ import { eiccaRoutes, eiccaWebhookRoutes } from './routes/eicca.js';
 import { glassEngineRoutes } from './routes/glass-engine.js';
 import { vdrRoutes } from './routes/vdr.js';
 import { simulationIngestRoutes } from './routes/simulation-ingest.js';
-import { createMcpRoutes, sameIsolate } from './routes/mcp.js';
+import { createMcpRoutes } from './routes/mcp.js';
 import { simulationRoutes } from './routes/simulation.js';
 import { entitlementsRoutes } from './routes/entitlements.js';
 import { tripwiresRoutes } from './routes/tripwires.js';
@@ -211,13 +211,19 @@ app.route(
   '/mcp',
   createMcpRoutes(
     /*
-     * `sameIsolate` is a promise, made in the one place that can make it: the
-     * delegated request is run by `app.fetch`, which is a plain function call
-     * in this isolate — not `fetch()`, not `env.SELF.fetch()`, not a service
-     * binding. The rate-limit marker in lib/require-auth.ts is a per-isolate
-     * nonce, so a cross-isolate fetcher would silently restore the double
-     * charge it exists to prevent. Swapping this for a networked fetcher now
-     * fails to compile until the brand is removed deliberately.
+     * `app.fetch` is a plain function call in THIS isolate — not `fetch()`, not
+     * `env.SELF.fetch()`, not a service binding. That matters because the
+     * rate-limit marker in lib/require-auth.ts is a per-isolate nonce, and a
+     * cross-isolate fetcher would silently restore the double charge it exists
+     * to prevent.
+     *
+     * No type can enforce that, and an earlier attempt to pretend otherwise was
+     * caught by the independent auditor: a `sameIsolate()` brand was an identity
+     * cast that would happily brand `env.SELF.fetch` too. What catches it now is
+     * `assertChargedOnce()` in routes/mcp.ts, which reads the delegated
+     * response's own `X-Rate-Limit-Remaining` and reports a fault when the skip
+     * did not take effect. An observation that can return a negative result,
+     * rather than a promise that cannot.
      *
      * The cast is the one this file owes: `ExecutionContext` from
      * workers-types is generic and Hono's `c.executionCtx` is a different
@@ -225,7 +231,7 @@ app.route(
      * of the two collapses. routes/mcp.ts types the context by the surface it
      * actually uses (nothing), and the mismatch is resolved once, here.
      */
-    sameIsolate((req, env, ctx) => app.fetch(req, env, ctx as ExecutionContext))
+    (req, env, ctx) => app.fetch(req, env, ctx as ExecutionContext)
   )
 );
 
