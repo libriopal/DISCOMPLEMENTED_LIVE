@@ -35,7 +35,7 @@ import { eiccaRoutes, eiccaWebhookRoutes } from './routes/eicca.js';
 import { glassEngineRoutes } from './routes/glass-engine.js';
 import { vdrRoutes } from './routes/vdr.js';
 import { simulationIngestRoutes } from './routes/simulation-ingest.js';
-import { createMcpRoutes } from './routes/mcp.js';
+import { createMcpRoutes, sameIsolate } from './routes/mcp.js';
 import { simulationRoutes } from './routes/simulation.js';
 import { entitlementsRoutes } from './routes/entitlements.js';
 import { tripwiresRoutes } from './routes/tripwires.js';
@@ -209,13 +209,23 @@ app.get('/api/figma/callback', async (c) => {
 app.use('/mcp', requireAuth);
 app.route(
   '/mcp',
-  createMcpRoutes((req, env, ctx) =>
-    // The one cast. `ExecutionContext` from workers-types is generic and Hono's
-    // `c.executionCtx` is a different instantiation of it; neither is assignable
-    // to the other and a union of the two collapses. routes/mcp.ts types the
-    // context by the surface it uses (nothing), so the mismatch is resolved once,
-    // here, in sight of the call it belongs to.
-    app.fetch(req, env, ctx as ExecutionContext)
+  createMcpRoutes(
+    /*
+     * `sameIsolate` is a promise, made in the one place that can make it: the
+     * delegated request is run by `app.fetch`, which is a plain function call
+     * in this isolate — not `fetch()`, not `env.SELF.fetch()`, not a service
+     * binding. The rate-limit marker in lib/require-auth.ts is a per-isolate
+     * nonce, so a cross-isolate fetcher would silently restore the double
+     * charge it exists to prevent. Swapping this for a networked fetcher now
+     * fails to compile until the brand is removed deliberately.
+     *
+     * The cast is the one this file owes: `ExecutionContext` from
+     * workers-types is generic and Hono's `c.executionCtx` is a different
+     * instantiation of it, so neither is assignable to the other and a union
+     * of the two collapses. routes/mcp.ts types the context by the surface it
+     * actually uses (nothing), and the mismatch is resolved once, here.
+     */
+    sameIsolate((req, env, ctx) => app.fetch(req, env, ctx as ExecutionContext))
   )
 );
 

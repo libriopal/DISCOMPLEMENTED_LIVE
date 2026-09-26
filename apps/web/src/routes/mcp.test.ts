@@ -28,20 +28,30 @@ import {
   MCP_TOOLS,
   MCP_REACHABLE,
   MCP_PROTOCOL_VERSION,
+  sameIsolate,
   type McpFetcher,
+  type McpFetcherFn,
 } from './mcp.js';
 
 /** A fetcher that records what was asked of it and answers with a sentinel. */
 function recorder(body: unknown = { ok: true }, status = 200) {
   const seen: Request[] = [];
-  const fetcher: McpFetcher = async (req) => {
+  /*
+   * `sameIsolate` is the brand the mount point must apply, and applying it here
+   * is honest: this fetcher IS an in-process call. The brand exists so that a
+   * future cross-isolate fetcher — `env.SELF.fetch`, a service binding — cannot
+   * be passed without deleting this call, which would show in a diff. A test
+   * fetcher is same-isolate by construction, which is exactly why the brand
+   * cannot be checked here and has to be checked at the mount.
+   */
+  const fn: McpFetcherFn = async (req) => {
     seen.push(req);
     return new Response(JSON.stringify(body), {
       status,
       headers: { 'content-type': 'application/json' },
     });
   };
-  return { seen, fetcher };
+  return { seen, fetcher: sameIsolate(fn) };
 }
 
 function server(fetcher: McpFetcher) {

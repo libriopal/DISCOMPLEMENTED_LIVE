@@ -61,11 +61,49 @@ export interface McpExecutionContext {
   passThroughOnException(): void;
 }
 
-export type McpFetcher = (
+/**
+ * A brand that can only be applied by calling `sameIsolate()`.
+ *
+ * WHY A BRAND AND NOT A COMMENT. The independent auditor's finding on the
+ * rate-limit fix: `INTERNAL_DELEGATION_NONCE` is generated once per isolate, so
+ * if the delegated request were ever served by a DIFFERENT isolate — a real
+ * network self-fetch, `env.SELF.fetch`, a service binding — the marker would not
+ * match, `checkRateLimit` would run again, and one tool call would cost two
+ * tokens exactly as it did before the fix. With no error, no log, and no test
+ * failing, because the test fetcher is same-isolate by construction.
+ *
+ * The failure is fail-CLOSED — the worst case is the old double charge, never a
+ * bypass — so this is a correctness fragility rather than a security hole. What
+ * makes it worth a type is that it would be SILENT, and silent regression of a
+ * fix is the thing this codebase keeps being bitten by.
+ *
+ * So the fetcher must be branded, and the brand can only be obtained from
+ * `sameIsolate()`, whose whole body is a comment saying what the caller is
+ * promising. Switching to a cross-isolate fetcher now means deleting that call,
+ * which shows up in a diff and fails to compile until someone does it
+ * deliberately.
+ */
+declare const SAME_ISOLATE: unique symbol;
+
+/**
+ * Assert that this fetcher runs the delegated request IN THIS ISOLATE.
+ *
+ * The caller is promising that the function is an in-process call — `app.fetch`
+ * is a plain function, so handing it here is true today. It is NOT true for
+ * `fetch()`, `env.SELF.fetch()` or a service binding, and passing one of those
+ * would silently restore the double-charge this brand exists to protect.
+ */
+export function sameIsolate(f: McpFetcherFn): McpFetcher {
+  return f as McpFetcher;
+}
+
+export type McpFetcherFn = (
   req: Request,
   env: Env,
   ctx: McpExecutionContext
 ) => Response | Promise<Response>;
+
+export type McpFetcher = McpFetcherFn & { readonly [SAME_ISOLATE]: true };
 
 /** JSON-RPC 2.0, the subset this server speaks. */
 interface RpcRequest {
