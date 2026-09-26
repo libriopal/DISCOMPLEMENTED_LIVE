@@ -442,7 +442,8 @@ describe('a double charge is detected, not assumed away', () => {
    * another file. v3 asks a question with one source of truth: a header
    * `requireAuth` sets for no other reason.
    */
-  const ack = (present: boolean) => ({
+  const ack = (present: boolean, status = 200) => ({
+    status,
     headers: {
       get: (n: string) => (n === DELEGATION_ACK_HEADER && present ? '1' : null),
     },
@@ -478,6 +479,7 @@ describe('a double charge is detected, not assumed away', () => {
      * detector must read one header and only one.
      */
     const withRateLimitOnly = {
+      status: 200,
       headers: {
         get: (n: string) => (n === 'X-Rate-Limit-Remaining' ? '499' : null),
       },
@@ -487,6 +489,7 @@ describe('a double charge is detected, not assumed away', () => {
     );
 
     const withBoth = {
+      status: 200,
       headers: {
         get: (n: string) =>
           n === DELEGATION_ACK_HEADER
@@ -498,6 +501,20 @@ describe('a double charge is detected, not assumed away', () => {
     };
     expect(assertChargedOnce(withBoth, true)).toBeNull();
   });
+
+  for (const status of [401, 429, 500]) {
+    it(`NEGATIVE CONTROL: a ${status} is not reported as a double charge`, () => {
+      /*
+       * `requireAuth` sets the acknowledgement after `checkRateLimit` passes, so
+       * a refusal short-circuits before it. Absent-because-refused is not
+       * absent-because-wrong-isolate. The 429 case is the one that matters: a
+       * caller whose budget is exhausted was charged ZERO times, and telling
+       * them they are being charged twice is the opposite of the truth — on
+       * every call, for as long as the budget stays spent.
+       */
+      expect(assertChargedOnce(ack(false, status), true)).toBeNull();
+    });
+  }
 
   it('the fault reaches the caller, not just the log', async () => {
     const fetcher: McpFetcher = async () =>

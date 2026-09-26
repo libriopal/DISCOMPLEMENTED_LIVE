@@ -459,10 +459,26 @@ function safeCtx(c: {
  * failure. The fault is reported alongside the result instead.
  */
 export function assertChargedOnce(
-  res: { headers: { get(name: string): string | null } },
+  res: { status: number; headers: { get(name: string): string | null } },
   wasAuthenticated: boolean
 ): string | null {
   if (!wasAuthenticated) return null;
+  /*
+   * ONLY ON A SUCCESSFUL RESPONSE, and this is the auditor's fourth finding on
+   * this guard.
+   *
+   * `requireAuth` sets the acknowledgement on the success path, after
+   * `checkRateLimit` passes. A 429 (budget exhausted), a 401 (bad key) or a 5xx
+   * short-circuits before that line runs, so the ack is absent for a reason that
+   * has nothing to do with isolates. Without this check, a caller whose hourly
+   * budget was spent got told "every MCP tool call is costing two tokens" on a
+   * call that was charged ZERO times — the exact opposite of the truth, on every
+   * call, for as long as the budget stayed exhausted.
+   *
+   * An alarm that fires hardest when the system is already refusing work is
+   * worse than no alarm: it trains the operator to ignore it.
+   */
+  if (res.status >= 400) return null;
   if (res.headers.get(DELEGATION_ACK_HEADER) !== null) return null;
   return (
     'RATE LIMIT MAY HAVE BEEN CHARGED TWICE. The delegated request came back ' +
